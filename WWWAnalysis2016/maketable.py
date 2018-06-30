@@ -7,9 +7,10 @@ from QFramework import TQSampleFolder, TQXSecParser, TQCut, TQAnalysisSampleVisi
 from rooutil.qutils import *
 from errors import E
 
-#filename = "output_sf_applied.root"
-#filename = "output.root"
-filename = sys.argv[1]
+try:
+    filename = sys.argv[1]
+except:
+    filename = "output_sf_applied.root"
 
 ROOT.gROOT.SetBatch(True)
 samples = TQSampleFolder.loadSampleFolder("{}:samples".format(filename))
@@ -61,6 +62,9 @@ def addProcesses(printer, showdata, prettyversion=True):
     #    for lspmass in lspmasses:
     #        printer.addCutflowProcess("/bsm/whsusy/{}/{}".format(chimass, lspmass), "({},{})".format(chimass, lspmass))
 
+    printer.addCutflowProcess("/bsm/whsusy/200/1", "(200,1)")
+    printer.addCutflowProcess("/bsm/whsusy/200/74", "(200,74)")
+
     printer.addCutflowProcess("|", "|")
     printer.addCutflowProcess("/sig", "WWW")
     printer.addCutflowProcess("/sig/www", "non-higgs")
@@ -74,24 +78,24 @@ def addProcesses(printer, showdata, prettyversion=True):
     printer.addCutflowProcess("|", "|")
     printer.addCutflowProcess("/fake+typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep", "Bkg. w/ est.")
     printer.addCutflowProcess("|", "|")
-    printer.addCutflowProcess("/fakeup", "Fakes syst up")
-    printer.addCutflowProcess("|", "|")
-    printer.addCutflowProcess("/typebkg/?", "Bkg. (MC)")
-    printer.addCutflowProcess("/typebkg/fakes", "Fakes (MC)")
-    printer.addCutflowProcess("|", "|")
-    printer.addCutflowProcess("/typebkg/?/ttW", "ttW")
-    printer.addCutflowProcess("/typebkg/?/VBSWW", "VBSWW")
-    printer.addCutflowProcess("/typebkg/?/ttZ", "ttZ")
-    printer.addCutflowProcess("/typebkg/?/WZ", "WZ")
-    printer.addCutflowProcess("/typebkg/?/Other/top", "top")
-    printer.addCutflowProcess("/typebkg/?/Other/ttV", "tth+ttgamma")
-    printer.addCutflowProcess("/typebkg/?/Other/W", "W")
-    printer.addCutflowProcess("/typebkg/?/Other/Z", "Z")
-    printer.addCutflowProcess("/typebkg/?/Other/VV", "other diboson")
-    printer.addCutflowProcess("/typebkg/?/Other/VVV", "other triboson")
-    printer.addCutflowProcess("|", "|")
-    printer.addCutflowProcess("typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep", "Prompt")
-    printer.addCutflowProcess("$ratio(typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep, /typebkg)", "Prompt Contamination")
+    #printer.addCutflowProcess("/fakeup", "Fakes syst up")
+    #printer.addCutflowProcess("|", "|")
+    #printer.addCutflowProcess("/typebkg/?", "Bkg. (MC)")
+    #printer.addCutflowProcess("/typebkg/fakes", "Fakes (MC)")
+    #printer.addCutflowProcess("|", "|")
+    #printer.addCutflowProcess("/typebkg/?/ttW", "ttW")
+    #printer.addCutflowProcess("/typebkg/?/VBSWW", "VBSWW")
+    #printer.addCutflowProcess("/typebkg/?/ttZ", "ttZ")
+    #printer.addCutflowProcess("/typebkg/?/WZ", "WZ")
+    #printer.addCutflowProcess("/typebkg/?/Other/top", "top")
+    #printer.addCutflowProcess("/typebkg/?/Other/ttV", "tth+ttgamma")
+    #printer.addCutflowProcess("/typebkg/?/Other/W", "W")
+    #printer.addCutflowProcess("/typebkg/?/Other/Z", "Z")
+    #printer.addCutflowProcess("/typebkg/?/Other/VV", "other diboson")
+    #printer.addCutflowProcess("/typebkg/?/Other/VVV", "other triboson")
+    #printer.addCutflowProcess("|", "|")
+    #printer.addCutflowProcess("typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep", "Prompt")
+    #printer.addCutflowProcess("$ratio(typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep, /typebkg)", "Prompt Contamination")
 #    printer.addCutflowProcess("|", "|")
 #    printer.addCutflowProcess("/typebkg/?/Other/top/singletop/tzq_ll_amcnlo", "tzq")
     printer.addCutflowProcess("|", "|")
@@ -202,7 +206,7 @@ def printCutflowSSWZExtrapolation(samples, variation=""):
 ########################################################################################
 #_______________________________________________________________________________
 # Supports only printing out by process boundaries
-def print9SignalRegions(samples):
+def printTableShort(samples):
     printer = TQCutflowPrinter(samples)
     printer.addCutflowCut("SRSSeeFull", "Full Selection: SRSSee", True)
     printer.addCutflowCut("SRSSemFull", "Full Selection: SRSSem", True)
@@ -215,6 +219,13 @@ def print9SignalRegions(samples):
     printer.addCutflowCut("SR0SFOSFull", "Full Selection: SR0SFOS", True)
     printer.addCutflowCut("SR1SFOSFull", "Full Selection: SR1SFOS", True)
     printer.addCutflowCut("SR2SFOSFull", "Full Selection: SR2SFOS", True)
+    printer.addCutflowCut("|", "|", True)
+    printer.addCutflowCut("WZCRSSeeFull", "WZCR: SRSSee", True)
+    printer.addCutflowCut("WZCRSSemFull", "WZCR: SRSSem", True)
+    printer.addCutflowCut("WZCRSSmmFull", "WZCR: SRSSmm", True)
+    printer.addCutflowCut("|", "|", True)
+    printer.addCutflowCut("WZCR1SFOSFull", "WZCR: SR1SFOS", True)
+    printer.addCutflowCut("WZCR2SFOSFull", "WZCR: SR2SFOS", True)
     addProcesses(printer, showdata=True)
     table = printer.createTable("style.firstColumnAlign=l")
     path = "cutflows/"
@@ -225,10 +236,10 @@ def print9SignalRegions(samples):
             pass
         else:
             raise
-    table.writeCSV("cutflows/9signal.csv")
-    table.writeHTML("cutflows/9signal.html")
-    table.writeLaTeX("cutflows/9signal.tex")
-    table.writePlain("cutflows/9signal.txt")
+    table.writeCSV("cutflows/summary.csv")
+    table.writeHTML("cutflows/summary.html")
+    table.writeLaTeX("cutflows/summary.tex")
+    table.writePlain("cutflows/summary.txt")
 
 ########################################################################################
 #_______________________________________________________________________________
@@ -373,8 +384,8 @@ def printTable(samples):
 if __name__ == "__main__":
 
     # Print cutflow table
-    blind()
-    print9SignalRegions(samples)
+    #blind()
+    printTableShort(samples)
     printTable(samples)
     #printCutflow(samples, "WZCR")
     #printCutflow(samples, "SUSY")

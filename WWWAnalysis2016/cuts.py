@@ -12,12 +12,12 @@ systvars = {
         "LepSFDown"         : "lepsf_dn/lepsf",
         "TrigSFUp"          : "trigsf_up/trigsf",
         "TrigSFDown"        : "trigsf_dn/trigsf",
-        "BTagLFUp"          : "weight_btagsf_light_UP/weight_btagsf",
-        "BTagLFDown"        : "weight_btagsf_light_DN/weight_btagsf",
-        "BTagHFUp"          : "weight_btagsf_heavy_UP/weight_btagsf",
-        "BTagHFDown"        : "weight_btagsf_heavy_DN/weight_btagsf",
-        "PileupUp"          : "purewgt_up/purewgt",
-        "PileupDown"        : "purewgt_dn/purewgt",
+        "BTagLFUp"          : "weight_btagsf_light_DN/weight_btagsf",
+        "BTagLFDown"        : "weight_btagsf_light_UP/weight_btagsf",
+        "BTagHFUp"          : "weight_btagsf_heavy_DN/weight_btagsf",
+        "BTagHFDown"        : "weight_btagsf_heavy_UP/weight_btagsf",
+        "PileupUp"          : "purewgt_dn/purewgt",
+        "PileupDown"        : "purewgt_up/purewgt",
         "FakeUp"            : "{$(usefakeweight)?ffwgt_full_up/ffwgt:1}",
         "FakeDown"          : "{$(usefakeweight)?ffwgt_full_dn/ffwgt:1}",
         "FakeRateUp"        : "{$(usefakeweight)?ffwgt_up/ffwgt:1}",
@@ -33,8 +33,8 @@ systvars = {
         "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-        "ISRUp"             : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*[TH3Map::/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_nevents_SMS([chimass],[lspmass],19)]*[TH3Map::/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_nevents_SMS([chimass],[lspmass],20)]:1}" , 
-        "ISRDown"           : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*[TH3Map::/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_nevents_SMS([chimass],[lspmass],19)]*[TH3Map::/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_nevents_SMS([chimass],[lspmass],21)]:1}" , 
+        #"ISRUp"             : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]:1}" , 
+        #"ISRDown"           : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]:1}" , 
         }
 
 def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_variation=""): #define _up _dn etc.
@@ -91,7 +91,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["Presel"] = TQCut("Presel", "Presel", PreselCutExpr, PreselWgtExpr)
 
     # WH SUSY sample mass filter and xsec expression
-    tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[(0.06272+0.2137+0.02619)*(0.3258)]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_nevents_SMS([chimass],[lspmass],19)]*[weight_isr]:1}")
+    tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[(0.06272+0.2137+0.02619)*(0.3258)]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[weight_isr]:1}")
 
     # Trigger cuts
     tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[Trigger]", "trigsf")

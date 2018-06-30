@@ -21,6 +21,7 @@ def applyWZNF(samples, cutnamesource, cutnametarget):
     nf = samples.getCounter("/data-typebkg/[qflip+photon+prompt+fakes]-sig", cutnamesource)
     nf.divide(wz)
     samples.setScaleFactor(cutnametarget, nf.getCounter(), nf.getError(), "/typebkg/lostlep")
+    #samples.setScaleFactor(cutnametarget, nf.getCounter(), 0, "/typebkg/lostlep")
 
 ########################################################################################
 def applyttWNF(samples, cutnamesource, cutnametarget):
@@ -41,7 +42,6 @@ if __name__ == "__main__":
     applyWZNF(samples, "WZCRSSeeFull", "SideSSeeFull")
     applyWZNF(samples, "WZCRSSemFull", "SideSSemFull")
     applyWZNF(samples, "WZCRSSmmFull", "SideSSmmFull")
-    applyWZNF(samples, "WZCR1SFOSFull", "SR0SFOSFull")
     applyWZNF(samples, "WZCR1SFOSFull", "SR1SFOSFull")
     applyWZNF(samples, "WZCR2SFOSFull", "SR2SFOSFull")
 
@@ -51,7 +51,6 @@ if __name__ == "__main__":
     applyWZNF(samples, "WZCRSSeeFull", "SideSSeeFullFakeUp")
     applyWZNF(samples, "WZCRSSemFull", "SideSSemFullFakeUp")
     applyWZNF(samples, "WZCRSSmmFull", "SideSSmmFullFakeUp")
-    applyWZNF(samples, "WZCR1SFOSFull", "SR0SFOSFullFakeUp")
     applyWZNF(samples, "WZCR1SFOSFull", "SR1SFOSFullFakeUp")
     applyWZNF(samples, "WZCR2SFOSFull", "SR2SFOSFullFakeUp")
 

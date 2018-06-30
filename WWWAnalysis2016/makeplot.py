@@ -229,6 +229,7 @@ def isblind(hname):
     if hname.find("TTWCR") != -1: return False
     if hname.find("TTZCR") != -1: return False
     if hname.find("LMETCR") != -1: return False
+    return False
     return True
 
 #_____________________________________________________________________________________

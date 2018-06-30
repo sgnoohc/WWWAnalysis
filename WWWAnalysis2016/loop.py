@@ -361,6 +361,6 @@ if __name__ == "__main__":
         if int(sys.argv[1]) == 0: os.system("python rooutil/qframework/share/tqmerge -o output.root -t analysis .output_-*normal.root")
         if int(sys.argv[1]) == 1: os.system("python rooutil/qframework/share/tqmerge -o output_jec_up.root -t analysis .output_-*jec_up.root")
         if int(sys.argv[1]) == 2: os.system("python rooutil/qframework/share/tqmerge -o output_jec_dn.root -t analysis .output_-*jec_dn.root")
-        os.system("rm .output_-*")
-        os.system("rm .temp.*")
+        os.system("rm -f .output_-*")
+        os.system("rm -f .temp.*")
 
