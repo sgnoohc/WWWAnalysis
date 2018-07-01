@@ -62,9 +62,9 @@ def main():
     print "Fake rate measurement (\mu)          {}" .format(s(n           , "FakeRateMu"    , n        , n        , n       ))
     print "Validation of fake rate method (e)   {}" .format(s(n           , "FakeClosureEl" , n        , n        , n       ))
     print "Validation of fake rate method (\mu) {}" .format(s(n           , "FakeClosureMu" , n        , n        , n       ))
-    print "Lepton reconstruction efficiency     {}" .format(s(n           , n               , "LepSF"  , "LepSF"  , "LepSF" ))
+    print "Lepton reconstruction efficiency     {}" .format(s("$<1$--1\%" , n               , "LepSF"  , "LepSF"  , "LepSF" ))
     print "Lepton energy resolution             {}" .format(s(n           , n               , n        , n        , n       ))
-    print "JEC uncertainties                    {}" .format(s(n           , n               , "JEC"    , "JEC"    , "JEC"   ))
+    print "JEC uncertainties                    {}" .format(s("$<1$--6\%" , n               , "JEC"    , "JEC"    , "JEC"   ))
     print "b-tagging SF (light-flavor)          {}" .format(s(n           , n               , "BTagLF" , "BTagLF" , "BTagLF"))
     print "b-tagging SF (heavy-flavor)          {}" .format(s(n           , n               , "BTagHF" , "BTagHF" , "BTagHF"))
     print "Pile-up reweighting                  {}" .format(s("$<1$--8\%" , n               , "Pileup" , "Pileup" , "Pileup"))
@@ -72,7 +72,7 @@ def main():
     print "Luminosity                           {}" .format(s(n           , n               , "2.5\%"  , "2.5\%"  , "2.5\%" ))
     print "Cross section measurement            {}" .format(s(n           , n               , n        , n        , "20\%"  ))
     print "Validation uncertainty               {}" .format(s(n           , n               , n        , n        , "20\%"  ))
-    print "Other uncertainty                    {}" .format(s(n           , n               , "100\%"  , "100\%"  , n       ))
+    print "Other uncertainty                    {}" .format(s(n           , n               , "50\%"   , "99\%"   , n       ))
 
 ##############################################################################
 def get_min_max_syst(f, process, systvar):
