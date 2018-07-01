@@ -1,6 +1,6 @@
 #!/bin/env python
 
-ntuplepath = "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/"
+ntuplepath = "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.2/skim/"
 
 #########################################################################################
 

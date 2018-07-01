@@ -132,8 +132,8 @@ MjjModeling             shape           -            -            -            1
 MllSSModeling           shape           -            -            -            1            -            -            -            -         
 Mll3lModeling           shape           -            -            -            1            -            -            -            -         
 LumSyst                 lnN             1.025        -            1.025        -            1.025        1.025        1.025        1.025
-SigPDF                  lnN             0.990/1.010  -            -            -            -            -            -            -
-SigQsq                  lnN             0.990/1.010  -            -            -            -            -            -            -
+SigPDF                  lnN             0.900/1.100  -            -            -            -            -            -            -
+SigQsq                  lnN             0.900/1.100  -            -            -            -            -            -            -
 XSec                    lnN             1.06         -            -            -            -            -            -            -
 vbsww_syst              lnN             -            -            -            -            -            -            -            1.30
 ttw_syst                lnN             -            -            -            -            -            -            1.30         -
@@ -217,8 +217,6 @@ lostlep_CRstat_0sfos    shape           -            -            -            1
 lostlep_CRstat_1sfos    shape           -            -            -            1            -            -            -            -
 lostlep_CRstat_2sfos    shape           -            -            -            1            -            -            -            -
 """.format(suffix, h_data.Integral(), rates["www"], rates["fake"], rates["photon"], rates["lostlep"], rates["qflip"], rates["prompt"], rates["ttw"], rates["vbsww"])
-
-    #print datacard
 
     f = open('statinputs/datacard_{}.txt'.format(suffix), 'w')
     f.write(datacard)
