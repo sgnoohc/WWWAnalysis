@@ -95,6 +95,9 @@ def main(model="sm", mass0=-1, mass1=-1):
             write_lostlep_CRstat_variations(h_nom)
             write_lostlep_TFstat_variations(h_nom)
             write_lostlep_TFsyst_variations(h_nom)
+            write_lostlep_Mjjsyst_variations(h_nom)
+            write_lostlep_MllSSsyst_variations(h_nom)
+            write_lostlep_Mll3lsyst_variations(h_nom)
 
     # Write data histogram
     h_data = samples.getHistogram("/data", histname).Clone("data_obs")
@@ -125,6 +128,9 @@ FakeRateMu              shape           -            1            -            -
 FakeClosureEl           shape           -            1            -            -            -            -            -            -
 FakeClosureMu           shape           -            1            -            -            -            -            -            -
 LostLepSyst             shape           -            -            -            1            -            -            -            -
+MjjModeling             shape           -            -            -            1            -            -            -            -         
+MllSSModeling           shape           -            -            -            1            -            -            -            -         
+Mll3lModeling           shape           -            -            -            1            -            -            -            -         
 LumSyst                 lnN             1.025        -            1.025        -            1.025        1.025        1.025        1.025
 SigPDF                  lnN             0.990/1.010  -            -            -            -            -            -            -
 SigQsq                  lnN             0.990/1.010  -            -            -            -            -            -            -
@@ -265,6 +271,11 @@ TFsysts_full  = [ n * math.sqrt(x**2 + y**2 + z**2 + a**2) for (x, y, z, a, n) i
 TFstats_full  = [ n * x for (x, n) in zip(TFstats_error, nominal) ]
 CRstats_full  = [ n * x for (x, n) in zip(CRstats_error, nominal) ]
 
+# Modeling
+Mjjsyst_error   = [0.0490, 0.0490, 0.0490, 0.0490, 0.0490, 0.0490, 0.0000, 0.0000, 0.0000] # 4.9% for Mjj modeling Table 11
+MllSSsyst_error = [0.0530, 0.0530, 0.0530, 0.0530, 0.0530, 0.0530, 0.0000, 0.0000, 0.0000] # 5.3% for MSFOS modeling Table 10
+Mll3lsyst_error = [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0820, 0.0820, 0.0820] # 8.2% for MSFOS modeling Table 10
+
 #########################################################################################################################################################
 def set_to_lostlep_nominal_hist(th1): return set_hist(th1, nominal)
 def set_to_lostlep_TFsystup_hist(th1): return set_hist(th1, [ x + y for (x, y) in zip(nominal, TFsysts_full) ])
@@ -273,6 +284,12 @@ def set_to_lostlep_TFstatup_hist(th1, ibin): return set_hist(th1, [ x + y if ibi
 def set_to_lostlep_TFstatdn_hist(th1, ibin): return set_hist(th1, [ x - y if ibin == index else x for index, (x, y) in enumerate(zip(nominal, TFstats_full)) ])
 def set_to_lostlep_CRstatup_hist(th1, ibin): return set_hist(th1, [ x + y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full)) ])
 def set_to_lostlep_CRstatdn_hist(th1, ibin): return set_hist(th1, [ x - y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full)) ])
+def set_to_lostlep_Mjjsystup_hist(th1): return set_hist(th1, [ x + y  for index, (x, y) in enumerate(zip(nominal, Mjjsyst_error)) ])
+def set_to_lostlep_Mjjsystdn_hist(th1): return set_hist(th1, [ x - y  for index, (x, y) in enumerate(zip(nominal, Mjjsyst_error)) ])
+def set_to_lostlep_MllSSsystup_hist(th1): return set_hist(th1, [ x + y  for index, (x, y) in enumerate(zip(nominal, MllSSsyst_error)) ])
+def set_to_lostlep_MllSSsystdn_hist(th1): return set_hist(th1, [ x - y  for index, (x, y) in enumerate(zip(nominal, MllSSsyst_error)) ])
+def set_to_lostlep_Mll3lsystup_hist(th1): return set_hist(th1, [ x + y  for index, (x, y) in enumerate(zip(nominal, Mll3lsyst_error)) ])
+def set_to_lostlep_Mll3lsystdn_hist(th1): return set_hist(th1, [ x - y  for index, (x, y) in enumerate(zip(nominal, Mll3lsyst_error)) ])
 
 #########################################################################################################################################################
 def make_suffix(model, mass0, mass1):
@@ -344,6 +361,27 @@ def write_lostlep_CRstat_variations(h_nom):
 def write_lostlep_TFsyst_variations(h_nom):
     h_systerr_up = set_to_lostlep_TFsystup_hist(h_nom.Clone("lostlep_LostLepSystUp"))
     h_systerr_dn = set_to_lostlep_TFsystdn_hist(h_nom.Clone("lostlep_LostLepSystDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
+
+#########################################################################################################################################################
+def write_lostlep_Mjjsyst_variations(h_nom):
+    h_systerr_up = set_to_lostlep_Mjjsystup_hist(h_nom.Clone("lostlep_MjjModelingUp"))
+    h_systerr_dn = set_to_lostlep_Mjjsystdn_hist(h_nom.Clone("lostlep_MjjModelingDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
+
+#########################################################################################################################################################
+def write_lostlep_MllSSsyst_variations(h_nom):
+    h_systerr_up = set_to_lostlep_MllSSsystup_hist(h_nom.Clone("lostlep_MllSSModelingUp"))
+    h_systerr_dn = set_to_lostlep_MllSSsystdn_hist(h_nom.Clone("lostlep_MllSSModelingDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
+
+#########################################################################################################################################################
+def write_lostlep_Mll3lsyst_variations(h_nom):
+    h_systerr_up = set_to_lostlep_Mll3lsystup_hist(h_nom.Clone("lostlep_Mll3lModelingUp"))
+    h_systerr_dn = set_to_lostlep_Mll3lsystdn_hist(h_nom.Clone("lostlep_Mll3lModelingDown"))
     h_systerr_up.Write()
     h_systerr_dn.Write()
 
