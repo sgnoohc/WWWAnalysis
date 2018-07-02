@@ -62,7 +62,7 @@ def main(model="sm", mass0=-1, mass1=-1):
         h_nom = samples.getHistogram(sampledirpaths[process], histname).Clone(process)
 
         # If lost lepton get the nominal number directly from the AN Table 13
-        if process == "lostlep": h_nom = set_to_lostlep_nominal_hist(h_nom) 
+        if process == "lostlep": h_nom = set_to_lostlep_nominal_hist(h_nom)
 
         # Write nominal histogram
         h_nom.Write()
@@ -71,7 +71,7 @@ def main(model="sm", mass0=-1, mass1=-1):
         rates[process] = h_nom.Integral()
 
         # Nominal histogram errors are needed to be varied one by one to create an effective uncorrelated histograms
-        if process != "lostlep": write_nominal_stat_variations(h_nom, process)
+        if process != "lostlep" and process != "fake": write_nominal_stat_variations(h_nom, process)
 
         # Write systematic histograms that are from weight variations
         for systvar in systvars:
@@ -99,6 +99,14 @@ def main(model="sm", mass0=-1, mass1=-1):
             write_lostlep_MllSSsyst_variations(h_nom)
             write_lostlep_Mll3lsyst_variations(h_nom)
 
+        # WWW signal theory systematics
+        if process == "www":
+            write_www_theory_syst_variations(h_nom)
+
+        # Fake has AR statistics
+        if process == "fake":
+            write_fake_ARstat_variations(h_nom)
+
     # Write data histogram
     h_data = samples.getHistogram("/data", histname).Clone("data_obs")
     h_data.Write()
@@ -115,30 +123,31 @@ observation  {:.1f}
 bin                                     SR           SR           SR           SR           SR           SR           SR           SR
 process                                 0            1            2            3            4            5            6            7
 process                                 www          fake         photon       lostlep      qflip        prompt       ttw          vbsww
-rate                                    {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}     
+rate                                    {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}       {:<6.3f}
 ----------------------------------------------------------------------------------------------------------------------------------
-JEC                     shape           1            -            1            -            1            1            1            1
-LepSF                   shape           1            -            1            -            1            1            1            1
-TrigSF                  shape           1            -            1            -            1            1            1            1
-BTagHF                  shape           1            -            1            -            1            1            1            1
-BTagLF                  shape           1            -            1            -            1            1            1            1
-Pileup                  shape           1            -            1            -            1            1            1            1
+JEC                     shape           1            -            1            -            -            1            1            1
+LepSF                   shape           1            -            1            -            -            1            1            1
+TrigSF                  shape           1            -            1            -            -            1            1            1
+BTagHF                  shape           1            -            1            -            -            1            1            1
+BTagLF                  shape           1            -            1            -            -            1            1            1
+Pileup                  shape           1            -            1            -            -            1            1            1
 FakeRateEl              shape           -            1            -            -            -            -            -            -
 FakeRateMu              shape           -            1            -            -            -            -            -            -
 FakeClosureEl           shape           -            1            -            -            -            -            -            -
 FakeClosureMu           shape           -            1            -            -            -            -            -            -
 LostLepSyst             shape           -            -            -            1            -            -            -            -
-MjjModeling             shape           -            -            -            1            -            -            -            -         
-MllSSModeling           shape           -            -            -            1            -            -            -            -         
-Mll3lModeling           shape           -            -            -            1            -            -            -            -         
+MjjModeling             shape           -            -            -            1            -            -            -            -
+MllSSModeling           shape           -            -            -            1            -            -            -            -
+Mll3lModeling           shape           -            -            -            1            -            -            -            -
+SigPDF                  shape           1            -            -            -            -            -            -            -
+SigQsq                  shape           1            -            -            -            -            -            -            -
+SigAlpha                shape           1            -            -            -            -            -            -            -
+SigXSec                 lnN             1.06         -            -            -            -            -            -            -
 LumSyst                 lnN             1.025        -            1.025        -            1.025        1.025        1.025        1.025
-SigPDF                  lnN             0.900/1.100  -            -            -            -            -            -            -
-SigQsq                  lnN             0.900/1.100  -            -            -            -            -            -            -
-XSec                    lnN             1.06         -            -            -            -            -            -            -
 vbsww_xsec              lnN             -            -            -            -            -            -            -            1.20
-vbsww_validation        lnN             -            -            -            -            -            -            -            1.20
+vbsww_validation        lnN             -            -            -            -            -            -            -            1.22
 ttw_xsec                lnN             -            -            -            -            -            -            1.20         -
-ttw_validation          lnN             -            -            -            -            -            -            1.20         -
+ttw_validation          lnN             -            -            -            -            -            -            1.18         -
 photon_syst             lnN             -            -            1.50         -            -            -            -            -
 qflip_syst              lnN             -            -            -            -            1.99         -            -            -
 www_stat_in_ee          shape           1            -            -            -            -            -            -            -
@@ -150,15 +159,15 @@ www_stat_out_mm         shape           1            -            -            -
 www_stat_0sfos          shape           1            -            -            -            -            -            -            -
 www_stat_1sfos          shape           1            -            -            -            -            -            -            -
 www_stat_2sfos          shape           1            -            -            -            -            -            -            -
-fake_stat_in_ee         shape           -            1            -            -            -            -            -            -
-fake_stat_in_em         shape           -            1            -            -            -            -            -            -
-fake_stat_in_mm         shape           -            1            -            -            -            -            -            -
-fake_stat_out_ee        shape           -            1            -            -            -            -            -            -
-fake_stat_out_em        shape           -            1            -            -            -            -            -            -
-fake_stat_out_mm        shape           -            1            -            -            -            -            -            -
-fake_stat_0sfos         shape           -            1            -            -            -            -            -            -
-fake_stat_1sfos         shape           -            1            -            -            -            -            -            -
-fake_stat_2sfos         shape           -            1            -            -            -            -            -            -
+fake_ARstat_in_ee       shape           -            1            -            -            -            -            -            -
+fake_ARstat_in_em       shape           -            1            -            -            -            -            -            -
+fake_ARstat_in_mm       shape           -            1            -            -            -            -            -            -
+fake_ARstat_out_ee      shape           -            1            -            -            -            -            -            -
+fake_ARstat_out_em      shape           -            1            -            -            -            -            -            -
+fake_ARstat_out_mm      shape           -            1            -            -            -            -            -            -
+fake_ARstat_0sfos       shape           -            1            -            -            -            -            -            -
+fake_ARstat_1sfos       shape           -            1            -            -            -            -            -            -
+fake_ARstat_2sfos       shape           -            1            -            -            -            -            -            -
 photon_stat_in_ee       shape           -            -            1            -            -            -            -            -
 photon_stat_in_em       shape           -            -            1            -            -            -            -            -
 photon_stat_in_mm       shape           -            -            1            -            -            -            -            -
@@ -247,6 +256,10 @@ def set_hist(th1, bincontents):
         th1.SetBinError(index + 1, 0)
     return th1
 
+#########################################################################################################################################################
+def stat_error_N(x): return x - 0.5 * ROOT.TMath.ChisquareQuantile(    0.3173 / 2, 2 * (x    ))
+def stat_error_P(x): return     0.5 * ROOT.TMath.ChisquareQuantile(1 - 0.3173 / 2, 2 * (x + 1)) - x
+
 # Lost lepton prediction from Table 13.
 nominal        = [0.80, 1.31, 3.02, 3.60, 4.86, 4.39, 0.47, 3.14,10.10]
 stats_up_systs = [0.48, 0.48, 0.50, 2.15, 1.79, 0.73, 0.00, 0.66, 0.89]
@@ -263,6 +276,7 @@ def set_to_lostlep_statdn_hist(th1, ibin): return set_hist(th1, [ x - y if ibin 
 
 # Lost lepton prediction errors with stat syst separated
 CRstats_error = [0.4082, 0.2831, 0.1449, 0.4082, 0.2831, 0.1449, 0.0000, 0.1774, 0.0822] # err(Data - non-3l) / (Data-non-3l) from Table 13 (n.b. mjj-in and mjj-out are correlated)
+CRstats_count = [     6,     13,     50,      6,     13,     50,      0,     34,    155] # err(Data - non-3l) / (Data-non-3l) from Table 13 (n.b. mjj-in and mjj-out are correlated)
 TFstats_error = [0.3857, 0.2076, 0.1634, 0.2178, 0.1283, 0.1355, 0.3191, 0.1475, 0.0896] # stat.  column from Table 12 (0SFOS gets the stat error from MC simulation in Table 13)
 TFsysts_lepsf = [0.0083, 0.0034, 0.0043, 0.0125, 0.0036, 0.0044, 0.0020, 0.0002, 0.0020] # lep.SF column from Table 12 (0SFOS takes larger value from 1SFOS or 2SFOS)
 TFsysts_puwgt = [0.0642, 0.0713, 0.0024, 0.0036, 0.0804, 0.0086, 0.0376, 0.0376, 0.0042] # PU     column from Table 12 (0SFOS takes larger value from 1SFOS or 2SFOS)
@@ -271,6 +285,8 @@ TFsysts_jecor = [0.0547, 0.0142, 0.0532, 0.0594, 0.0301, 0.0205, 0.0152, 0.0152,
 TFsysts_full  = [ n * math.sqrt(x**2 + y**2 + z**2 + a**2) for (x, y, z, a, n) in zip(TFsysts_lepsf, TFsysts_puwgt, TFsysts_ttzwz, TFsysts_jecor, nominal) ]
 TFstats_full  = [ n * x for (x, n) in zip(TFstats_error, nominal) ]
 CRstats_full  = [ n * x for (x, n) in zip(CRstats_error, nominal) ]
+CRstats_full_up  = [ n * (stat_error_P(x)/x) if x != 0 else 0 for (x, n) in zip(CRstats_count, nominal) ]
+CRstats_full_dn  = [ n * (stat_error_N(x)/x) if x != 0 else 0 for (x, n) in zip(CRstats_count, nominal) ]
 
 # Modeling
 Mjjsyst_error   = [0.0490, 0.0490, 0.0490, 0.0490, 0.0490, 0.0490, 0.0000, 0.0000, 0.0000] # 4.9% for Mjj modeling Table 11
@@ -283,8 +299,8 @@ def set_to_lostlep_TFsystup_hist(th1): return set_hist(th1, [ x + y for (x, y) i
 def set_to_lostlep_TFsystdn_hist(th1): return set_hist(th1, [ x - y for (x, y) in zip(nominal, TFsysts_full) ])
 def set_to_lostlep_TFstatup_hist(th1, ibin): return set_hist(th1, [ x + y if ibin == index else x for index, (x, y) in enumerate(zip(nominal, TFstats_full)) ])
 def set_to_lostlep_TFstatdn_hist(th1, ibin): return set_hist(th1, [ x - y if ibin == index else x for index, (x, y) in enumerate(zip(nominal, TFstats_full)) ])
-def set_to_lostlep_CRstatup_hist(th1, ibin): return set_hist(th1, [ x + y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full)) ])
-def set_to_lostlep_CRstatdn_hist(th1, ibin): return set_hist(th1, [ x - y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full)) ])
+def set_to_lostlep_CRstatup_hist(th1, ibin): return set_hist(th1, [ x + y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full_up)) ])
+def set_to_lostlep_CRstatdn_hist(th1, ibin): return set_hist(th1, [ x - y if ((ibin == index) or (ibin == index % 3 and index < 6)) else x for index, (x, y) in enumerate(zip(nominal, CRstats_full_dn)) ])
 def set_to_lostlep_Mjjsystup_hist(th1): return set_hist(th1, [ x + y  for index, (x, y) in enumerate(zip(nominal, Mjjsyst_error)) ])
 def set_to_lostlep_Mjjsystdn_hist(th1): return set_hist(th1, [ x - y  for index, (x, y) in enumerate(zip(nominal, Mjjsyst_error)) ])
 def set_to_lostlep_MllSSsystup_hist(th1): return set_hist(th1, [ x + y  for index, (x, y) in enumerate(zip(nominal, MllSSsyst_error)) ])
@@ -390,7 +406,7 @@ def write_lostlep_Mll3lsyst_variations(h_nom):
 def do_not_write_syst_hist(process, systvar):
     if systvar.find("Fake") != -1 and process.find("fake") == -1: return True
     if systvar.find("Fake") == -1 and process.find("fake") != -1: return True
-    if systvar.find("Fake") != -1 and (systvar.find("El") == -1 and systvar.find("Mu") == -1): return True
+    #if systvar.find("Fake") != -1 and (systvar.find("El") == -1 and systvar.find("Mu") == -1): return True
     if process.find("lostlep") != -1: return True
     return False
 
@@ -415,9 +431,49 @@ def bin_suffix_comb(ibin):
     if ibin == 8: return "_1sfos"
     if ibin == 9: return "_2sfos"
 
+pdf_up_error = [ 0.043159   , 0.02767    , 0.0227303     , 0.0231684  , 0.0218397   , 0.00903931 , 0.0337773   , 0.043174   , 0.0169784  , ]
+pdf_dn_error = [ 0.035867   , 0.0223932  , 0.019016      , 0.0187451  , 0.0180389   , 0.00729971 , 0.0269668   , 0.0349376  , 0.0134577  , ]
+q2_up_error  = [ 0.012439   , 0.0110485  , 0.0036819     , 0.0768119  , 0.00946869  , 0.0909396  , 0.0123575   , 0.0608722  , 0.075198   , ]
+q2_dn_error  = [ 0.00389075 , 0.0187065  , 0.0151138     , 0.102129   , 0.0354567   , 0.135643   , 0.0291748   , 0.0822849  , 0.0942069  , ]
+aS_up_error  = [ 0.00278907 , 0.00310995 , 0.000380084   , 0.00636957 , 0.000984983 , 0.00583416 , 0.000283398 , 0.00391803 , 0.00787921 , ]
+aS_dn_error  = [ 0.00299298 , 0.00221614 , 0.00000864175 , 0.00420784 , 0.00206036  , 0.00561643 , 0.00140796  , 0.0017675  , 0.0121466  , ]
 
+def set_to_www_pdfsystup_hist(nom, th1): return set_hist(th1, [ x + x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], pdf_up_error)) ])
+def set_to_www_pdfsystdn_hist(nom, th1): return set_hist(th1, [ x - x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], pdf_dn_error)) ])
+def set_to_www_q2systup_hist (nom, th1): return set_hist(th1, [ x + x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], q2_up_error)) ])
+def set_to_www_q2systdn_hist (nom, th1): return set_hist(th1, [ x - x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], q2_dn_error)) ])
+def set_to_www_aSsystup_hist (nom, th1): return set_hist(th1, [ x + x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], aS_up_error)) ])
+def set_to_www_aSsystdn_hist (nom, th1): return set_hist(th1, [ x - x*y  for index, (x, y) in enumerate(zip([nom.GetBinContent(ibin) for ibin in xrange(1,nom.GetNbinsX()+1)], aS_dn_error)) ])
 
+#########################################################################################################################################################
+def write_www_theory_syst_variations(h_nom):
+    h_systerr_up = set_to_www_pdfsystup_hist(h_nom, h_nom.Clone("www_SigPDFUp"))
+    h_systerr_dn = set_to_www_pdfsystdn_hist(h_nom, h_nom.Clone("www_SigPDFDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
+    h_systerr_up = set_to_www_q2systup_hist(h_nom, h_nom.Clone("www_SigQsqUp"))
+    h_systerr_dn = set_to_www_q2systdn_hist(h_nom, h_nom.Clone("www_SigQsqDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
+    h_systerr_up = set_to_www_aSsystup_hist(h_nom, h_nom.Clone("www_SigAlphaUp"))
+    h_systerr_dn = set_to_www_aSsystdn_hist(h_nom, h_nom.Clone("www_SigAlphaDown"))
+    h_systerr_up.Write()
+    h_systerr_dn.Write()
 
+#########################################################################################################################################################
+ARstats_count = [ 8, 17, 57, 5, 41, 47, 17, 2, 6] # fake AR counts
+ARstats_full_up  = [ (stat_error_P(x)/x) if x != 0 else 0 for x in ARstats_count ]
+ARstats_full_dn  = [ (stat_error_N(x)/x) if x != 0 else 0 for x in ARstats_count ]
+print ARstats_full_up
+def set_to_fake_ARstatup_hist(nom, th1, ibin): return set_hist(th1, [ x + x*y if ibin == index else x for index, (x, y) in enumerate(zip([nom.GetBinContent(ii) for ii in xrange(1,nom.GetNbinsX()+1)], ARstats_full_up)) ])
+def set_to_fake_ARstatdn_hist(nom, th1, ibin): return set_hist(th1, [ x - x*y if ibin == index else x for index, (x, y) in enumerate(zip([nom.GetBinContent(ii) for ii in xrange(1,nom.GetNbinsX()+1)], ARstats_full_dn)) ])
+def write_fake_ARstat_variations(h_nom):
+    for i in xrange(h_nom.GetNbinsX()):
+        ibin = i + 1
+        h_staterr_up = set_to_fake_ARstatup_hist(h_nom, h_nom.Clone("fake_fake_ARstat" + bin_suffix(ibin) + "Up"), i)
+        h_staterr_dn = set_to_fake_ARstatdn_hist(h_nom, h_nom.Clone("fake_fake_ARstat" + bin_suffix(ibin) + "Down"), i)
+        h_staterr_up.Write()
+        h_staterr_dn.Write()
 
 #########################################################################################################################################################
 #########################################################################################################################################################

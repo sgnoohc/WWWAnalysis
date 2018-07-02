@@ -161,6 +161,16 @@ def main(samples, sample_to_run, extra_args):
     TH1F('MTlvlv' , '' , 180 , 0. , 1000.) << ([MTlvlv] : '\#it{m}_{T,lvlv} [GeV]');
     #@*/*: MTlvlv;
 
+    @BTCRSSeeFull: lep_pt0, lep_pt1, MET;
+    @BTCRSSemFull: lep_pt0, lep_pt1, MET;
+    @BTCRSSmmFull: lep_pt0, lep_pt1, MET;
+    @BTCRSideSSeeFull: lep_pt0, lep_pt1, MET;
+    @BTCRSideSSemFull: lep_pt0, lep_pt1, MET;
+    @BTCRSideSSmmFull: lep_pt0, lep_pt1, MET;
+    @LMETCRSSeeFull: lep_pt0, lep_pt1, MET, Mjj;
+    @LMETCRSSemFull: lep_pt0, lep_pt1, MET, Mjj;
+    @LMETCRSSmmFull: lep_pt0, lep_pt1, MET, Mjj;
+
     @SRSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
     @SRSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
     @SRSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;

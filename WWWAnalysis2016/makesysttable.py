@@ -52,37 +52,43 @@ def main():
     t = "FILL ME"
 
     # Control data statistics
-    print "Control data statistics              {}" .format(s("CRstat"    , "stat"          , n        , n        , n       ))
-    print "Simulation statistics                {}" .format(s("stat"      , n               , "stat"   , "stat"   , "stat"  ))
-    print "Control region contamination         {}" .format(s("$<1$--2\%" , "4--40\%"       , n        , n        , n       ))
-    print "\Mjj modeling (SS only)              {}" .format(s("4.3\%"     , n               , n        , n        , n       ))
-    print "\MSFOS extrapolation                 {}" .format(s("5.3--8.2\%", n               , n        , n        , n       ))
-    print "\\ttZ/WZ fraction                     {}".format(s("$<1\%$"    , n               , n        , n        , n       ))
-    print "Fake rate measurement (e)            {}" .format(s(n           , "FakeRateEl"    , n        , n        , n       ))
-    print "Fake rate measurement (\mu)          {}" .format(s(n           , "FakeRateMu"    , n        , n        , n       ))
-    print "Validation of fake rate method (e)   {}" .format(s(n           , "FakeClosureEl" , n        , n        , n       ))
-    print "Validation of fake rate method (\mu) {}" .format(s(n           , "FakeClosureMu" , n        , n        , n       ))
-    print "Lepton reconstruction efficiency     {}" .format(s("$<1$--1\%" , n               , "LepSF"  , "LepSF"  , "LepSF" ))
-    print "Lepton energy resolution             {}" .format(s(n           , n               , n        , n        , n       ))
-    print "JEC uncertainties                    {}" .format(s("$<1$--6\%" , n               , "JEC"    , "JEC"    , "JEC"   ))
-    print "b-tagging SF (light-flavor)          {}" .format(s(n           , n               , "BTagLF" , "BTagLF" , "BTagLF"))
-    print "b-tagging SF (heavy-flavor)          {}" .format(s(n           , n               , "BTagHF" , "BTagHF" , "BTagHF"))
-    print "Pile-up reweighting                  {}" .format(s("$<1$--8\%" , n               , "Pileup" , "Pileup" , "Pileup"))
-    print "Trigger SF                           {}" .format(s(n           , n               , "TrigSF" , "TrigSF" , "TrigSF"))
-    print "Luminosity                           {}" .format(s(n           , n               , "2.5\%"  , "2.5\%"  , "2.5\%" ))
-    print "Cross section measurement            {}" .format(s(n           , n               , n        , n        , "20\%"  ))
-    print "Validation uncertainty               {}" .format(s(n           , n               , n        , n        , "20\%"  ))
-    print "Other uncertainty                    {}" .format(s(n           , n               , "50\%"   , "99\%"   , n       ))
+    print "Control data statistics              {}" .format(s("CRstat"     , "ARstat"        , n        , n        , n          ))
+    print "Simulation statistics                {}" .format(s("stat"       , n               , "stat"   , "stat"   , "stat"     ))
+    print "Control region contamination         {}" .format(s("$<1$--2\%"  , "4--40\%"       , n        , n        , n          ))
+    print "\Mjj modeling (SS only)              {}" .format(s("4.3\%"      , n               , n        , n        , n          ))
+    print "\MSFOS extrapolation                 {}" .format(s("5.3--8.2\%" , n               , n        , n        , n          ))
+    print "\\ttZ/WZ fraction                     {}".format(s("$<1\%$"     , n               , n        , n        , n          ))
+    print "Fake rate measurement (e)            {}" .format(s(n            , "FakeRateEl"    , n        , n        , n          ))
+    print "Fake rate measurement (\mu)          {}" .format(s(n            , "FakeRateMu"    , n        , n        , n          ))
+    print "Validation of fake rate method (e)   {}" .format(s(n            , "FakeClosureEl" , n        , n        , n          ))
+    print "Validation of fake rate method (\mu) {}" .format(s(n            , "FakeClosureMu" , n        , n        , n          ))
+    print "Fake rate measurement                {}" .format(s(n            , "FakeRate"      , n        , n        , n          ))
+    print "Validation of fake rate method       {}" .format(s(n            , "FakeClosure"   , n        , n        , n          ))
+    print "Lepton reconstruction efficiency     {}" .format(s("$<1$--1\%"  , n               , "LepSF"  , "LepSF"  , "LepSF"    ))
+    print "Lepton energy resolution             {}" .format(s(n            , n               , n        , n        , n          ))
+    print "JEC uncertainties                    {}" .format(s("$<1$--6\%"  , n               , "JEC"    , "JEC"    , "JEC"      ))
+    print "b-tagging SF (light-flavor)          {}" .format(s(n            , n               , "BTagLF" , "BTagLF" , "BTagLF"   ))
+    print "b-tagging SF (heavy-flavor)          {}" .format(s(n            , n               , "BTagHF" , "BTagHF" , "BTagHF"   ))
+    print "Pile-up reweighting                  {}" .format(s("$<1$--8\%"  , n               , "Pileup" , "Pileup" , "Pileup"   ))
+    print "Trigger SF                           {}" .format(s(n            , n               , "TrigSF" , "TrigSF" , "TrigSF"   ))
+    print "Luminosity                           {}" .format(s(n            , n               , "2.5\%"  , "2.5\%"  , "2.5\%"    ))
+    print "Cross section measurement            {}" .format(s(n            , n               , n        , n        , "20\%"     ))
+    print "Validation uncertainty               {}" .format(s(n            , n               , "50\%"   , "50\%"   , "18--22\%" ))
 
 ##############################################################################
 def get_min_max_syst(f, process, systvar):
     nominal = f.Get(process).Clone() # Crucial to clone it otherwise accumulates in each loop
     syst_up = f.Get(process + "_" + systvar + "Up").Clone() # Crucial to clone it otherwise accumulates in each loop
     syst_dn = f.Get(process + "_" + systvar + "Down").Clone() # Crucial to clone it otherwise accumulates in each loop
-    if process == "prompt": # 
+    if process == "prompt": #
         add_vbsww_and_ttw(f, process, systvar, nominal, syst_up, syst_dn)
     frac_errors = []
     for i in xrange(1,syst_up.GetNbinsX()+1):
+        if i == 1: continue
+        if i == 4: continue
+        if i == 5: continue
+        if i == 6: continue
+        if i == 8: continue
         nom = nominal.GetBinContent(i)
         upe = syst_up.GetBinContent(i)
         dne = syst_dn.GetBinContent(i)
@@ -123,6 +129,8 @@ def syst_name(syst):
         return "stat"
     if syst.find("_CRstat_") != -1:
         return "CRstat"
+    if syst.find("_ARstat_") != -1:
+        return "ARstat"
     return syst
 
 ##############################################################################
