@@ -77,7 +77,7 @@ def main(model="sm", mass0=-1, mass1=-1):
         for systvar in systvars:
 
             # Some process or some variations do not need to be written
-            if do_not_write_syst_hist(process, systvar):
+            if do_not_write_syst_hist(process, systvar, model):
                 continue
 
             # Write the systvariation histograms
@@ -100,8 +100,12 @@ def main(model="sm", mass0=-1, mass1=-1):
             write_lostlep_Mll3lsyst_variations(h_nom)
 
         # WWW signal theory systematics
-        if process == "www":
-            write_www_theory_syst_variations(h_nom)
+        if model == "sm":
+            if process == "www":
+                write_www_theory_syst_variations(h_nom)
+        elif model == "whsusy":
+            if process == "whsusy":
+                write_whsusy_theory_syst_variations(h_nom)
 
         # Fake has AR statistics
         if process == "fake":
@@ -149,7 +153,7 @@ vbsww_validation        lnN             -            -            -            -
 ttw_xsec                lnN             -            -            -            -            -            -            1.20         -
 ttw_validation          lnN             -            -            -            -            -            -            1.18         -
 photon_syst             lnN             -            -            1.50         -            -            -            -            -
-qflip_syst              lnN             -            -            -            -            1.99         -            -            -
+qflip_syst              lnN             -            -            -            -            1.50         -            -            -
 www_stat_in_ee          shape           1            -            -            -            -            -            -            -
 www_stat_in_em          shape           1            -            -            -            -            -            -            -
 www_stat_in_mm          shape           1            -            -            -            -            -            -            -
@@ -403,11 +407,12 @@ def write_lostlep_Mll3lsyst_variations(h_nom):
     h_systerr_dn.Write()
 
 #########################################################################################################################################################
-def do_not_write_syst_hist(process, systvar):
+def do_not_write_syst_hist(process, systvar, model):
     if systvar.find("Fake") != -1 and process.find("fake") == -1: return True
     if systvar.find("Fake") == -1 and process.find("fake") != -1: return True
     #if systvar.find("Fake") != -1 and (systvar.find("El") == -1 and systvar.find("Mu") == -1): return True
     if process.find("lostlep") != -1: return True
+    if systvar.find("ISR") != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True
     return False
 
 #########################################################################################################################################################
@@ -459,6 +464,10 @@ def write_www_theory_syst_variations(h_nom):
     h_systerr_dn = set_to_www_aSsystdn_hist(h_nom, h_nom.Clone("www_SigAlphaDown"))
     h_systerr_up.Write()
     h_systerr_dn.Write()
+
+#########################################################################################################################################################
+def write_whsusy_theory_syst_variations(h_nom):
+    pass
 
 #########################################################################################################################################################
 ARstats_count = [ 8, 17, 57, 5, 41, 47, 17, 2, 6] # fake AR counts

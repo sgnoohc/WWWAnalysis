@@ -19,10 +19,16 @@ def main():
     systs_dn = get_systs_dn(f, processes)
     rates_up, rates_dn = get_rates(f, processes, systs_up, systs_dn)
     compute_total_bkg(rates_up, rates_dn)
-    print_order = ["qflip", "photon", "fake", "lostlep", "prompt", "total", "www"]
+    print_order = ["qflip", "photon", "fake", "lostlep", "prompt", "vbsww", "ttw", "total", "www"]
     for process in print_order:
         print '{:30s}'.format(nice_name(process)), ' '.join('& ${:4.1f}^{{+{:4.1f}}}_{{-{:4.1f}}}$'.format(p.val if p.val > 0 else 0, u.err if p.val > 0 else 0, d.err if p.val > 0 else 0) for p, u, d in zip(rates_up[process], rates_up[process], rates_dn[process])), '\\\\'
-        #print '{:30s}'.format(nice_name(process)), ' '.join('{:6.3f} +{:6.3f} -{:6.3f}'.format(p.val if p.val > 0 else 0, u.err if p.val > 0 else 0, d.err if p.val > 0 else 0) for p, u, d in zip(rates_up[process], rates_up[process], rates_dn[process])), '\\\\'
+
+    for process in print_order:
+        print process
+        for p, u, d in zip(rates_up[process], rates_up[process], rates_dn[process]):
+            print "{:6.3f} {:6.3f}".format(p.val, math.sqrt(u.err*d.err))
+
+        #print '{:30s}'.format(nice_name(process)), '\t'.join('{:6.3f} +{:6.3f} -{:6.3f}'.format(p.val if p.val > 0 else 0, u.err if p.val > 0 else 0, d.err if p.val > 0 else 0) for p, u, d in zip(rates_up[process], rates_up[process], rates_dn[process])), '\\\\'
 
 ##############################################################################
 def get_processes(f):
@@ -86,6 +92,8 @@ def nice_name(process):
     if process == "qflip"   : return "charge flips"
     if process == "photon"  : return "$\gamma\\to$non-prompt $\ell$"
     if process == "total"   : return "Background sum"
+    if process == "vbsww"   : return "VBS WW"
+    if process == "ttw"     : return "ttW"
     print "why are you here?"
     return ""
 

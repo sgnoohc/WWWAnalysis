@@ -29,6 +29,7 @@ def main(samples, sample_to_run, extra_args):
     if index == 0: cuts = getWWWAnalysisCuts()
     if index == 1: cuts = getWWWAnalysisCuts(jecvar_suffix="_up")
     if index == 2: cuts = getWWWAnalysisCuts(jecvar_suffix="_dn")
+    if index == 3: cuts = getWWWAnalysisCuts(genmet_prefix="gen", genmet_suffix="_gen")
 
     #
     #
@@ -279,6 +280,7 @@ def main(samples, sample_to_run, extra_args):
     if index == 0: samples.writeToFile("{}_normal.root".format(prefix), True)
     if index == 1: samples.writeToFile("{}_jec_up.root".format(prefix), True)
     if index == 2: samples.writeToFile("{}_jec_dn.root".format(prefix), True)
+    if index == 3: samples.writeToFile("{}_gen_met.root".format(prefix), True)
 
     os.system("rm {}".format(eventlist_filename))
     os.system("rm {}".format(histojob_filename))
@@ -350,6 +352,7 @@ if __name__ == "__main__":
         print "  0 : nominal"
         print "  1 : jec_up"
         print "  2 : jec_dn"
+        print "  3 : gen_met"
         print ""
         sys.exit()
 
@@ -366,11 +369,18 @@ if __name__ == "__main__":
         # Run single job
         main(samples, str(sys.argv[2]), [int(sys.argv[1])])
     else:
+        # First remove old files
+        os.system("rm -f .output_-*")
+        os.system("rm -f .temp.*")
+        os.system("rm -f .*.cfg")
+        os.system("rm -f .*.cfg")
+
         # Run parallel jobs
         runParallel(16, main, samples, [sys.argv[1]])
         if int(sys.argv[1]) == 0: os.system("python rooutil/qframework/share/tqmerge -o output.root -t analysis .output_-*normal.root")
         if int(sys.argv[1]) == 1: os.system("python rooutil/qframework/share/tqmerge -o output_jec_up.root -t analysis .output_-*jec_up.root")
         if int(sys.argv[1]) == 2: os.system("python rooutil/qframework/share/tqmerge -o output_jec_dn.root -t analysis .output_-*jec_dn.root")
+        if int(sys.argv[1]) == 3: os.system("python rooutil/qframework/share/tqmerge -o output_gen_met.root -t analysis .output_-*gen_met.root")
         os.system("rm -f .output_-*")
         os.system("rm -f .temp.*")
 

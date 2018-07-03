@@ -399,6 +399,8 @@ if __name__ == "__main__":
     #blind()
     printTableShort(samples)
     printTable(samples)
+    #printCutflow(samples, "SR")
     #printCutflow(samples, "WZCR")
     #printCutflow(samples, "SUSY")
     #printCutflow(samples, "Presel")
+    #printCutflow(samples, "Trigger")
