@@ -243,6 +243,9 @@ SigAlpha                shape           1            -            -            -
 """
     if model == "whsusy":
         datacard += """ISR                     shape           1            -            -            -            -            -            -            -
+Qsq                     shape           1            -            -            -            -            -            -            -
+PDF                     shape           1            -            -            -            -            -            -            -
+AlphaS                  shape           1            -            -            -            -            -            -            -
 GenMET                  shape           1            -            -            -            -            -            -            -
 """
 
@@ -423,7 +426,10 @@ def do_not_write_syst_hist(process, systvar, model):
     if systvar.find("Fake") != -1 and process.find("fake") == -1: return True
     if systvar.find("Fake") == -1 and process.find("fake") != -1: return True
     if process.find("lostlep") != -1: return True
-    if systvar.find("ISR") != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True
+    if systvar.find("ISR")   != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True # These theory systematics only for SUSY
+    if systvar.find("Qsq")   != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True # These theory systematics only for SUSY
+    if systvar.find("PDF")   != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True # These theory systematics only for SUSY
+    if systvar.find("Alpha") != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True # These theory systematics only for SUSY
     return False
 
 #########################################################################################################################################################

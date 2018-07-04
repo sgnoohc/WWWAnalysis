@@ -6,6 +6,19 @@ import ROOT
 from QFramework import TQSampleFolder, TQXSecParser, TQCut, TQAnalysisSampleVisitor, TQSampleInitializer, TQCutflowAnalysisJob, TQCutflowPrinter, TQHistoMakerAnalysisJob, TQHWWPlotter, TQEventlistAnalysisJob
 from rooutil.qutils import *
 
+# weight counter expressions for simplicity
+version = "v1.2.2"
+isr_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]".format(version)
+isr_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]".format(version)
+isr_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]".format(version)
+wgt_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],1)]".format(version)
+pdf_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],10)]".format(version)
+pdf_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],11)]".format(version)
+qsq_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],5)]".format(version)
+qsq_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],9)]".format(version)
+als_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],12)]".format(version)
+als_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],13)]".format(version)
+
 # Systematic variations as dictionary
 systvars = {
         "LepSFUp"           : "lepsf_up/lepsf",
@@ -33,8 +46,14 @@ systvars = {
         "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-        "ISRUp"             : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]/[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]:1}" , 
-        "ISRDown"           : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]/[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]:1}" , 
+        "ISRUp"             : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_up) , 
+        "ISRDown"           : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_dn) , 
+        "PDFUp"             : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_pdf_up]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, pdf_up) , 
+        "PDFDown"           : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_pdf_down]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, pdf_dn) , 
+        "QsqUp"             : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_fr_r2_f2]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, qsq_up) , 
+        "QsqDown"           : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_fr_r0p5_f0p5]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, qsq_dn) , 
+        "AlphaSUp"          : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_alphas_up]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, als_up) , 
+        "AlphaSDown"        : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_alphas_down]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, als_dn) , 
         }
 
 def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_prefix="",genmet_suffix=""): #define _up _dn etc.

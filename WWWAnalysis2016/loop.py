@@ -96,8 +96,8 @@ def main(samples, sample_to_run, extra_args):
     TH1F('lep_pt1' , '' , 180 , 0. , 150 ) << (lep_pt[1] : '\#it{p}_{T, trail-lep} [GeV]');
     #@*/*: lep_pt1;
 
-    #TH1F('lep_pt2' , '' , 180 , 0. , 150 ) << (lep_pt[2] : '\#it{p}_{T, trail-lep} [GeV]');
-    ##@*/*: lep_pt1;
+    TH1F('lep_pt2' , '' , 180 , 0. , 150 ) << (lep_pt[2] : '\#it{p}_{T, subtrail-lep} [GeV]');
+    #@*/*: lep_pt1;
 
     TH1F('lep_eta0' , '' , 180 , -2.5 , 2.5 ) << (lep_eta[0] : '\#eta_{lead-lep}');
     #@*/*: lep_eta0;
@@ -172,15 +172,15 @@ def main(samples, sample_to_run, extra_args):
     @LMETCRSSemFull: lep_pt0, lep_pt1, MET, Mjj;
     @LMETCRSSmmFull: lep_pt0, lep_pt1, MET, Mjj;
 
-    @SRSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SRSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SRSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SideSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SideSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SideSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide;
-    @SR0SFOSFull/* :MllSS_wide, MTlvlv;
-    @SR1SFOSFull/* :MllSS_wide, MTlvlv;
-    @SR2SFOSFull/* :MllSS_wide, MTlvlv;
+    @SRSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SRSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SRSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SideSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SideSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SideSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SR0SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
+    @SR1SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
+    @SR2SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
 
     """)
     f.close()
