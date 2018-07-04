@@ -33,8 +33,8 @@ systvars = {
         "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-        "ISRUp"             : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]:1}" , 
-        "ISRDown"           : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]:1}" , 
+        "ISRUp"             : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]/[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]:1}" , 
+        "ISRDown"           : "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]/[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]:1}" , 
         }
 
 def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_prefix="",genmet_suffix=""): #define _up _dn etc.

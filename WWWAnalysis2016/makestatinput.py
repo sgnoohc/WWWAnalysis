@@ -28,12 +28,17 @@ def main(model="sm", mass0=-1, mass1=-1):
     samples = TQSampleFolder.loadSampleFolder("{}:samples".format(filename))
     samples_jec_up = TQSampleFolder.loadSampleFolder("output_jec_up.root:samples")
     samples_jec_dn = TQSampleFolder.loadSampleFolder("output_jec_dn.root:samples")
+    samples_gen_met = TQSampleFolder.loadSampleFolder("output_gen_met.root:samples")
 
     # Set the histogram name to perform the fit on (we use the 9 bin histogram
     histname = "{SRSSeeFull,SRSSemFull,SRSSmmFull,SideSSeeFull,SideSSemFull,SideSSmmFull,SR0SFOSFull,SR1SFOSFull,SR2SFOSFull}"
 
     # We have 8 categories for the fit
     processes = [ "vbsww" , "ttw" , "lostlep" , "photon" , "qflip" , "prompt" , "fake" , "www" ,]
+
+    #######
+    # NOTE "www" means "signal" - i.e. for whsusy model www = whsusy and www is included in prompt
+    #######
 
     # Set the diectionary of the paths where we will retrieve the histograms from
     sampledirpaths = {
@@ -63,6 +68,9 @@ def main(model="sm", mass0=-1, mass1=-1):
 
         # If lost lepton get the nominal number directly from the AN Table 13
         if process == "lostlep": h_nom = set_to_lostlep_nominal_hist(h_nom)
+
+        # If whsusy model with signal then get the average of the two histogram
+        if model == "whsusy" and process == "www": set_to_average_and_write_genmet_syst_hist(h_nom, samples_gen_met.getHistogram(sampledirpaths[process], histname).Clone(process))
 
         # Write nominal histogram
         h_nom.Write()
@@ -103,9 +111,6 @@ def main(model="sm", mass0=-1, mass1=-1):
         if model == "sm":
             if process == "www":
                 write_www_theory_syst_variations(h_nom)
-        elif model == "whsusy":
-            if process == "whsusy":
-                write_whsusy_theory_syst_variations(h_nom)
 
         # Fake has AR statistics
         if process == "fake":
@@ -143,9 +148,6 @@ LostLepSyst             shape           -            -            -            1
 MjjModeling             shape           -            -            -            1            -            -            -            -
 MllSSModeling           shape           -            -            -            1            -            -            -            -
 Mll3lModeling           shape           -            -            -            1            -            -            -            -
-SigPDF                  shape           1            -            -            -            -            -            -            -
-SigQsq                  shape           1            -            -            -            -            -            -            -
-SigAlpha                shape           1            -            -            -            -            -            -            -
 SigXSec                 lnN             1.06         -            -            -            -            -            -            -
 LumSyst                 lnN             1.025        -            1.025        -            1.025        1.025        1.025        1.025
 vbsww_xsec              lnN             -            -            -            -            -            -            -            1.20
@@ -233,6 +235,16 @@ lostlep_CRstat_0sfos    shape           -            -            -            1
 lostlep_CRstat_1sfos    shape           -            -            -            1            -            -            -            -
 lostlep_CRstat_2sfos    shape           -            -            -            1            -            -            -            -
 """.format(suffix, h_data.Integral(), rates["www"], rates["fake"], rates["photon"], rates["lostlep"], rates["qflip"], rates["prompt"], rates["ttw"], rates["vbsww"])
+
+    if model == "sm":
+        datacard += """SigPDF                  shape           1            -            -            -            -            -            -            -
+SigQsq                  shape           1            -            -            -            -            -            -            -
+SigAlpha                shape           1            -            -            -            -            -            -            -
+"""
+    if model == "whsusy":
+        datacard += """ISR                     shape           1            -            -            -            -            -            -            -
+GenMET                  shape           1            -            -            -            -            -            -            -
+"""
 
     f = open('statinputs/datacard_{}.txt'.format(suffix), 'w')
     f.write(datacard)
@@ -410,7 +422,6 @@ def write_lostlep_Mll3lsyst_variations(h_nom):
 def do_not_write_syst_hist(process, systvar, model):
     if systvar.find("Fake") != -1 and process.find("fake") == -1: return True
     if systvar.find("Fake") == -1 and process.find("fake") != -1: return True
-    #if systvar.find("Fake") != -1 and (systvar.find("El") == -1 and systvar.find("Mu") == -1): return True
     if process.find("lostlep") != -1: return True
     if systvar.find("ISR") != -1 and ((model == "sm") or (model == "whsusy" and process.find("www") == -1)): return True
     return False
@@ -483,6 +494,21 @@ def write_fake_ARstat_variations(h_nom):
         h_staterr_dn = set_to_fake_ARstatdn_hist(h_nom, h_nom.Clone("fake_fake_ARstat" + bin_suffix(ibin) + "Down"), i)
         h_staterr_up.Write()
         h_staterr_dn.Write()
+
+#########################################################################################################################################################
+def set_to_average_and_write_genmet_syst_hist(h_nom, h_sys):
+    h_sys_up = h_sys.Clone("www_GenMETUp")
+    h_sys_dn = h_sys.Clone("www_GenMETDown")
+    for i in xrange(1, h_nom.GetNbinsX()+1):
+        nc = h_nom.GetBinContent(i)
+        sc = h_sys.GetBinContent(i)
+        n = (nc + sc) / 2.
+        d = abs(n - sc)
+        h_nom.SetBinContent(i, n)
+        h_sys_up.SetBinContent(i, n + d)
+        h_sys_dn.SetBinContent(i, n - d)
+    h_sys_up.Write()
+    h_sys_dn.Write()
 
 #########################################################################################################################################################
 #########################################################################################################################################################
