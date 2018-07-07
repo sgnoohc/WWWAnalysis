@@ -28,7 +28,7 @@ def main():
         "exclude_priority_value" : "<-1",
 
         # N-cores
-        "ncore" : 3,
+        "ncore" : 4,
 
         # TQCuts config file
         "cuts" : "cuts.cfg",
