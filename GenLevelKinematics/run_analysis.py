@@ -55,8 +55,8 @@ def main():
 
     # Create plots and tables
     samples = TQSampleFolder.loadSampleFolder("outputs/output.root:samples")
-    autoplot (samples,          bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, options={"remove_underflow": True})
-    autotable(samples, "yield", bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, options={"cuts": "cuts.cfg"})
+    autoplot (samples,          bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, sig_path={"WZ":"/bkg/WZ"}, options={"remove_underflow": True, "signal_scale":"auto"})
+    autotable(samples, "yield", bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, sig_path={"WZ":"/bkg/WZ"}, options={"cuts": "cuts.cfg"})
 
 #_____________________________________________________________________________________________________
 def generate_cuts_config():
@@ -64,13 +64,17 @@ def generate_cuts_config():
     tqcuts = {}
 
     # Create cuts
-    tqcuts["Root"]                = TQCut("Root"                , "Root"                                         , "1"                                 , "evt_scale1fb*purewgt*35.9*1.0384615385")
-    tqcuts["SameSignDecay"]       = TQCut("SameSignDecay"       , "WWW events with gen-level same-sign decay"    , "www_channel == 2"                  , "1")
-    tqcuts["SameSignDecayLepPt"]  = TQCut("SameSignDecayLepPt"  , "Leptons > 25 GeV"                             , "l_p4[1].pt() >= 25"                , "1")
-    tqcuts["SameSignDecayHighPt"] = TQCut("SameSignDecayHighPt" , "The W->jj boson has pt #geq 150 GeV"          , "q_w_pt[0] >= 150"                  , "1")
-    tqcuts["SameSignDecayJetPt"]  = TQCut("SameSignDecayJetPt"  , "Quarks to pass pt #geq 30 GeV"                , "q_p4[1].pt()>=30"                  , "1")
-    tqcuts["SameSignDecayNjet1"]  = TQCut("SameSignDecayNjet1"  , "Lead q pt #geq 30 && sublead q pt < 30"       , "q_p4[0].pt()>=30&&q_p4[1].pt()<30" , "1")
-    tqcuts["ThreeLeptonDecay"]    = TQCut("ThreeLeptonDecay"    , "WWW events with gen-level three-lepton decay" , "www_channel == 3"                  , "1")
+    tqcuts["Root"]                 = TQCut("Root"                 , "Root"                                         , "1"                                                            , "evt_scale1fb*purewgt*35.9*1.0384615385")
+    tqcuts["SameSignDecay"]        = TQCut("SameSignDecay"        , "WWW events with gen-level same-sign decay"    , "{'$(treename)'=='t_www'?www_channel == 2:1}"                  , "1")
+    tqcuts["SameSignDecayLepPt"]   = TQCut("SameSignDecayLepPt"   , "Leptons > 25 GeV"                             , "{'$(treename)'=='t_www'?l_p4[1].pt() >= 25:1}"                , "1")
+    tqcuts["SameSignDecayJetPt"]   = TQCut("SameSignDecayJetPt"   , "Quarks to pass pt #geq 30 GeV"                , "{'$(treename)'=='t_www'?q_p4[1].pt()>=30:1}"                  , "1")
+    tqcuts["SameSignDecayNjet1"]   = TQCut("SameSignDecayNjet1"   , "Lead q pt #geq 30 && sublead q pt < 30"       , "{'$(treename)'=='t_www'?q_p4[0].pt()>=30&&q_p4[1].pt()<30:1}" , "1")
+    tqcuts["SameSignDecayNj2Reco"] = TQCut("SameSignDecayNj2Reco" , "n_{jets} #geq 2"                              , "nj30 >= 2"                                                    , "1")
+    tqcuts["SameSignDecayMjjW"]    = TQCut("SameSignDecayMjjW"    , "|m_{jj} - m_{W}| #leq 15"                     , "abs(Mjj-80) <= 15"                                            , "1")
+    tqcuts["SameSignDecayMjjSB"]   = TQCut("SameSignDecayMjjSB"   , "|m_{jj} - m_{W}| > 15"                        , "abs(Mjj-80) >  15"                                            , "1")
+    tqcuts["SameSignDecayMjjHigh"] = TQCut("SameSignDecayMjjHigh" , "m_{jj} #geq 150"                              , "Mjj >= 150"                                                   , "1")
+    tqcuts["ThreeLeptonDecay"]     = TQCut("ThreeLeptonDecay"     , "WWW events with gen-level three-lepton decay" , "{'$(treename)'=='t_www'?www_channel == 3:1}"                  , "1")
+    tqcuts["SameSignDecayHighPt"]  = TQCut("SameSignDecayHighPt"  , "The W->jj boson has pt #geq 150 GeV"          , "{'$(treename)'=='t_www'?q_w_pt[0] >= 150:1}"                  , "1")
 
     # Build selection tree
     tqcuts["Root"].addCut(tqcuts["SameSignDecay"])
@@ -80,6 +84,10 @@ def generate_cuts_config():
     tqcuts["SameSignDecayLepPt"].addCut(tqcuts["SameSignDecayHighPt"])
     tqcuts["SameSignDecayLepPt"].addCut(tqcuts["SameSignDecayJetPt"])
     tqcuts["SameSignDecayLepPt"].addCut(tqcuts["SameSignDecayNjet1"])
+    tqcuts["SameSignDecayJetPt"].addCut(tqcuts["SameSignDecayNj2Reco"])
+    tqcuts["SameSignDecayNj2Reco"].addCut(tqcuts["SameSignDecayMjjW"])
+    tqcuts["SameSignDecayNj2Reco"].addCut(tqcuts["SameSignDecayMjjSB"])
+    tqcuts["SameSignDecayMjjSB"].addCut(tqcuts["SameSignDecayMjjHigh"])
 
     exportTQCutsToTextFile(tqcuts["Root"], "cuts.cfg")
 
