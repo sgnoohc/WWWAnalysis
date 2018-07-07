@@ -318,7 +318,10 @@ def addBSMsamples(samples):
             lspmasses[0] = lspmasses[0] + 1
         if chimass == 125: chimass = 127
         for lspmass in lspmasses:
-            config_strs.append("whsusy_fullscan*, /bsm/whsusy/{mchi}/{mlsp}, -2, true, t_ss, false, nominal".format(mchi=chimass, mlsp=lspmass))
+            if lspmass != 50 or chimass != 200:
+                continue
+            #config_strs.append("whsusy_fullscan*, /bsm/whsusy/{mchi}/{mlsp}, -2, true, t_ss, false, nominal".format(mchi=chimass, mlsp=lspmass))
+            config_strs.append("whsusy_200_50_fullsim*, /bsm/whsusy/{mchi}/{mlsp}, -2, true, t_ss, false, nominal".format(mchi=chimass, mlsp=lspmass))
 
     # Add BSM samples
     config_filename = ".temp.{}.samples.cfg".format(os.getpid())
@@ -336,6 +339,8 @@ def addBSMsamples(samples):
             lspmasses[0] = lspmasses[0] + 1
         if chimass == 125: chimass = 127
         for lspmass in lspmasses:
+            if lspmass != 50 or chimass != 200:
+                continue
             samples.getSampleFolder("/bsm/whsusy/{}/{}".format(chimass, lspmass)).setTagInteger("mchi", chimass)
             samples.getSampleFolder("/bsm/whsusy/{}/{}".format(chimass, lspmass)).setTagInteger("mlsp", lspmass)
 

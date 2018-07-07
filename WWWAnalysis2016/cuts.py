@@ -8,16 +8,18 @@ from rooutil.qutils import *
 
 # weight counter expressions for simplicity
 version = "v1.2.2"
-isr_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]".format(version)
-isr_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],20)]".format(version)
-isr_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],21)]".format(version)
-wgt_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],1)]".format(version)
-pdf_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],10)]".format(version)
-pdf_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],11)]".format(version)
-qsq_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],5)]".format(version)
-qsq_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],9)]".format(version)
-als_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],12)]".format(version)
-als_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],13)]".format(version)
+#whfilename = "whsusy_fullscan_skim_1_1.root"
+whfilename = "whsusy_200_50_fullsim_skim_1_1.root"
+isr_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],19)]".format(version, whfilename)
+isr_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],20)]".format(version, whfilename)
+isr_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],21)]".format(version, whfilename)
+wgt_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],1)]".format(version, whfilename)
+pdf_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],10)]".format(version, whfilename)
+pdf_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],11)]".format(version, whfilename)
+qsq_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],5)]".format(version, whfilename)
+qsq_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],9)]".format(version, whfilename)
+als_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],12)]".format(version, whfilename)
+als_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],13)]".format(version, whfilename)
 
 # Systematic variations as dictionary
 systvars = {
@@ -113,7 +115,9 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["Presel"] = TQCut("Presel", "Presel", PreselCutExpr, PreselWgtExpr)
 
     # WH SUSY sample mass filter and xsec expression
-    tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[(0.06272+0.2137+0.02619)*(0.3258)]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.1/skim/whsusy_fullscan_skim_1_1.root:h_counterSMS([chimass],[lspmass],19)]*[weight_isr]:1}")
+    #BR = "(0.06272+0.2137*0.3258*0.3258+0.02619)*(0.3258)"
+    BR = "0.134843696693296"
+    tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?["+BR+"]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./"+isr_nominal+"*[weight_isr]:1}")
 
     # Trigger cuts
     tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[Trigger]", "trigsf")
@@ -144,7 +148,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["SRSSeeMjjW"]    = TQCut("SRSSeeMjjW"    , "SRSSee: 4. |Mjj-80| < 15"    , "abs(Mjj"+jecvar_suffix+"-80.)<15."                , "1")
     tqcuts["SRSSeeMjjL"]    = TQCut("SRSSeeMjjL"    , "SRSSee: 5. MjjL < 400"       , "MjjL"+jecvar_suffix+"<400."                       , "1")
     tqcuts["SRSSeeDetajjL"] = TQCut("SRSSeeDetajjL" , "SRSSee: 6. DetajjL < 1.5"    , "DetajjL"+jecvar_suffix+"<1.5"                     , "1")
-    tqcuts["SRSSeeMET"]     = TQCut("SRSSeeMET"     , "SRSSee: 7. MET > 60"         , genmet_prefix+"met"+jecvar_suffix+"_pt>60."        , "1")
+    tqcuts["SRSSeeMET"]     = TQCut("SRSSeeMET"     , "SRSSee: 7. MET > 60"         , "met"+genmet_suffix+jecvar_suffix+"_pt>60."        , "1")
     tqcuts["SRSSeeMllSS"]   = TQCut("SRSSeeMllSS"   , "SRSSee: 8. MllSS > 40"       , "MllSS>40."                                        , "1")
     tqcuts["SRSSeeFull"]    = TQCut("SRSSeeFull"    , "SR-ee"                       , "1"                                                , "1")
     # Define same-sign dielectron region cut hierarchy structure
@@ -174,7 +178,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["SRSSemMjjW"]    = TQCut("SRSSemMjjW"    , "SRSSem: 4. |Mjj-80| < 15"    , "abs(Mjj"+jecvar_suffix+"-80.)<15."            , "1")
     tqcuts["SRSSemMjjL"]    = TQCut("SRSSemMjjL"    , "SRSSem: 5. MjjL < 400"       , "MjjL"+jecvar_suffix+"<400."                   , "1")
     tqcuts["SRSSemDetajjL"] = TQCut("SRSSemDetajjL" , "SRSSem: 6. DetajjL < 1.5"    , "DetajjL"+jecvar_suffix+"<1.5"                 , "1")
-    tqcuts["SRSSemMET"]     = TQCut("SRSSemMET"     , "SRSSem: 7. MET > 60"         , genmet_prefix+"met"+jecvar_suffix+"_pt>60."    , "1")
+    tqcuts["SRSSemMET"]     = TQCut("SRSSemMET"     , "SRSSem: 7. MET > 60"         , "met"+genmet_suffix+jecvar_suffix+"_pt>60."    , "1")
     tqcuts["SRSSemMllSS"]   = TQCut("SRSSemMllSS"   , "SRSSem: 8. MllSS > 30"       , "MllSS>30."                                    , "1")
     tqcuts["SRSSemMTmax"]   = TQCut("SRSSemMTmax"   , "SRSSem: 9. MTmax"            , "MTmax"+jecvar_suffix+genmet_suffix+">90."     , "1")
     tqcuts["SRSSemFull"]    = TQCut("SRSSemFull"    , "SR-e#mu"                     , "1"                                            , "1")
@@ -232,7 +236,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["SR0SFOSPre"]        = TQCut("SR0SFOSPre"       , "0SFOS"                                   , "1"                                              , "1")
     tqcuts["SR0SFOSPt3l"]       = TQCut("SR0SFOSPt3l"      , "SR0SFOS: 3. p_{T, lll} > 0"              , "1."                                             , "1")
     tqcuts["SR0SFOSDPhi3lMET"]  = TQCut("SR0SFOSDPhi3lMET" , "SR0SFOS: 4. #Delta#phi_{lll, MET} > 2.5" , "DPhi3lMET"+jecvar_suffix+genmet_suffix+">2.5"   , "1")
-    tqcuts["SR0SFOSMET"]        = TQCut("SR0SFOSMET"       , "SR0SFOS: 5. MET > 30"                    , genmet_prefix+"met"+jecvar_suffix+"_pt>30."      , "1")
+    tqcuts["SR0SFOSMET"]        = TQCut("SR0SFOSMET"       , "SR0SFOS: 5. MET > 30"                    , "met"+genmet_suffix+jecvar_suffix+"_pt>30."      , "1")
     tqcuts["SR0SFOSMll"]        = TQCut("SR0SFOSMll"       , "SR0SFOS: 6. Mll > 20"                    , "Mll3L > 20."                                    , "1")
     tqcuts["SR0SFOSM3l"]        = TQCut("SR0SFOSM3l"       , "SR0SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                         , "1")
     tqcuts["SR0SFOSZVt"]        = TQCut("SR0SFOSZVt"       , "SR0SFOS: 8. |Mee-MZ| > 15"               , "abs(Mee3L-91.1876) > 15."                       , "1")
@@ -263,7 +267,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["SR1SFOSPre"]        = TQCut("SR1SFOSPre"       , "1SFOS"                                   , "1"                                                , "1")
     tqcuts["SR1SFOSPt3l"]       = TQCut("SR1SFOSPt3l"      , "SR1SFOS: 3. p_{T, lll} > 60"             , "Pt3l>60."                                         , "1")
     tqcuts["SR1SFOSDPhi3lMET"]  = TQCut("SR1SFOSDPhi3lMET" , "SR1SFOS: 4. #Delta#phi_{lll, MET} > 2.5" , "DPhi3lMET"+jecvar_suffix+genmet_suffix+">2.5"     , "1")
-    tqcuts["SR1SFOSMET"]        = TQCut("SR1SFOSMET"       , "SR1SFOS: 5. MET > 40"                    , genmet_prefix+"met"+jecvar_suffix+"_pt>40."        , "1")
+    tqcuts["SR1SFOSMET"]        = TQCut("SR1SFOSMET"       , "SR1SFOS: 5. MET > 40"                    , "met"+genmet_suffix+jecvar_suffix+"_pt>40."        , "1")
     tqcuts["SR1SFOSMll"]        = TQCut("SR1SFOSMll"       , "SR1SFOS: 6. Mll > 20"                    , "Mll3L > 20."                                      , "1")
     tqcuts["SR1SFOSM3l"]        = TQCut("SR1SFOSM3l"       , "SR1SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                           , "1")
     tqcuts["SR1SFOSZVt"]        = TQCut("SR1SFOSZVt"       , "SR1SFOS: 8. |MSFOS-MZ| > 20"             , "nSFOSinZ == 0"                                    , "1")
@@ -294,7 +298,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     tqcuts["SR2SFOSPre"]        = TQCut("SR2SFOSPre"       , "2SFOS"                                   , "1"                                              , "1")
     tqcuts["SR2SFOSPt3l"]       = TQCut("SR2SFOSPt3l"      , "SR2SFOS: 3. p_{T, lll} > 60"             , "Pt3l>60."                                       , "1")
     tqcuts["SR2SFOSDPhi3lMET"]  = TQCut("SR2SFOSDPhi3lMET" , "SR2SFOS: 4. #Delta#phi_{lll, MET} > 2.5" , "DPhi3lMET"+jecvar_suffix+genmet_suffix+">2.5"   , "1")
-    tqcuts["SR2SFOSMET"]        = TQCut("SR2SFOSMET"       , "SR2SFOS: 5. MET > 55"                    , genmet_prefix+"met"+jecvar_suffix+"_pt>55."      , "1")
+    tqcuts["SR2SFOSMET"]        = TQCut("SR2SFOSMET"       , "SR2SFOS: 5. MET > 55"                    , "met"+genmet_suffix+jecvar_suffix+"_pt>55."      , "1")
     tqcuts["SR2SFOSMll"]        = TQCut("SR2SFOSMll"       , "SR2SFOS: 6. Mll > 20"                    , "(Mll3L > 20. && Mll3L1 > 20.)"                  , "1")
     tqcuts["SR2SFOSM3l"]        = TQCut("SR2SFOSM3l"       , "SR2SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                         , "1")
     tqcuts["SR2SFOSZVt"]        = TQCut("SR2SFOSZVt"       , "SR2SFOS: 8. |MSFOS-MZ| > 20"             , "nSFOSinZ == 0"                                  , "1")
@@ -331,7 +335,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
                 "SRSSeeMjjW" : TQCut("SideSSeeMjj" , "SRSSee: 4. |Mjj-80| >= 15" , "abs(Mjj"+jecvar_suffix+"-80.)>=15." , "1"),
                 "SRSSemMjjW" : TQCut("SideSSemMjj" , "SRSSem: 4. |Mjj-80| >= 15" , "abs(Mjj"+jecvar_suffix+"-80.)>=15." , "1"),
                 "SRSSmmMjjW" : TQCut("SideSSmmMjj" , "SRSSmm: 4. |Mjj-80| >= 15" , "abs(Mjj"+jecvar_suffix+"-80.)>=15." , "1"),
-                "SRSSmmMET" : TQCut("SideSSmmMET" , "SRSSmm: 7. MET > 60" , genmet_prefix+"met"+jecvar_suffix+"_pt>60." , "1"),
+                "SRSSmmMET" : TQCut("SideSSmmMET" , "SRSSmm: 7. MET > 60" , "met"+genmet_suffix+jecvar_suffix+"_pt>60." , "1"),
                 },
             cutdict=tqcuts,
             )
@@ -621,9 +625,9 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
                 "SRSSeeDetajjL" : TQCut("LMETCRSSeeDetajjL" , "LMETCRSSee: 6. DetajjL < inf" , "1" , "1"),
                 "SRSSemDetajjL" : TQCut("LMETCRSSemDetajjL" , "LMETCRSSem: 6. DetajjL < inf" , "1" , "1"),
                 "SRSSmmDetajjL" : TQCut("LMETCRSSmmDetajjL" , "LMETCRSSmm: 6. DetajjL < inf" , "1" , "1"),
-                "SRSSeeMET" : TQCut("LMETCRSSeeMET" , "LMETCRSSee: 7. MET < 60" , "("+genmet_prefix+"met"+jecvar_suffix+"_pt<60.)*(abs(MllSS-91.1876)>10.)" , "1"),
-                "SRSSemMET" : TQCut("LMETCRSSemMET" , "LMETCRSSem: 7. MET < 60" , genmet_prefix+"met"+jecvar_suffix+"_pt<60." , "1"),
-                "SRSSmmMET" : TQCut("LMETCRSSmmMET" , "LMETCRSSmm: 7. MET < 60" , genmet_prefix+"met"+jecvar_suffix+"_pt<60." , "1"),
+                "SRSSeeMET" : TQCut("LMETCRSSeeMET" , "LMETCRSSee: 7. MET < 60" , "("+"met"+genmet_suffix+jecvar_suffix+"_pt<60.)*(abs(MllSS-91.1876)>10.)" , "1"),
+                "SRSSemMET" : TQCut("LMETCRSSemMET" , "LMETCRSSem: 7. MET < 60" , "met"+genmet_suffix+jecvar_suffix+"_pt<60." , "1"),
+                "SRSSmmMET" : TQCut("LMETCRSSmmMET" , "LMETCRSSmm: 7. MET < 60" , "met"+genmet_suffix+jecvar_suffix+"_pt<60." , "1"),
                 "SRSSemMTmax" : TQCut("LMETCRSSemMTmax" , "LMETCRSSem: 9. MTmax"    , "1." , "1"),
                 },
             cutdict=tqcuts,
@@ -652,9 +656,9 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
                 "SRSSeeDetajjL" : TQCut("LMETWZCRSSeeDetajjL" , "LMETWZCRSSee: 6. DetajjL < inf" , "1" , "1"),
                 "SRSSemDetajjL" : TQCut("LMETWZCRSSemDetajjL" , "LMETWZCRSSem: 6. DetajjL < inf" , "1" , "1"),
                 "SRSSmmDetajjL" : TQCut("LMETWZCRSSmmDetajjL" , "LMETWZCRSSmm: 6. DetajjL < inf" , "1" , "1"),
-                "SRSSeeMET" : TQCut("LMETWZCRSSeeFull" , "LMETCRSSee: 7. MET < 60" , "("+genmet_prefix+"met"+jecvar_suffix+"_pt<60.)*(abs(MllSS-91.1876)>10.)" , "1"),
-                "SRSSemMET" : TQCut("LMETWZCRSSemFull" , "LMETCRSSem: 7. MET < 60" , genmet_prefix+"met"+jecvar_suffix+"_pt<60." , "1"),
-                "SRSSmmMET" : TQCut("LMETWZCRSSmmFull" , "LMETCRSSmm: 7. MET < 60" , genmet_prefix+"met"+jecvar_suffix+"_pt<60." , "1"),
+                "SRSSeeMET" : TQCut("LMETWZCRSSeeFull" , "LMETCRSSee: 7. MET < 60" , "("+"met"+genmet_suffix+jecvar_suffix+"_pt<60.)*(abs(MllSS-91.1876)>10.)" , "1"),
+                "SRSSemMET" : TQCut("LMETWZCRSSemFull" , "LMETCRSSem: 7. MET < 60" , "met"+genmet_suffix+jecvar_suffix+"_pt<60." , "1"),
+                "SRSSmmMET" : TQCut("LMETWZCRSSmmFull" , "LMETCRSSmm: 7. MET < 60" , "met"+genmet_suffix+jecvar_suffix+"_pt<60." , "1"),
                 },
             cutdict=tqcuts,
             )
@@ -669,7 +673,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
             cut=tqcuts["SR0SFOS"],
             name_edits={"SR":"GCR"},
             cut_edits={
-                "SR0SFOS" : TQCut("GCR0SFOS" , "GCR0SFOS:" , "(nSFOSinZ==0)*("+genmet_prefix+"met_pt<30)*(abs(M3l-91.1876)<20)" , "1"),
+                "SR0SFOS" : TQCut("GCR0SFOS" , "GCR0SFOS:" , "(nSFOSinZ==0)*(met"+genmet_suffix+"_pt<30)*(abs(M3l-91.1876)<20)" , "1"),
                 },
             cutdict=tqcuts,
             )

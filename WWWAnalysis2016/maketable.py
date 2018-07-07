@@ -63,6 +63,7 @@ def addProcesses(printer, showdata, prettyversion=True):
     #        printer.addCutflowProcess("/bsm/whsusy/{}/{}".format(chimass, lspmass), "({},{})".format(chimass, lspmass))
 
     printer.addCutflowProcess("/bsm/whsusy/200/1", "(200,1)")
+    printer.addCutflowProcess("/bsm/whsusy/200/50", "(200,50)")
     printer.addCutflowProcess("/bsm/whsusy/150/24", "(150,24)")
     printer.addCutflowProcess("/bsm/whsusy/200/74", "(200,74)")
 
