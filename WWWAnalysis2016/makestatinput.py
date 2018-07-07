@@ -47,7 +47,7 @@ def main(model="sm", mass0=-1, mass1=-1):
             "lostlep" : "/typebkg/lostlep/[ttZ+WZ+Other]",
             "photon"  : "/typebkg/photon/[ttZ+WZ+Other]",
             "qflip"   : "/typebkg/qflip/[ttZ+WZ+Other]",
-            "prompt"  : "/typebkg/prompt/[ttZ+WZ+Other]" if model == "sm" else "/typebkg/prompt/[ttZ+WZ+Other]+sig",
+            "prompt"  : "/typebkg/prompt/[ttZ+WZ+Other]" if model == "sm" else "/typebkg/prompt/[ttZ+WZ+Other]+sig" if model != "whwww" else "/typebkg/prompt/[ttZ+WZ+Other]+sig/www",
             "fake"    : "/fake",
             "www"     : get_sigmodel_path(model, mass0, mass1),
             }
@@ -340,6 +340,7 @@ def get_sigmodel_path(model, mass0, mass1):
     if model == "wprime": sigmodel = "/bsm/wprime/{}".format(mass0)
     if model == "hpmpm": sigmodel = "/bsm/hpmpm/{}".format(mass0)
     if model == "whsusy": sigmodel = "/bsm/whsusy/{}/{}".format(mass0, mass1)
+    if model == "whwww": sigmodel = "/sig/whwww"
     return sigmodel
 
 #########################################################################################################################################################

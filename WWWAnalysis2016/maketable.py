@@ -240,6 +240,10 @@ def printTableShort(samples):
     printer.addCutflowCut("AR0SFOSZVt", "AR: SR0SFOS", True)
     printer.addCutflowCut("AR1SFOSMT3rd", "AR: SR1SFOS", True)
     printer.addCutflowCut("AR2SFOSZVt", "AR: SR2SFOS", True)
+    printer.addCutflowCut("|", "|", True)
+    printer.addCutflowCut("Nj1SSeeFull", "Full Selection: Nj1SSee", True)
+    printer.addCutflowCut("Nj1SSemFull", "Full Selection: Nj1SSem", True)
+    printer.addCutflowCut("Nj1SSmmFull", "Full Selection: Nj1SSmm", True)
     addProcesses(printer, showdata=True)
     table = printer.createTable("style.firstColumnAlign=l")
     path = "cutflows/"

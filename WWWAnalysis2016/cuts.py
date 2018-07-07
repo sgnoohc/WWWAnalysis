@@ -87,7 +87,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     # 8107 = total semileptonic same-sign (from Wprime sample itself with splitWprime function in dilepbabymaker)
     # only one factor of (0.21 * (1-0.21)) because it's counted with same sign
     # 0.21 = HWW or W->lv (l = e or mu only, as 8107 was determined with e/mu only)
-    ["1"                                                                             , "{\"$(path)\"==\"/sig/www\"?1.0384615385:1}" ] ,
+    ["1"                                                                             , "{\"$(path)\"==\"/sig/www\"?1.0384615385:1}" ] , # Theory paper vs. 208 fb
     ["1"                                                                             , "evt_scale1fb"                  ] , 
     ["1"                                                                             , "purewgt"                       ] , 
     ["1"                                                                             , "{$(usefakeweight)?ffwgt:35.9}" ] , 
@@ -325,6 +325,28 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
     #____________________________________________________________________________________________________________________________________________________________________________
     #
     # SR dilepton Mjj sideband
+    #
+    # Take cuts starting from SRDilep and modify names in each
+    # Then also swap SRDilep by "SBDilep" defined by below
+    copyEditCuts(
+            cut=tqcuts["SRDilep"],
+            name_edits={"SR":"Nj1"},
+            cut_edits={
+                "SRSSeeNj2" : TQCut("Nj1SSeeNj1" , "SRSSee: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSemNj2" : TQCut("Nj1SSemNj1" , "SRSSem: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSmmNj2" : TQCut("Nj1SSmmNj1" , "SRSSmm: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSeePre" : TQCut("Nj1SSeeFull", "SRSSee: Njet 1 Full" , "1" , "1"),
+                "SRSSemPre" : TQCut("Nj1SSemFull", "SRSSem: Njet 1 Full" , "1" , "1"),
+                "SRSSmmPre" : TQCut("Nj1SSmmFull", "SRSSmm: Njet 1 Full" , "1" , "1"),
+                },
+            cutdict=tqcuts,
+            )
+    # Then add it to Presel
+    tqcuts["Presel"].addCut(tqcuts["Nj1Dilep"])
+
+    #____________________________________________________________________________________________________________________________________________________________________________
+    #
+    # SR dilepton nj==1
     #
     # Take cuts starting from SRDilep and modify names in each
     # Then also swap SRDilep by "SBDilep" defined by below
