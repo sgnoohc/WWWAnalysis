@@ -46,7 +46,13 @@ def main():
 
     }
 
+    # Analyze
     loop(options)
+
+    # Create plots and tables
+    samples = TQSampleFolder.loadSampleFolder("outputs/output.root:samples")
+    autoplot (samples,          bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, options={"remove_underflow": True})
+    autotable(samples, "yield", bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, options={"cuts": "cuts.cfg"})
 
 if __name__ == "__main__":
 
