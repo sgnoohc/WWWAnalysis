@@ -18,7 +18,6 @@ def main(argv):
         print "  INDEX = 0 : Nominal"
         print "  INDEX = 1 : JEC_Up variation"
         print "  INDEX = 2 : JEC_Down variation"
-        print "  INDEX = 3 : Gen MET variation"
         print ""
         print ""
         sys.exit()
@@ -70,92 +69,79 @@ def main(argv):
 
     # First generate cuts.cfg file
     skiplooping = False
-    if   index == 0: generate_www_analysis_cuts()
-    elif index == 1: generate_www_analysis_cuts(jecvar_suffix="_up")
-    elif index == 2: generate_www_analysis_cuts(jecvar_suffix="_dn")
-    elif index == 3: generate_www_analysis_cuts(genmet_prefix="gen", genmet_suffix="_gen")
-    elif index == -1: skiplooping = True
+    if   index == 0:
+        generate_www_analysis_cuts()
+    elif index == 1:
+        generate_www_analysis_cuts(jecvar_suffix="_up")
+    elif index == 2:
+        generate_www_analysis_cuts(jecvar_suffix="_dn")
+    elif index == -1:
+        skiplooping = True
     else: help()
 
     # Analyze
     if not skiplooping: qutils.loop(options)
 
-    # Create plots and tables
-    regions = ["SRSSee", "SRSSem", "SRSSmm", "SideSSee", "SideSSem", "SideSSmm", "SR0SFOS", "SR1SFOS", "SR2SFOS", "Nj1SSee", "Nj1SSem", "Nj1SSmm" ]
-    srbins = "{SRSSeeFull, SRSSemFull, SRSSmmFull, SideSSeeFull, SideSSemFull, SideSSmmFull, SR0SFOSFull, SR1SFOSFull, SR2SFOSFull}"
-    srnj1bins = "{Nj1SSeeFull, Nj1SSemFull, Nj1SSmmFull}"
-    bkg_path = [
-            ("#gamma#rightarrowlepton", "/typebkg/photon"),
-            ("Charge mis-id", "/typebkg/qflip"),
-            ("Non-prompt", "/fake"),
-            ("Lost/three lep", "/typebkg/lostlep"),
-            ("Irredu.", "/typebkg/prompt")
-            ]
-    sig_path = [
-            ("WWW", "/sig")
-            ]
+    # Retreive the result
     samples = TQSampleFolder.loadSampleFolder("{}/output.root:samples".format(options["output_dir"]))
-    qutils.    plot (samples, srbins     , bkg_path=bkg_path, sig_path=sig_path, options={"no_ratio": True})
-    qutils.    plot (samples, srnj1bins  , bkg_path=bkg_path, sig_path=sig_path, options={"no_ratio": True})
-    for region in regions:
-        qutils.autotable(samples, region, bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg", "from_cut": region})
 
-    #qutils.autotable(samples, "yield"    , bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
+    # Create plots and tables
+    bkg_path = [
+            ("#gamma#rightarrowlepton" , "/typebkg/photon"  ) ,
+            ("Charge mis-id"           , "/typebkg/qflip"   ) ,
+            ("Non-prompt"              , "/fake"            ) ,
+            ("Lost/three lep"          , "/typebkg/lostlep" ) ,
+            ("Irredu."                 , "/typebkg/prompt"  ) 
+            ]
+    sig_path = [ ("WWW", "/sig") ]
+
+    histnames = [
+            "{SRSSeeFull, SRSSemFull, SRSSmmFull, SideSSeeFull, SideSSemFull, SideSSmmFull, SR0SFOSFull, SR1SFOSFull, SR2SFOSFull}",
+            "{Nj1SSeeFull, Nj1SSemFull, Nj1SSmmFull}",
+            "Nj1SSeeFull/MTmax" ,
+            "Nj1SSemFull/MTmax" ,
+            "Nj1SSmmFull/MTmax" ,
+            "Nj1SSeeFull/MTmin" ,
+            "Nj1SSemFull/MTmin" ,
+            "Nj1SSmmFull/MTmin" ,
+            "Nj1SSeeFull/MllSS" ,
+            "Nj1SSemFull/MllSS" ,
+            "Nj1SSmmFull/MllSS" ,
+            "Nj1SSeeFull/MET" ,
+            "Nj1SSemFull/MET" ,
+            "Nj1SSmmFull/MET" ,
+            "Nj1SSeeFull/lep_pt0",
+            "Nj1SSemFull/lep_pt0",
+            "Nj1SSmmFull/lep_pt0",
+            "Nj1SSeeFull/lep_pt1",
+            "Nj1SSemFull/lep_pt1",
+            "Nj1SSmmFull/lep_pt1",
+            "Nj1SSeeFull/jets_pt0",
+            "Nj1SSemFull/jets_pt0",
+            "Nj1SSmmFull/jets_pt0",
+            "Nj1SSmmFull/MTmin" ,
+            ]
+    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path, data_path="/data", options={"no_ratio": True, "blind":True})
+
+    # Make cutflow table
+    cutnames = [
+            "SRSSee",
+            "SRSSem",
+            "SRSSmm",
+            "SideSSee",
+            "SideSSem",
+            "SideSSmm",
+            "SR0SFOS",
+            "SR1SFOS",
+            "SR2SFOS",
+            "Nj1SSee",
+            "Nj1SSem",
+            "Nj1SSmm",
+            ]
+    qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
 
 #_____________________________________________________________________________________________________
 def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_prefix="",genmet_suffix=""): #define _up _dn etc.
-
-    # weight counter expressions for simplicity
-    version = "v1.2.2"
-    #whfilename = "whsusy_fullscan_skim_1_1.root"
-    whfilename = "whsusy_200_50_fullsim_skim_1_1.root"
-    isr_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],19)]".format(version, whfilename)
-    isr_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],20)]".format(version, whfilename)
-    isr_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],21)]".format(version, whfilename)
-    wgt_nominal = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],1)]".format(version, whfilename)
-    pdf_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],10)]".format(version, whfilename)
-    pdf_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],11)]".format(version, whfilename)
-    qsq_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],5)]".format(version, whfilename)
-    qsq_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],9)]".format(version, whfilename)
-    als_up      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],12)]".format(version, whfilename)
-    als_dn      = "[TH3Map:/nfs-7/userdata/phchang/WWW_babies/WWW_{}/skim/{}:h_counterSMS([chimass],[lspmass],13)]".format(version, whfilename)
-
-    # Systematic variations as dictionary
-    systvars = {
-            "LepSFUp"           : "lepsf_up/lepsf",
-            "LepSFDown"         : "lepsf_dn/lepsf",
-            "TrigSFUp"          : "trigsf_up/trigsf",
-            "TrigSFDown"        : "trigsf_dn/trigsf",
-            "BTagLFUp"          : "weight_btagsf_light_DN/weight_btagsf",
-            "BTagLFDown"        : "weight_btagsf_light_UP/weight_btagsf",
-            "BTagHFUp"          : "weight_btagsf_heavy_DN/weight_btagsf",
-            "BTagHFDown"        : "weight_btagsf_heavy_UP/weight_btagsf",
-            "PileupUp"          : "purewgt_dn/purewgt",
-            "PileupDown"        : "purewgt_up/purewgt",
-            "FakeUp"            : "{$(usefakeweight)?ffwgt_full_up/ffwgt:1}",
-            "FakeDown"          : "{$(usefakeweight)?ffwgt_full_dn/ffwgt:1}",
-            "FakeRateUp"        : "{$(usefakeweight)?ffwgt_up/ffwgt:1}",
-            "FakeRateDown"      : "{$(usefakeweight)?ffwgt_dn/ffwgt:1}",
-            "FakeRateElUp"      : "{$(usefakeweight)?ffwgt_el_up/ffwgt:1}",
-            "FakeRateElDown"    : "{$(usefakeweight)?ffwgt_el_dn/ffwgt:1}",
-            "FakeRateMuUp"      : "{$(usefakeweight)?ffwgt_mu_up/ffwgt:1}",
-            "FakeRateMuDown"    : "{$(usefakeweight)?ffwgt_mu_dn/ffwgt:1}",
-            "FakeClosureUp"     : "{$(usefakeweight)?ffwgt_closure_up/ffwgt:1}",
-            "FakeClosureDown"   : "{$(usefakeweight)?ffwgt_closure_dn/ffwgt:1}",
-            "FakeClosureElUp"   : "{$(usefakeweight)?ffwgt_closure_el_up/ffwgt:1}",
-            "FakeClosureElDown" : "{$(usefakeweight)?ffwgt_closure_el_dn/ffwgt:1}",
-            "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
-            "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-            "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-            "ISRUp"             : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_isr_up/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_up) , 
-            "ISRDown"           : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_isr_down/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_dn) , 
-            "PDFUp"             : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_pdf_up]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, pdf_up) , 
-            "PDFDown"           : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_pdf_down]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, pdf_dn) , 
-            "QsqUp"             : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_fr_r2_f2]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, qsq_up) , 
-            "QsqDown"           : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_fr_r0p5_f0p5]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, qsq_dn) , 
-            "AlphaSUp"          : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_alphas_up]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, als_up) , 
-            "AlphaSDown"        : "{{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?[weight_alphas_down]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, als_dn) , 
-            }
 
     #
     #
@@ -190,15 +176,13 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     # The "children" cuts can be added via TQCut::addCut(TQCut* cut) function.
     tqcuts = {}
 
+    # Mother of all cuts
+    tqcuts["Root"] = TQCut("Root", "Root", "1", "1")
+
     # Preselection TQCut object
     # This object will have all the cuts added into a tree structure via adding "children" using TQCut::addCut.
     # Eventually at the end of the function this object will be returned
     tqcuts["Presel"] = TQCut("Presel", "Presel", PreselCutExpr, PreselWgtExpr)
-
-    # WH SUSY sample mass filter and xsec expression
-    #BR = "(0.06272+0.2137*0.3258*0.3258+0.02619)*(0.3258)"
-    BR = "0.134843696693296"
-    tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?["+BR+"]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./"+isr_nominal+"*[weight_isr]:1}")
 
     # Trigger cuts
     tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[Trigger]", "trigsf")
@@ -210,7 +194,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SRTrilep"] = TQCut("SRTrilep" , "SRTrilep" , "({$(usefakeweight)?(nVlep==3)*(nLlep==3)*(nTlep==2):(nVlep==3)*(nLlep==3)*(nTlep==3)})*(lep_pt[0]>25.)" , "{$(usefakeweight)?1.:lepsf"+lepsfvar_suffix+"}")
 
     # The cut hierarchies are defined by adding "children" cuts via function TQCut::addCut
-    tqcuts["SUSY"].addCut(tqcuts["Trigger"])
+    tqcuts["Root"].addCut(tqcuts["Trigger"])
     tqcuts["Trigger"].addCut(tqcuts["Presel"])
     tqcuts["Presel"].addCut(tqcuts["SRDilep"])
     tqcuts["Presel"].addCut(tqcuts["SRTrilep"])
@@ -231,7 +215,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SRSSeeDetajjL"] = TQCut("SRSSeeDetajjL" , "SRSSee: 6. DetajjL < 1.5"    , "DetajjL"+jecvar_suffix+"<1.5"                     , "1")
     tqcuts["SRSSeeMET"]     = TQCut("SRSSeeMET"     , "SRSSee: 7. MET > 60"         , "met"+genmet_suffix+jecvar_suffix+"_pt>60."        , "1")
     tqcuts["SRSSeeMllSS"]   = TQCut("SRSSeeMllSS"   , "SRSSee: 8. MllSS > 40"       , "MllSS>40."                                        , "1")
-    tqcuts["SRSSeeFull"]    = TQCut("SRSSeeFull"    , "SRSS-ee: Full selection"     , "1"                                                , "1")
+    tqcuts["SRSSeeFull"]    = TQCut("SRSSeeFull"    , "SR ee"                       , "1"                                                , "1")
     # Define same-sign dielectron region cut hierarchy structure
     tqcuts["SRDilep"]      .addCut( tqcuts["SRSSee"]        ) 
     tqcuts["SRSSee"]       .addCut( tqcuts["SRSSeeZeeVt"]   ) 
@@ -262,7 +246,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SRSSemMET"]     = TQCut("SRSSemMET"     , "SRSSem: 7. MET > 60"         , "met"+genmet_suffix+jecvar_suffix+"_pt>60."    , "1")
     tqcuts["SRSSemMllSS"]   = TQCut("SRSSemMllSS"   , "SRSSem: 8. MllSS > 30"       , "MllSS>30."                                    , "1")
     tqcuts["SRSSemMTmax"]   = TQCut("SRSSemMTmax"   , "SRSSem: 9. MTmax"            , "MTmax"+jecvar_suffix+genmet_suffix+">90."     , "1")
-    tqcuts["SRSSemFull"]    = TQCut("SRSSemFull"    , "SRSSem: Full selection"      , "1"                                            , "1")
+    tqcuts["SRSSemFull"]    = TQCut("SRSSemFull"    , "SR e#mu"                     , "1"                                            , "1")
     # Define same-sign emu region cut hierarchy structure
     tqcuts["SRDilep"]       .addCut( tqcuts ["SRSSem"]        ) 
     tqcuts["SRSSem"]        .addCut( tqcuts ["SRSSemTVeto"]   ) 
@@ -292,7 +276,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SRSSmmDetajjL"] = TQCut("SRSSmmDetajjL" , "SRSSmm: 6. DetajjL < 1.5"    , "DetajjL"+jecvar_suffix+"<1.5"               , "1")
     tqcuts["SRSSmmMET"]     = TQCut("SRSSmmMET"     , "SRSSmm: 7. MET > 0"          , "1."                                         , "1")
     tqcuts["SRSSmmMllSS"]   = TQCut("SRSSmmMllSS"   , "SRSSmm: 8. MllSS > 40"       , "MllSS>40."                                  , "1")
-    tqcuts["SRSSmmFull"]    = TQCut("SRSSmmFull"    , "SRSSmm: Full selection"      , "1"                                          , "1")
+    tqcuts["SRSSmmFull"]    = TQCut("SRSSmmFull"    , "SR #mu#mu"                   , "1"                                          , "1")
     # Define same-sign dimuon region cut hierarchy structure
     tqcuts["SRDilep"]       .addCut( tqcuts["SRSSmm"]        ) 
     tqcuts["SRSSmm"]        .addCut( tqcuts["SRSSmmTVeto"]   ) 
@@ -322,7 +306,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SR0SFOSM3l"]        = TQCut("SR0SFOSM3l"       , "SR0SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                         , "1")
     tqcuts["SR0SFOSZVt"]        = TQCut("SR0SFOSZVt"       , "SR0SFOS: 8. |Mee-MZ| > 15"               , "abs(Mee3L-91.1876) > 15."                       , "1")
     tqcuts["SR0SFOSMTmax"]      = TQCut("SR0SFOSMTmax"     , "SR0SFOS: 9. MTmax > 90"                  , "MTmax3L"+jecvar_suffix+genmet_suffix+">90."     , "1")
-    tqcuts["SR0SFOSFull"]       = TQCut("SR0SFOSFull"      , "SR0SFOS: Full selection"                 , "1"                                              , "1")
+    tqcuts["SR0SFOSFull"]       = TQCut("SR0SFOSFull"      , "SR 0SFOS"                                , "1"                                              , "1")
     # Define three lepton with 0 opposite-sign pair with same flavor cut hierarchy
     tqcuts["SRTrilep"]         .addCut( tqcuts["SR0SFOS"]          ) 
     tqcuts["SR0SFOS"]          .addCut( tqcuts["SR0SFOSNj1"]       ) 
@@ -353,7 +337,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SR1SFOSM3l"]        = TQCut("SR1SFOSM3l"       , "SR1SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                           , "1")
     tqcuts["SR1SFOSZVt"]        = TQCut("SR1SFOSZVt"       , "SR1SFOS: 8. |MSFOS-MZ| > 20"             , "nSFOSinZ == 0"                                    , "1")
     tqcuts["SR1SFOSMT3rd"]      = TQCut("SR1SFOSMT3rd"     , "SR1SFOS: 9. MT3rd > 90"                  , "MT3rd"+jecvar_suffix+genmet_suffix+">90."         , "1")
-    tqcuts["SR1SFOSFull"]       = TQCut("SR1SFOSFull"      , "SR1SFOS: Full selection"                 , "1"                                                , "1")
+    tqcuts["SR1SFOSFull"]       = TQCut("SR1SFOSFull"      , "SR 1SFOS"                                , "1"                                                , "1")
     # Define three lepton with 1 opposite-sign pair with same flavor cut hierarchy
     tqcuts["SRTrilep"]         .addCut( tqcuts["SR1SFOS"]          ) 
     tqcuts["SR1SFOS"]          .addCut( tqcuts["SR1SFOSNj1"]       ) 
@@ -383,7 +367,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SR2SFOSMll"]        = TQCut("SR2SFOSMll"       , "SR2SFOS: 6. Mll > 20"                    , "(Mll3L > 20. && Mll3L1 > 20.)"                  , "1")
     tqcuts["SR2SFOSM3l"]        = TQCut("SR2SFOSM3l"       , "SR2SFOS: 7. |M3l-MZ| > 10"               , "abs(M3l-91.1876) > 10."                         , "1")
     tqcuts["SR2SFOSZVt"]        = TQCut("SR2SFOSZVt"       , "SR2SFOS: 8. |MSFOS-MZ| > 20"             , "nSFOSinZ == 0"                                  , "1")
-    tqcuts["SR2SFOSFull"]       = TQCut("SR2SFOSFull"      , "SR2SFOS: Full selection"                 , "1"                                              , "1")
+    tqcuts["SR2SFOSFull"]       = TQCut("SR2SFOSFull"      , "SR 2SFOS"                                , "1"                                              , "1")
     # Define three lepton with 2 opposite-sign pair with same flavor cut hierarchy
     tqcuts["SRTrilep"]         .addCut( tqcuts["SR2SFOS"]          ) 
     tqcuts["SR2SFOS"]          .addCut( tqcuts["SR2SFOSNj1"]       ) 
@@ -416,11 +400,12 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
                 "SRSSeeNj2" : TQCut("Nj1SSeeNj1" , "Nj1SSee: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
                 "SRSSemNj2" : TQCut("Nj1SSemNj1" , "Nj1SSem: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
                 "SRSSmmNj2" : TQCut("Nj1SSmmNj1" , "Nj1SSmm: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
-                "SRSSeePre" : TQCut("Nj1SSeeFull", "Nj1SSee: Full selection" , "1" , "1"),
-                "SRSSemPre" : TQCut("Nj1SSemFull", "Nj1SSem: Full selection" , "1" , "1"),
-                "SRSSmmPre" : TQCut("Nj1SSmmFull", "Nj1SSmm: Full selection" , "1" , "1"),
+                "SRSSeePre" : TQCut("Nj1SSeeFull", "Nj1 ee"     , "1" , "1"),
+                "SRSSemPre" : TQCut("Nj1SSemFull", "Nj1 e#mu"   , "1" , "1"),
+                "SRSSmmPre" : TQCut("Nj1SSmmFull", "Nj1 #mu#mu" , "1" , "1"),
                 },
             cutdict=tqcuts,
+            terminate=["SRSSeePre", "SRSSemPre", "SRSSmmPre"]
             )
     # Then add it to Presel
     tqcuts["Presel"].addCut(tqcuts["Nj1Dilep"])
@@ -449,6 +434,51 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     #
     # Add weight variation systematics
     #
+
+    # h_neventsinfile
+    wgt_nominal = "[TH1Map:$(.init.filepath):h_neventsinfile(1)]"
+    pdf_up      = "[TH1Map:$(.init.filepath):h_neventsinfile(10)]"
+    pdf_dn      = "[TH1Map:$(.init.filepath):h_neventsinfile(11)]"
+    als_up      = "[TH1Map:$(.init.filepath):h_neventsinfile(13)]"
+    als_dn      = "[TH1Map:$(.init.filepath):h_neventsinfile(12)]"
+    qsq_up      = "[TH1Map:$(.init.filepath):h_neventsinfile(5)]"
+    qsq_dn      = "[TH1Map:$(.init.filepath):h_neventsinfile(9)]"
+
+    # Systematic variations as dictionary
+    systvars = {
+            "LepSFUp"           : "lepsf_up/lepsf",
+            "LepSFDown"         : "lepsf_dn/lepsf",
+            "TrigSFUp"          : "trigsf_up/trigsf",
+            "TrigSFDown"        : "trigsf_dn/trigsf",
+            "BTagLFUp"          : "weight_btagsf_light_DN/weight_btagsf",
+            "BTagLFDown"        : "weight_btagsf_light_UP/weight_btagsf",
+            "BTagHFUp"          : "weight_btagsf_heavy_DN/weight_btagsf",
+            "BTagHFDown"        : "weight_btagsf_heavy_UP/weight_btagsf",
+            "PileupUp"          : "purewgt_dn/purewgt",
+            "PileupDown"        : "purewgt_up/purewgt",
+            "FakeUp"            : "{$(usefakeweight)?ffwgt_full_up/ffwgt:1}",
+            "FakeDown"          : "{$(usefakeweight)?ffwgt_full_dn/ffwgt:1}",
+            "FakeRateUp"        : "{$(usefakeweight)?ffwgt_up/ffwgt:1}",
+            "FakeRateDown"      : "{$(usefakeweight)?ffwgt_dn/ffwgt:1}",
+            "FakeRateElUp"      : "{$(usefakeweight)?ffwgt_el_up/ffwgt:1}",
+            "FakeRateElDown"    : "{$(usefakeweight)?ffwgt_el_dn/ffwgt:1}",
+            "FakeRateMuUp"      : "{$(usefakeweight)?ffwgt_mu_up/ffwgt:1}",
+            "FakeRateMuDown"    : "{$(usefakeweight)?ffwgt_mu_dn/ffwgt:1}",
+            "FakeClosureUp"     : "{$(usefakeweight)?ffwgt_closure_up/ffwgt:1}",
+            "FakeClosureDown"   : "{$(usefakeweight)?ffwgt_closure_dn/ffwgt:1}",
+            "FakeClosureElUp"   : "{$(usefakeweight)?ffwgt_closure_el_up/ffwgt:1}",
+            "FakeClosureElDown" : "{$(usefakeweight)?ffwgt_closure_el_dn/ffwgt:1}",
+            "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
+            "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
+            "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
+            "PDFUp"             : "{{\'$(treename)\'==\'t_www\'?[weight_pdf_up]       / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, pdf_up) ,
+            "PDFDown"           : "{{\'$(treename)\'==\'t_www\'?[weight_pdf_down]     / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, pdf_dn) ,
+            "QsqUp"             : "{{\'$(treename)\'==\'t_www\'?[weight_fr_r2_f2]     / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, qsq_up) ,
+            "QsqDown"           : "{{\'$(treename)\'==\'t_www\'?[weight_fr_r0p5_f0p5] / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, qsq_dn) ,
+            "AlphaSUp"          : "{{\'$(treename)\'==\'t_www\'?[weight_alphas_up]    / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, als_up) ,
+            "AlphaSDown"        : "{{\'$(treename)\'==\'t_www\'?[weight_alphas_down]  / [weight_fr_r1_f1] * {} / {}:1}}".format(wgt_nominal, als_dn) ,
+            }
+
     qutils.addWeightSystematics(tqcuts["SRSSeeFull"], systvars, tqcuts)
     qutils.addWeightSystematics(tqcuts["SRSSemFull"], systvars, tqcuts)
     qutils.addWeightSystematics(tqcuts["SRSSmmFull"], systvars, tqcuts)
@@ -695,7 +725,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["SRTrilep"].addCut(tqcuts["GCR0SFOS"])
 
     # Return the "Root node" which holds all cuts in a tree structure
-    qutils.exportTQCutsToTextFile(tqcuts["SUSY"], "cuts.cfg")
+    qutils.exportTQCutsToTextFile(tqcuts["Root"], "cuts.cfg")
 
     cuts = qutils.loadTQCutsFromTextFile("cuts.cfg")
 
