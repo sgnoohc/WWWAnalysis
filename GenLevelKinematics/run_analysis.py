@@ -4,7 +4,7 @@ import os
 import sys
 import ROOT
 from QFramework import TQCut, TQSampleFolder
-from rooutil.qutils import loop, exportTQCutsToTextFile, loadTQCutsFromTextFile
+from rooutil.qutils import loop, exportTQCutsToTextFile, loadTQCutsFromTextFile, autoplot, autotable
 
 #_____________________________________________________________________________________________________
 def main():
