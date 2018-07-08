@@ -3,7 +3,7 @@
 import os
 import sys
 import ROOT
-from QFramework import TQSampleFolder, TQXSecParser, TQCut, TQAnalysisSampleVisitor, TQSampleInitializer, TQCutflowAnalysisJob, TQCutflowPrinter, TQHistoMakerAnalysisJob, TQHWWPlotter, TQEventlistAnalysisJob
+from QFramework import *
 from rooutil.qutils import *
 sys.path.append("..")
 
