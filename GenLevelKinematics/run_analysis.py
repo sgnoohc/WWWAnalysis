@@ -53,8 +53,15 @@ def main():
 
     # Create plots and tables
     samples = TQSampleFolder.loadSampleFolder("outputs/output.root:samples")
-    autoplot (samples,          bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, sig_path={"WZ":"/bkg/WZ"}, options={"remove_underflow": True, "signal_scale":"auto"})
-    autotable(samples, "yield", bkg_path={"WWW":"/sig/www", "WHWWW":"/sig/whwww"}, sig_path={"WZ":"/bkg/WZ"}, options={"cuts": "cuts.cfg"})
+    bkg_path = [
+            ("WWW", "/sig/www"),
+            ("WHWWW", "/sig/whwww"),
+            ]
+    sig_path = [
+            ("WZ", "/bkg/WZ")
+            ]
+    autoplot (samples,          bkg_path=bkg_path, sig_path=sig_path, options={"remove_underflow": True, "signal_scale":"auto"})
+    autotable(samples, "yield", bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
 
 #_____________________________________________________________________________________________________
 def generate_cuts_config():
