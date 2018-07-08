@@ -1,0 +1,11 @@
+plots/
+outputs/
+cutflows/
+plottery/
+rooutil/
+statinputs/
+eventlists/
+*.root
+cuts.cfg
+*.pyc
+*.swp
