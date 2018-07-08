@@ -5,7 +5,6 @@ import sys
 import ROOT
 from QFramework import TQCut, TQSampleFolder
 from rooutil.qutils import loop, exportTQCutsToTextFile, loadTQCutsFromTextFile
-sys.path.append("..")
 
 #_____________________________________________________________________________________________________
 def main():
