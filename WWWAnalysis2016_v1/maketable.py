@@ -67,6 +67,11 @@ def addProcesses(printer, showdata, prettyversion=True):
     printer.addCutflowProcess("/bsm/whsusy/150/24", "(150,24)")
     printer.addCutflowProcess("/bsm/whsusy/200/74", "(200,74)")
 
+    # Doubly charged higgs samples
+    hpmpmmasses = [200,300,400,500,600,900,1000,1500,2000]
+    for hpmpmmass in hpmpmmasses:
+        printer.addCutflowProcess("/bsm/hpmpm/{}".format(hpmpmmass), "H++[{}]".format(hpmpmmass))
+
     printer.addCutflowProcess("|", "|")
     printer.addCutflowProcess("/sig", "WWW")
     printer.addCutflowProcess("/sig/www", "non-higgs")

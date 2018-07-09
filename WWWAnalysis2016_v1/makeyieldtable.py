@@ -12,7 +12,12 @@ import math
 ##############################################################################
 def main():
 
-    f = ROOT.TFile("statinputs/hist_sm.root")
+    try:
+        fname = sys.argv[1]
+    except:
+        fname = "statinputs/hist_sm.root"
+
+    f = ROOT.TFile(fname)
 
     processes = get_processes(f)
     systs_up = get_systs_up(f, processes)

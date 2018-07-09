@@ -47,7 +47,6 @@ systvars = {
         "FakeClosureElDown" : "{$(usefakeweight)?ffwgt_closure_el_dn/ffwgt:1}",
         "FakeClosureMuUp"   : "{$(usefakeweight)?ffwgt_closure_mu_up/ffwgt:1}",
         "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
-        "FakeClosureMuDown" : "{$(usefakeweight)?ffwgt_closure_mu_dn/ffwgt:1}",
         "ISRUp"             : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_up/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_up) , 
         "ISRDown"           : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_isr_down/weight_isr]*{}/{}:1}}".format(isr_nominal, isr_dn) , 
         "PDFUp"             : "{{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?[weight_pdf_up]/[weight_fr_r1_f1]*{}/{}:1}}".format(wgt_nominal, pdf_up) , 
