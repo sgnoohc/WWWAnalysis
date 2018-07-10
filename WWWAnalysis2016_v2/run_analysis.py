@@ -73,8 +73,10 @@ def main(argv):
         generate_www_analysis_cuts()
     elif index == 1:
         generate_www_analysis_cuts(jecvar_suffix="_up")
+        options["output_suffix"] = "_jec_up"
     elif index == 2:
         generate_www_analysis_cuts(jecvar_suffix="_dn")
+        options["output_suffix"] = "_jec_dn"
     elif index == -1:
         skiplooping = True
     else: help()
@@ -97,31 +99,33 @@ def main(argv):
 
     histnames = [
             "{SRSSeeFull, SRSSemFull, SRSSmmFull, SideSSeeFull, SideSSemFull, SideSSmmFull, SR0SFOSFull, SR1SFOSFull, SR2SFOSFull}",
-            "{Nj1SSeeFull, Nj1SSemFull, Nj1SSmmFull}",
-            "Nj1SSeeFull/MTmax" ,
-            "Nj1SSemFull/MTmax" ,
-            "Nj1SSmmFull/MTmax" ,
-            "Nj1SSeeFull/MTmin" ,
-            "Nj1SSemFull/MTmin" ,
-            "Nj1SSmmFull/MTmin" ,
-            "Nj1SSeeFull/MllSS" ,
-            "Nj1SSemFull/MllSS" ,
-            "Nj1SSmmFull/MllSS" ,
-            "Nj1SSeeFull/MET" ,
-            "Nj1SSemFull/MET" ,
-            "Nj1SSmmFull/MET" ,
-            "Nj1SSeeFull/lep_pt0",
-            "Nj1SSemFull/lep_pt0",
-            "Nj1SSmmFull/lep_pt0",
-            "Nj1SSeeFull/lep_pt1",
-            "Nj1SSemFull/lep_pt1",
-            "Nj1SSmmFull/lep_pt1",
-            "Nj1SSeeFull/jets_pt0",
-            "Nj1SSemFull/jets_pt0",
-            "Nj1SSmmFull/jets_pt0",
-            "Nj1SSmmFull/MTmin" ,
+            "{SRNj1SSeeFull, SRNj1SSemFull, SRNj1SSmmFull}",
+            "{WZCRSSeeFull, WZCRSSemFull, WZCRSSmmFull, WZCR1SFOSFull, WZCR2SFOSFull}",
+            "{WZCRNj1SSeeFull, WZCRNj1SSemFull, WZCRNj1SSmmFull}",
+            "SRNj1SSeeFull/MTmax" ,
+            "SRNj1SSemFull/MTmax" ,
+            "SRNj1SSmmFull/MTmax" ,
+            "SRNj1SSeeFull/MTmin" ,
+            "SRNj1SSemFull/MTmin" ,
+            "SRNj1SSmmFull/MTmin" ,
+            "SRNj1SSeeFull/MllSS" ,
+            "SRNj1SSemFull/MllSS" ,
+            "SRNj1SSmmFull/MllSS" ,
+            "SRNj1SSeeFull/MET" ,
+            "SRNj1SSemFull/MET" ,
+            "SRNj1SSmmFull/MET" ,
+            "SRNj1SSeeFull/lep_pt0",
+            "SRNj1SSemFull/lep_pt0",
+            "SRNj1SSmmFull/lep_pt0",
+            "SRNj1SSeeFull/lep_pt1",
+            "SRNj1SSemFull/lep_pt1",
+            "SRNj1SSmmFull/lep_pt1",
+            "SRNj1SSeeFull/jets_pt0",
+            "SRNj1SSemFull/jets_pt0",
+            "SRNj1SSmmFull/jets_pt0",
+            "SRNj1SSmmFull/MTmin" ,
             ]
-    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path, data_path="/data", options={"no_ratio": True, "blind":True})
+    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path, data_path="/data", options={"blind":["SR"]})
 
     # Make cutflow table
     cutnames = [
@@ -134,9 +138,9 @@ def main(argv):
             "SR0SFOS",
             "SR1SFOS",
             "SR2SFOS",
-            "Nj1SSee",
-            "Nj1SSem",
-            "Nj1SSmm",
+            "SRNj1SSee",
+            "SRNj1SSem",
+            "SRNj1SSmm",
             ]
     qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
 
@@ -395,20 +399,20 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     # Then also swap SRDilep by "SBDilep" defined by below
     qutils.copyEditCuts(
             cut=tqcuts["SRDilep"],
-            name_edits={"SR":"Nj1"},
+            name_edits={"SR":"SRNj1"},
             cut_edits={
-                "SRSSeeNj2" : TQCut("Nj1SSeeNj1" , "Nj1SSee: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
-                "SRSSemNj2" : TQCut("Nj1SSemNj1" , "Nj1SSem: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
-                "SRSSmmNj2" : TQCut("Nj1SSmmNj1" , "Nj1SSmm: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
-                "SRSSeePre" : TQCut("Nj1SSeeFull", "Nj1 ee"     , "1" , "1"),
-                "SRSSemPre" : TQCut("Nj1SSemFull", "Nj1 e#mu"   , "1" , "1"),
-                "SRSSmmPre" : TQCut("Nj1SSmmFull", "Nj1 #mu#mu" , "1" , "1"),
+                "SRSSeeNj2" : TQCut("SRNj1SSeeNj1" , "SRNj1SSee: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSemNj2" : TQCut("SRNj1SSemNj1" , "SRNj1SSem: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSmmNj2" : TQCut("SRNj1SSmmNj1" , "SRNj1SSmm: 2. n_{j} = 1" , "nj30"+jecvar_suffix+"==1" , "1"),
+                "SRSSeePre" : TQCut("SRNj1SSeeFull", "SRNj1 ee"     , "1" , "1"),
+                "SRSSemPre" : TQCut("SRNj1SSemFull", "SRNj1 e#mu"   , "1" , "1"),
+                "SRSSmmPre" : TQCut("SRNj1SSmmFull", "SRNj1 #mu#mu" , "1" , "1"),
                 },
             cutdict=tqcuts,
             terminate=["SRSSeePre", "SRSSemPre", "SRSSmmPre"]
             )
     # Then add it to Presel
-    tqcuts["Presel"].addCut(tqcuts["Nj1Dilep"])
+    tqcuts["Presel"].addCut(tqcuts["SRNj1Dilep"])
 
     #____________________________________________________________________________________________________________________________________________________________________________
     #
@@ -488,9 +492,9 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     qutils.addWeightSystematics(tqcuts["SR0SFOSFull"], systvars, tqcuts)
     qutils.addWeightSystematics(tqcuts["SR1SFOSFull"], systvars, tqcuts)
     qutils.addWeightSystematics(tqcuts["SR2SFOSFull"], systvars, tqcuts)
-    qutils.addWeightSystematics(tqcuts["Nj1SSeeFull"], systvars, tqcuts)
-    qutils.addWeightSystematics(tqcuts["Nj1SSemFull"], systvars, tqcuts)
-    qutils.addWeightSystematics(tqcuts["Nj1SSmmFull"], systvars, tqcuts)
+    qutils.addWeightSystematics(tqcuts["SRNj1SSeeFull"], systvars, tqcuts)
+    qutils.addWeightSystematics(tqcuts["SRNj1SSemFull"], systvars, tqcuts)
+    qutils.addWeightSystematics(tqcuts["SRNj1SSmmFull"], systvars, tqcuts)
 
     #____________________________________________________________________________________________________________________________________________________________________________
     #
@@ -562,9 +566,24 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
                 },
             cutdict=tqcuts,
             )
+    qutils.copyEditCuts(
+            cut=tqcuts["SRNj1Dilep"],
+            name_edits={"SRNj1":"WZCRNj1"},
+            cut_edits={
+                "SRNj1Dilep" : TQCut("WZCRNj1Dilep" , "WZCRNj1Dilep" , "{$(usefakeweight)?(nVlep==3)*(nLlep==3)*(nTlep==2):(nVlep==3)*(nLlep==3)*(nTlep==3)}" , "{$(usefakeweight)?1.:lepsf"+lepsfvar_suffix+"}"),
+                "SRNj1SSee" : TQCut("WZCRNj1SSee" , "WZCRNj1SSee:" , "(abs(Mll3L-91.1876)<10.||abs(Mll3L1-91.1876)<10.)*(passSSee)*(1)*(MllSS>10.)*(met"+genmet_suffix+jecvar_suffix+"_pt<30.)" , "1"),
+                "SRNj1SSem" : TQCut("WZCRNj1SSem" , "WZCRNj1SSem:" , "(abs(Mll3L-91.1876)<10.||abs(Mll3L1-91.1876)<10.)*(passSSem)*(1)*(MllSS>10.)*(met"+genmet_suffix+jecvar_suffix+"_pt<45.)" , "1"),
+                "SRNj1SSmm" : TQCut("WZCRNj1SSmm" , "WZCRNj1SSmm:" , "(abs(Mll3L-91.1876)<10.||abs(Mll3L1-91.1876)<10.)*(passSSmm)*(1)*(MllSS>10.)*(met"+genmet_suffix+jecvar_suffix+"_pt<55.)" , "1"),
+                "SRNj1SSeeNj1" : TQCut("WZCRNj1SSeeNj1" , "WZCRNj1SSee: 2. n_{j} #leq 1" , "nj30"+jecvar_suffix+"<=1" , "1"),
+                "SRNj1SSemNj1" : TQCut("WZCRNj1SSemNj1" , "WZCRNj1SSem: 2. n_{j} #leq 1" , "nj30"+jecvar_suffix+"<=1" , "1"),
+                "SRNj1SSmmNj1" : TQCut("WZCRNj1SSmmNj1" , "WZCRNj1SSmm: 2. n_{j} #leq 1" , "nj30"+jecvar_suffix+"<=1" , "1"),
+                },
+            cutdict=tqcuts,
+            )
     # Then add it to Presel
     tqcuts["Presel"].addCut(tqcuts["WZCRDilep"])
     tqcuts["Presel"].addCut(tqcuts["WZCRTrilep"])
+    tqcuts["Presel"].addCut(tqcuts["WZCRNj1Dilep"])
 
     #____________________________________________________________________________________________________________________________________________________________________________
     #
