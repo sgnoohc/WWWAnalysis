@@ -8,8 +8,8 @@ from rooutil import plottery_wrapper as p
 from plottery import plottery as ply
 
 ROOT.gROOT.SetBatch(True)
-samples = TQSampleFolder.loadSampleFolder("output_sf_applied.root:samples")
-#samples = TQSampleFolder.loadSampleFolder("output.root:samples")
+#samples = TQSampleFolder.loadSampleFolder("output_sf_applied.root:samples")
+samples = TQSampleFolder.loadSampleFolder("output.root:samples")
 
 output_plot_dir = "plots"
 
@@ -172,7 +172,7 @@ def plot_bsm(histname, output_name, systs=None, options={}, plotfunc=p.plot_hist
                 "output_name": "{}/{}_bsm.pdf".format(output_plot_dir, output_name),
                 "bkg_sort_method": "unsorted",
                 #"yaxis_range": [0., 21],
-                #"signal_scale": 2
+                "signal_scale": "auto"
                 }
     alloptions.update(options)
     # Fake background
@@ -193,19 +193,24 @@ def plot_bsm(histname, output_name, systs=None, options={}, plotfunc=p.plot_hist
     #p.add_frac_syst(qflip, 1.0)
 
     www = samples.getHistogram("/sig", histname).Clone("WWW")
-    whsusy_200_1 = samples.getHistogram("/bsm/whsusy/200/1", histname).Clone("WH(200, 1)")
-    whsusy_200_74 = samples.getHistogram("/bsm/whsusy/200/74", histname).Clone("WH(200, 74)")
-    sigs = [ www, whsusy_200_1, whsusy_200_74 ]
+    hpmpm_200  = samples.getHistogram("/bsm/hpmpm/200", histname).Clone("H^{#pm#pm} [200]")
+    hpmpm_500  = samples.getHistogram("/bsm/hpmpm/500", histname).Clone("H^{#pm#pm} [500]")
+    hpmpm_1000 = samples.getHistogram("/bsm/hpmpm/1000", histname).Clone("H^{#pm#pm} [1000]")
+    sigs = [ hpmpm_200, hpmpm_500, hpmpm_1000 ]
+    #whsusy_200_1 = samples.getHistogram("/bsm/whsusy/200/1", histname).Clone("WH(200, 1)")
+    #whsusy_200_74 = samples.getHistogram("/bsm/whsusy/200/74", histname).Clone("WH(200, 74)")
+    #sigs = [ www, whsusy_200_1, whsusy_200_74 ]
     bgs  = [ 
              photon,
              qflip,
              fake_cn,
              lostlep,
              prompt,
+             www,
              ]
     data =   samples.getHistogram("/data", histname).Clone("Data")
     data =   None
-    colors = [ 920, 2007, 2005, 2003, 2001, 2]
+    colors = [ 920, 2007, 2005, 2003, 2001, 3]
     plotfunc(
             sigs = sigs,
             bgs  = bgs,
@@ -279,6 +284,7 @@ def isblind(hname):
 #_____________________________________________________________________________________
 def dofrmethod(hname):
     if hname.find("SR") != -1: return True
+    if hname.find("Side") != -1: return True
     if hname.find("BT") != -1: return True
     if hname.find("LMETCR") != -1: return True
     return False
@@ -307,7 +313,7 @@ def plotall(histnames):
         hfilename = hfilename.replace("}", "_")
 
         #nb = 15 if hname.find("BTCR") != -1 else 30
-        nb = 15
+        nb = 8
 
         ## Plotting by bkg type
         #proc = multiprocessing.Process(target=plot_typebkg, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": isblind(hname), "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_hist})
@@ -335,14 +341,14 @@ def plotall(histnames):
             proc = multiprocessing.Process(target=plot_bsm, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": isblind(hname), "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_hist})
             jobs.append(proc)
             proc.start()
-            proc = multiprocessing.Process(target=plot_signal_comparison, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": isblind(hname), "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_hist})
-            jobs.append(proc)
-            proc.start()
+            #proc = multiprocessing.Process(target=plot_signal_comparison, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": isblind(hname), "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_hist})
+            #jobs.append(proc)
+            #proc.start()
 
         # For scanning cuts to optimize
-        #proc = multiprocessing.Process(target=plot, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": hname.find("WZ") == -1, "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_cut_scan})
-        #jobs.append(proc)
-        #proc.start()
+        proc = multiprocessing.Process(target=plot_frmethod, args=[hname, hfilename], kwargs={"systs":None, "options":{"blind": hname.find("WZ") == -1, "autobin":False, "nbins":nb, "lumi_value":35.9, "yaxis_log":False}, "plotfunc": p.plot_cut_scan})
+        jobs.append(proc)
+        proc.start()
 
     for job in jobs:
         job.join()
@@ -352,28 +358,36 @@ if __name__ == "__main__":
     histnames = samples.getListOfHistogramNames()
     histnames = []
 
-    # lepton pt in 2lepton
-    histnames.extend(["SRSSeeFull/lep_pt0+SRSSemFull/lep_pt0+SRSSmmFull/lep_pt0+SideSSeeFull/lep_pt0+SideSSemFull/lep_pt0+SideSSmmFull/lep_pt0"])
-    histnames.extend(["SRSSeeFull/lep_pt1+SRSSemFull/lep_pt1+SRSSmmFull/lep_pt1+SideSSeeFull/lep_pt1+SideSSemFull/lep_pt1+SideSSmmFull/lep_pt1"])
 
-    # lepton pt in 3lepton
-    histnames.extend(["SR0SFOSFull/lep_pt0+SR1SFOSFull/lep_pt0+SR2SFOSFull/lep_pt0"])
-    histnames.extend(["SR0SFOSFull/lep_pt1+SR1SFOSFull/lep_pt1+SR2SFOSFull/lep_pt1"])
-    histnames.extend(["SR0SFOSFull/lep_pt2+SR1SFOSFull/lep_pt2+SR2SFOSFull/lep_pt2"])
+    # Regular
+    ## lepton pt in 2lepton
+    #histnames.extend(["SRSSeeFull/lep_pt0+SRSSemFull/lep_pt0+SRSSmmFull/lep_pt0+SideSSeeFull/lep_pt0+SideSSemFull/lep_pt0+SideSSmmFull/lep_pt0"])
+    #histnames.extend(["SRSSeeFull/lep_pt1+SRSSemFull/lep_pt1+SRSSmmFull/lep_pt1+SideSSeeFull/lep_pt1+SideSSemFull/lep_pt1+SideSSmmFull/lep_pt1"])
 
-    # b-tagging validation region
-    histnames.extend(["{BTCRSSeeFull,BTCRSSemFull,BTCRSSmmFull,BTCRSideSSeeFull,BTCRSideSSemFull,BTCRSideSSmmFull,BTCR0SFOSFull,BTCR1SFOSFull,BTCR2SFOSFull}"])
-    histnames.extend(["BTCRSSeeFull/lep_pt0+BTCRSSemFull/lep_pt0+BTCRSSmmFull/lep_pt0+BTCRSideSSeeFull/lep_pt0+BTCRSideSSemFull/lep_pt0+BTCRSideSSmmFull/lep_pt0"])
-    histnames.extend(["BTCRSSeeFull/lep_pt1+BTCRSSemFull/lep_pt1+BTCRSSmmFull/lep_pt1+BTCRSideSSeeFull/lep_pt1+BTCRSideSSemFull/lep_pt1+BTCRSideSSmmFull/lep_pt1"])
-    histnames.extend(["BTCRSSeeFull/MET+BTCRSSemFull/MET+BTCRSSmmFull/MET+BTCRSideSSeeFull/MET+BTCRSideSSemFull/MET+BTCRSideSSmmFull/MET"])
+    ## lepton pt in 3lepton
+    #histnames.extend(["SR0SFOSFull/lep_pt0+SR1SFOSFull/lep_pt0+SR2SFOSFull/lep_pt0"])
+    #histnames.extend(["SR0SFOSFull/lep_pt1+SR1SFOSFull/lep_pt1+SR2SFOSFull/lep_pt1"])
+    #histnames.extend(["SR0SFOSFull/lep_pt2+SR1SFOSFull/lep_pt2+SR2SFOSFull/lep_pt2"])
 
-    # Mjj validation region
-    histnames.extend(["{LMETCRSSeeFull,LMETCRSSemFull,LMETCRSSmmFull}"])
-    histnames.extend(["LMETCRSSeeFull/lep_pt0+LMETCRSSemFull/lep_pt0+LMETCRSSmmFull/lep_pt0"])
-    histnames.extend(["LMETCRSSeeFull/lep_pt1+LMETCRSSemFull/lep_pt1+LMETCRSSmmFull/lep_pt1"])
-    histnames.extend(["LMETCRSSeeFull/MET+LMETCRSSemFull/MET+LMETCRSSmmFull/MET"])
-    histnames.extend(["LMETCRSSeeFull/Mjj+LMETCRSSemFull/Mjj+LMETCRSSmmFull/Mjj"])
+    ## b-tagging validation region
+    #histnames.extend(["{BTCRSSeeFull,BTCRSSemFull,BTCRSSmmFull,BTCRSideSSeeFull,BTCRSideSSemFull,BTCRSideSSmmFull,BTCR0SFOSFull,BTCR1SFOSFull,BTCR2SFOSFull}"])
+    #histnames.extend(["BTCRSSeeFull/lep_pt0+BTCRSSemFull/lep_pt0+BTCRSSmmFull/lep_pt0+BTCRSideSSeeFull/lep_pt0+BTCRSideSSemFull/lep_pt0+BTCRSideSSmmFull/lep_pt0"])
+    #histnames.extend(["BTCRSSeeFull/lep_pt1+BTCRSSemFull/lep_pt1+BTCRSSmmFull/lep_pt1+BTCRSideSSeeFull/lep_pt1+BTCRSideSSemFull/lep_pt1+BTCRSideSSmmFull/lep_pt1"])
+    #histnames.extend(["BTCRSSeeFull/MET+BTCRSSemFull/MET+BTCRSSmmFull/MET+BTCRSideSSeeFull/MET+BTCRSideSSemFull/MET+BTCRSideSSmmFull/MET"])
 
+    ## Mjj validation region
+    #histnames.extend(["{LMETCRSSeeFull,LMETCRSSemFull,LMETCRSSmmFull}"])
+    #histnames.extend(["LMETCRSSeeFull/lep_pt0+LMETCRSSemFull/lep_pt0+LMETCRSSmmFull/lep_pt0"])
+    #histnames.extend(["LMETCRSSeeFull/lep_pt1+LMETCRSSemFull/lep_pt1+LMETCRSSmmFull/lep_pt1"])
+    #histnames.extend(["LMETCRSSeeFull/MET+LMETCRSSemFull/MET+LMETCRSSmmFull/MET"])
+    #histnames.extend(["LMETCRSSeeFull/Mjj+LMETCRSSemFull/Mjj+LMETCRSSmmFull/Mjj"])
+
+
+    histnames.extend(["SRSSeeFull/MllSS_wide+SRSSemFull/MllSS_wide+SRSSmmFull/MllSS_wide+SideSSeeFull/MllSS_wide+SideSSemFull/MllSS_wide+SideSSmmFull/MllSS_wide"])
+    histnames.extend(["SRSSeeFull/DPhill+SRSSemFull/DPhill+SRSSmmFull/DPhill+SideSSeeFull/DPhill+SideSSemFull/DPhill+SideSSmmFull/DPhill"])
+    histnames.extend(["SRSSeeFull/DPhill+SRSSemFull/DPhill+SRSSmmFull/DPhill"])
+    histnames.extend(["SideSSeeFull/DPhill+SideSSemFull/DPhill+SideSSmmFull/DPhill"])
+    histnames.extend(["SideSSmmFull/DPhill"])
 
 
 

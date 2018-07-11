@@ -115,7 +115,7 @@ def getWWWAnalysisCuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",b
 
     # WH SUSY sample mass filter and xsec expression
     #BR = "(0.06272+0.2137*0.3258*0.3258+0.02619)*(0.3258)"
-    BR = "0.134843696693296"
+    BR = "0.1292"
     tqcuts["SUSY"] = TQCut("SUSY", "SUSY", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?chimass==$(mchi)&&lspmass==$(mlsp):1}", "{\"$(path)\"==\"/bsm/whsusy/$(mchi)/$(mlsp)\"?["+BR+"]*[TH1Map:/home/users/phchang/public_html/analysis/www/code/VVVBabyMakerProduction/dilepbabymaker/xsec_susy_13tev.root:h_xsec_c1n2([chimass])]*1000./"+isr_nominal+"*[weight_isr]:1}")
 
     # Trigger cuts

@@ -42,6 +42,9 @@ def main(samples, sample_to_run, extra_args):
     TH1F('MllSS' , '' , 180 , 0. , 300.) << (MllSS : '\#it{m}_{ll} [GeV]');
     #@*/*: MllSS;
 
+    TH1F('DPhill' , '' , 180 , 0. , 3.1416) << (TMath::Abs(TVector2::Phi_mpi_pi(lep_phi[0] - lep_phi[1])) : '\#Delta\#phi_{ll}');
+    #@*/*: DPhill;
+
     TH1F('MllSS_wide' , '' , 180 , 0. , 2000.) << (MllSS : '\#it{m}_{ll} [GeV]');
     #@*/*: MllSS_wide;
 
@@ -172,12 +175,12 @@ def main(samples, sample_to_run, extra_args):
     @LMETCRSSemFull: lep_pt0, lep_pt1, MET, Mjj;
     @LMETCRSSmmFull: lep_pt0, lep_pt1, MET, Mjj;
 
-    @SRSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
-    @SRSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
-    @SRSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
-    @SideSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
-    @SideSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
-    @SideSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2;
+    @SRSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
+    @SRSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
+    @SRSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
+    @SideSSeeFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
+    @SideSSemFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
+    @SideSSmmFull/*: MllSS_wide, MTlvlv, Mjj, Mlvlvjj_wide, lep_pt0, lep_pt1, lep_pt2, DPhill;
     @SR0SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
     @SR1SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
     @SR2SFOSFull/* :MllSS_wide, MTlvlv, lep_pt0, lep_pt1, lep_pt2;
@@ -365,7 +368,7 @@ if __name__ == "__main__":
     samples = TQSampleFolder("samples")
 
     # Connect input baby ntuple
-    connectNtuples(samples, "../samples.cfg", ntuplepath, "<-1")
+    connectNtuples(samples, "../samples.cfg", ntuplepath, "<-1", "<-2")
 
     # Add BSM samples
     addBSMsamples(samples)
