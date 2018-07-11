@@ -141,6 +141,14 @@ def main(argv):
             "SRNj1SSee",
             "SRNj1SSem",
             "SRNj1SSmm",
+            "WZCRSSee",
+            "WZCRSSem",
+            "WZCRSSmm",
+            "WZCR1SFOS",
+            "WZCR2SFOS",
+            "WZCRNj1SSee",
+            "WZCRNj1SSem",
+            "WZCRNj1SSmm",
             ]
     qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
 

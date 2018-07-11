@@ -52,8 +52,17 @@ def main():
             # The control regions will normalize the counts
             # The systematics
             "control_regions" : {
-                ("SRSSeeFull"  , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSeeFull", "/data-typebkg/[qflip+photon+prompt+fakes]-sig"),
-                ("SideSSeeFull", "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSeeFull", "/data-typebkg/[qflip+photon+prompt+fakes]-sig"),
+                ("SRSSeeFull"   , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSeeFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SRSSemFull"   , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSemFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SRSSmmFull"   , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSmmFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SideSSeeFull" , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSeeFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SideSSemFull" , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSemFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SideSSmmFull" , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRSSmmFull"    , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SR1SFOSFull"  , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCR1SFOSFull"   , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                ("SR2SFOSFull"  , "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCR2SFOSFull"   , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                #("SRNj1SSeeFull", "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRNj1SSeeFull" , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                #("SRNj1SSemFull", "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRNj1SSemFull" , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
+                #("SRNj1SSmmFull", "/typebkg/lostlep/[ttZ+WZ+Other]") : ("WZCRNj1SSmmFull" , "/data-typebkg/qflip-typebkg/photon-typebkg/prompt-typebkg/fakes-typebkg/lostlep/VBSWW-typebkg/lostlep/ttW-sig"),
                 },
 
             # Weight variation systematics that are saved in the "nominal_sample" TQSampleFolder
@@ -76,6 +85,19 @@ def main():
                 ],
 
             "statistical" : [ "www", "vbsww", "ttw", "photon", "qflip", "prompt", "fake" ],
+
+            "flat_systematics" : [
+                    ("VBSWWXSec"            , ["vbsww"                                           ] , "1.2"  , ""     ) ,
+                    ("ttWXSec"              , ["ttw"                                             ] , "1.2"  , ""     ) ,
+                    ("VBSWWVRSyst"          , ["vbsww"                                           ] , "1.22" , ""     ) ,
+                    ("ttWVRSyst"            , ["ttw"                                             ] , "1.18" , ""     ) ,
+                    ("QFlipVRSyst"          , ["qflip"                                           ] , "1.5"  , ""     ) ,
+                    ("PhotonVRSyst"         , ["photon"                                          ] , "1.5"  , ""     ) ,
+                    ("LostLepMll3LModeling" , ["lostlep"                                         ] , "1.082", "SFOS" ) ,
+                    ("LostLepMllSSModeling" , ["lostlep"                                         ] , "1.053", "SS"   ) ,
+                    ("LostLepMjjModeling"   , ["lostlep"                                         ] , "1.049", "SS"   ) ,
+                    ("LumSyst"              , ["vbsww", "ttw", "photon", "qflip", "prompt", "www"] , "1.025", ""     ) ,
+                ],
 
             }
 
