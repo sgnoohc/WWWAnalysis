@@ -4,7 +4,7 @@ from QFramework import TQSampleFolder
 from rooutil import qutils
 
 #########################################################################################################################################################
-def main():
+def main(model="", mass=""):
 
     samples = TQSampleFolder.loadSampleFolder("outputs/output.root:samples")
     samples_jec_up = TQSampleFolder.loadSampleFolder("outputs/output_jec_up.root:samples")
@@ -13,7 +13,7 @@ def main():
     options = {
 
             # Signal name and TQSampleFolder path
-            "sig" : ("www", "/sig"),
+            "sig" : ("www", "/sig" if model == "" else "/bsm/{}/{}".format(model, mass)),
 
             # Background names and TQSampelFolder paths
             "bkgs" : [
@@ -23,7 +23,7 @@ def main():
                 ("ttw"     , "/typebkg/?/ttW"),
                 ("photon"  , "/typebkg/photon/[ttZ+WZ+Other]"),
                 ("qflip"   , "/typebkg/qflip/[ttZ+WZ+Other]"),
-                ("prompt"  , "/typebkg/prompt/[ttZ+WZ+Other]"),
+                ("prompt"  , "/typebkg/prompt/[ttZ+WZ+Other]" if model == "" else "/typebkg/prompt/[ttZ+WZ+Other]+sig"),
                 ],
 
             # Data TQSampleFolder paths
@@ -69,11 +69,11 @@ def main():
             # The nomenclature of the coutner names must be <BIN_COUNTER><SYSTS>Up and <BIN_COUNTER><SYSTS>Down
             # The keyword are the systematics and then the items list the processes to apply the systematics
             "systematics" : [
-                ("LepSF"         , { "procs_to_apply" : ["vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
-                ("TrigSF"        , { "procs_to_apply" : ["vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
-                ("BTagLF"        , { "procs_to_apply" : ["vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
-                ("BTagHF"        , { "procs_to_apply" : ["vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
-                ("Pileup"        , { "procs_to_apply" : ["vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
+                ("LepSF"         , { "procs_to_apply" : ["www", "vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
+                ("TrigSF"        , { "procs_to_apply" : ["www", "vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
+                ("BTagLF"        , { "procs_to_apply" : ["www", "vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
+                ("BTagHF"        , { "procs_to_apply" : ["www", "vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
+                ("Pileup"        , { "procs_to_apply" : ["www", "vbsww", "ttw", "photon", "qflip", "prompt", "lostlep"]                                                                          }),
                 ("FakeRateEl"    , { "procs_to_apply" : ["fake"]                                                                                                                          }),
                 ("FakeRateMu"    , { "procs_to_apply" : ["fake"]                                                                                                                          }),
                 ("FakeClosureEl" , { "procs_to_apply" : ["fake"]                                                                                                                          }),
@@ -102,8 +102,14 @@ def main():
             }
 
 
-    print qutils.make_counting_experiment_statistics_data_card(options)
+    return qutils.make_counting_experiment_statistics_data_card(options)
 
 if __name__ == "__main__":
 
-    main()
+    qutils.makedir("statinputs/")
+    f = open("statinputs/datacard_sm.txt", "w")
+    f.write(main())
+    masses = [200, 300, 400, 500, 600, 900, 1000, 1500, 2000]
+    for mass in masses:
+        f = open("statinputs/datacard_hpmpm_{}.txt".format(mass), "w")
+        f.write(main("hpmpm", mass))

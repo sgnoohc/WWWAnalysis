@@ -95,13 +95,36 @@ def main(argv):
             ("Lost/three lep"          , "/typebkg/lostlep" ) ,
             ("Irredu."                 , "/typebkg/prompt"  ) 
             ]
-    sig_path = [ ("WWW", "/sig") ]
+    sig_path_plots = [
+            ("WWW", "/sig"),
+            ("H^{#pm#pm} [200 GeV]", "/bsm/hpmpm/200"),
+            ("H^{#pm#pm} [1 TeV]", "/bsm/hpmpm/1500"),
+            ]
+
+    sig_path_table = [
+            ("WWW", "/sig"),
+            ("H [200 GeV]", "/bsm/hpmpm/200"),
+            ("H [300 GeV]", "/bsm/hpmpm/300"),
+            ("H [400 GeV]", "/bsm/hpmpm/400"),
+            ("H [500 GeV]", "/bsm/hpmpm/500"),
+            ("H [600 GeV]", "/bsm/hpmpm/600"),
+            ("H [900 GeV]", "/bsm/hpmpm/900"),
+            ("H [1000 GeV]", "/bsm/hpmpm/1000"),
+            ("H [1500 GeV]", "/bsm/hpmpm/1500"),
+            ("H [2000 GeV]", "/bsm/hpmpm/2000"),
+            ]
 
     histnames = [
             "{SRSSeeFull, SRSSemFull, SRSSmmFull, SideSSeeFull, SideSSemFull, SideSSmmFull, SR0SFOSFull, SR1SFOSFull, SR2SFOSFull}",
             "{SRNj1SSeeFull, SRNj1SSemFull, SRNj1SSmmFull}",
             "{WZCRSSeeFull, WZCRSSemFull, WZCRSSmmFull, WZCR1SFOSFull, WZCR2SFOSFull}",
             "{WZCRNj1SSeeFull, WZCRNj1SSemFull, WZCRNj1SSmmFull}",
+            "SRSSeeFull/MTlvlv" ,
+            "SRSSemFull/MTlvlv" ,
+            "SRSSmmFull/MTlvlv" ,
+            "SRSSeeFull/MllSS_wide" ,
+            "SRSSemFull/MllSS_wide" ,
+            "SRSSmmFull/MllSS_wide" ,
             "SRNj1SSeeFull/MTmax" ,
             "SRNj1SSemFull/MTmax" ,
             "SRNj1SSmmFull/MTmax" ,
@@ -124,8 +147,10 @@ def main(argv):
             "SRNj1SSemFull/jets_pt0",
             "SRNj1SSmmFull/jets_pt0",
             "SRNj1SSmmFull/MTmin" ,
+            "SRSSeeFull/MllSS_wide+SRSSemFull/MllSS_wide+SRSSmmFull/MllSS_wide+SideSSeeFull/MllSS_wide+SideSSemFull/MllSS_wide+SideSSmmFull/MllSS_wide" ,
+            "SRSSeeFull/MllSS_varbin+SRSSemFull/MllSS_varbin+SRSSmmFull/MllSS_varbin+SideSSeeFull/MllSS_varbin+SideSSemFull/MllSS_varbin+SideSSmmFull/MllSS_varbin" ,
             ]
-    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path, data_path="/data", options={"blind":["SR"]})
+    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path_plots, data_path="/data", options={"blind":["SR"]})
 
     # Make cutflow table
     cutnames = [
@@ -150,7 +175,38 @@ def main(argv):
             "WZCRNj1SSem",
             "WZCRNj1SSmm",
             ]
-    qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path, options={"cuts": "cuts.cfg"})
+    qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
+
+    # Make summary cutflow table
+    summary_cuts = [
+            "SRSSeeFull",
+            "SRSSemFull",
+            "SRSSmmFull",
+            "|",
+            "SideSSeeFull",
+            "SideSSemFull",
+            "SideSSmmFull",
+            "|",
+            "SR0SFOSFull",
+            "SR1SFOSFull",
+            "SR2SFOSFull",
+            "|",
+            "SRNj1SSeeFull",
+            "SRNj1SSemFull",
+            "SRNj1SSmmFull",
+            "|",
+            "WZCRSSeeFull",
+            "WZCRSSemFull",
+            "WZCRSSmmFull",
+            "|",
+            "WZCR1SFOSFull",
+            "WZCR2SFOSFull",
+            "|",
+            "WZCRNj1SSeeFull",
+            "WZCRNj1SSemFull",
+            "WZCRNj1SSmmFull",
+            ]
+    qutils.table(samples, "Root", bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg", "cuts_list": summary_cuts, "output_name": "summary"})
 
 #_____________________________________________________________________________________________________
 def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_prefix="",genmet_suffix=""): #define _up _dn etc.
@@ -167,6 +223,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     # only one factor of (0.21 * (1-0.21)) because it's counted with same sign
     # 0.21 = HWW or W->lv (l = e or mu only, as 8107 was determined with e/mu only)
     ["1"                                                                             , "{\'$(path)\'==\'/sig/www\'?1.0384615385:1}" ] , # Theory paper vs. 208 fb
+    ["1"                                                                             , "{\'$(type)\'==\'hpmpm\'?{$(mass)==600?1.0335276365*0.3258*0.3258:0.3258*0.3258}:1}" ] , # BR(W->lv)^2 for m=600 the scale1fb of 0.01 assumed 100k events. But due to some inefficiency need to rescale by 1.0335276.
     ["1"                                                                             , "evt_scale1fb"                  ] , 
     ["1"                                                                             , "purewgt"                       ] , 
     ["1"                                                                             , "{$(usefakeweight)?ffwgt:35.9}" ] , 
