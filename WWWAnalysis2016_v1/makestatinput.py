@@ -70,10 +70,11 @@ def main(model="sm", mass0=-1, mass1=-1):
         if process == "lostlep": h_nom = set_to_lostlep_nominal_hist(h_nom)
 
         # If whsusy model with signal then get the average of the two histogram
-        if model == "whsusy" and process == "www": set_to_average_and_write_genmet_syst_hist(h_nom, samples_gen_met.getHistogram(sampledirpaths[process], histname).Clone(process))
+        #if model == "whsusy" and process == "www": set_to_average_and_write_genmet_syst_hist(h_nom, samples_gen_met.getHistogram(sampledirpaths[process], histname).Clone(process))
 
         # Write nominal histogram
-        h_nom.Write()
+        #h_nom.Write()
+        mask_bins(h_nom).Write()
 
         # Save the total number that will be used to output to datacards
         rates[process] = h_nom.Integral()
@@ -89,12 +90,15 @@ def main(model="sm", mass0=-1, mass1=-1):
                 continue
 
             # Write the systvariation histograms
-            samples.getHistogram(sampledirpaths[process], histname.replace("Full", "Full" + systvar)).Clone(process + "_" + systvar).Write()
+            #samples.getHistogram(sampledirpaths[process], histname.replace("Full", "Full" + systvar)).Clone(process + "_" + systvar).Write()
+            mask_bins(samples.getHistogram(sampledirpaths[process], histname.replace("Full", "Full" + systvar)).Clone(process + "_" + systvar)).Write()
 
         # JEC systematic histograms need to be called from a different sample output
         if process != "fake" and process != "lostlep":
-            samples_jec_up.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECUp").Write()
-            samples_jec_dn.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECDown").Write()
+            #samples_jec_up.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECUp").Write()
+            #samples_jec_dn.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECDown").Write()
+            mask_bins(samples_jec_up.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECUp")).Write()
+            mask_bins(samples_jec_dn.getHistogram(sampledirpaths[process], histname).Clone(process + "_JECDown")).Write()
 
         # Lost lepton has special treatment
         if process == "lostlep":
@@ -118,7 +122,8 @@ def main(model="sm", mass0=-1, mass1=-1):
 
     # Write data histogram
     h_data = samples.getHistogram("/data", histname).Clone("data_obs")
-    h_data.Write()
+    #h_data.Write()
+    mask_bins(h_data).Write()
 
     datacard="""imax 1 number of bins
 jmax * number of processes
@@ -356,8 +361,10 @@ def write_nominal_stat_variations(h_nom, process):
         vardown = max(bc - be, 1e-6)
         h_statvarup  .SetBinContent(ibin, varup)
         h_statvardown.SetBinContent(ibin, vardown)
-        h_statvarup  .Write()
-        h_statvardown.Write()
+        #h_statvarup  .Write()
+        #h_statvardown.Write()
+        mask_bins(h_statvarup  ).Write()
+        mask_bins(h_statvardown).Write()
 
 #########################################################################################################################################################
 def write_lostlep_stat_variations(h_nom):
@@ -365,15 +372,19 @@ def write_lostlep_stat_variations(h_nom):
         ibin = i + 1
         h_staterr_up = set_to_lostlep_statup_hist(h_nom.Clone("lostlep_lostlep_stat" + bin_suffix(ibin) + "Up"), i)
         h_staterr_dn = set_to_lostlep_statdn_hist(h_nom.Clone("lostlep_lostlep_stat" + bin_suffix(ibin) + "Down"), i)
-        h_staterr_up.Write()
-        h_staterr_dn.Write()
+        #h_staterr_up.Write()
+        #h_staterr_dn.Write()
+        mask_bins(h_staterr_up).Write()
+        mask_bins(h_staterr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_syst_variations(h_nom):
     h_systerr_up = set_to_lostlep_systup_hist(h_nom.Clone("lostlep_LostLepSystUp"))
     h_systerr_dn = set_to_lostlep_systdn_hist(h_nom.Clone("lostlep_LostLepSystDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_TFstat_variations(h_nom):
@@ -381,8 +392,10 @@ def write_lostlep_TFstat_variations(h_nom):
         ibin = i + 1
         h_staterr_up = set_to_lostlep_TFstatup_hist(h_nom.Clone("lostlep_lostlep_stat" + bin_suffix(ibin) + "Up"), i)
         h_staterr_dn = set_to_lostlep_TFstatdn_hist(h_nom.Clone("lostlep_lostlep_stat" + bin_suffix(ibin) + "Down"), i)
-        h_staterr_up.Write()
-        h_staterr_dn.Write()
+        #h_staterr_up.Write()
+        #h_staterr_dn.Write()
+        mask_bins(h_staterr_up).Write()
+        mask_bins(h_staterr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_CRstat_variations(h_nom):
@@ -391,36 +404,46 @@ def write_lostlep_CRstat_variations(h_nom):
         if i == 3 or i == 4 or i == 5: continue
         h_staterr_up = set_to_lostlep_CRstatup_hist(h_nom.Clone("lostlep_lostlep_CRstat" + bin_suffix_comb(ibin) + "Up"), i)
         h_staterr_dn = set_to_lostlep_CRstatdn_hist(h_nom.Clone("lostlep_lostlep_CRstat" + bin_suffix_comb(ibin) + "Down"), i)
-        h_staterr_up.Write()
-        h_staterr_dn.Write()
+        #h_staterr_up.Write()
+        #h_staterr_dn.Write()
+        mask_bins(h_staterr_up).Write()
+        mask_bins(h_staterr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_TFsyst_variations(h_nom):
     h_systerr_up = set_to_lostlep_TFsystup_hist(h_nom.Clone("lostlep_LostLepSystUp"))
     h_systerr_dn = set_to_lostlep_TFsystdn_hist(h_nom.Clone("lostlep_LostLepSystDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_Mjjsyst_variations(h_nom):
     h_systerr_up = set_to_lostlep_Mjjsystup_hist(h_nom.Clone("lostlep_MjjModelingUp"))
     h_systerr_dn = set_to_lostlep_Mjjsystdn_hist(h_nom.Clone("lostlep_MjjModelingDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_MllSSsyst_variations(h_nom):
     h_systerr_up = set_to_lostlep_MllSSsystup_hist(h_nom.Clone("lostlep_MllSSModelingUp"))
     h_systerr_dn = set_to_lostlep_MllSSsystdn_hist(h_nom.Clone("lostlep_MllSSModelingDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def write_lostlep_Mll3lsyst_variations(h_nom):
     h_systerr_up = set_to_lostlep_Mll3lsystup_hist(h_nom.Clone("lostlep_Mll3lModelingUp"))
     h_systerr_dn = set_to_lostlep_Mll3lsystdn_hist(h_nom.Clone("lostlep_Mll3lModelingDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def do_not_write_syst_hist(process, systvar, model):
@@ -472,16 +495,22 @@ def set_to_www_aSsystdn_hist (nom, th1): return set_hist(th1, [ x - x*y  for ind
 def write_www_theory_syst_variations(h_nom):
     h_systerr_up = set_to_www_pdfsystup_hist(h_nom, h_nom.Clone("www_SigPDFUp"))
     h_systerr_dn = set_to_www_pdfsystdn_hist(h_nom, h_nom.Clone("www_SigPDFDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
     h_systerr_up = set_to_www_q2systup_hist(h_nom, h_nom.Clone("www_SigQsqUp"))
     h_systerr_dn = set_to_www_q2systdn_hist(h_nom, h_nom.Clone("www_SigQsqDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
     h_systerr_up = set_to_www_aSsystup_hist(h_nom, h_nom.Clone("www_SigAlphaUp"))
     h_systerr_dn = set_to_www_aSsystdn_hist(h_nom, h_nom.Clone("www_SigAlphaDown"))
-    h_systerr_up.Write()
-    h_systerr_dn.Write()
+    #h_systerr_up.Write()
+    #h_systerr_dn.Write()
+    mask_bins(h_systerr_up).Write()
+    mask_bins(h_systerr_dn).Write()
 
 #########################################################################################################################################################
 def write_whsusy_theory_syst_variations(h_nom):
@@ -499,8 +528,10 @@ def write_fake_ARstat_variations(h_nom):
         ibin = i + 1
         h_staterr_up = set_to_fake_ARstatup_hist(h_nom, h_nom.Clone("fake_fake_ARstat" + bin_suffix(ibin) + "Up"), i)
         h_staterr_dn = set_to_fake_ARstatdn_hist(h_nom, h_nom.Clone("fake_fake_ARstat" + bin_suffix(ibin) + "Down"), i)
-        h_staterr_up.Write()
-        h_staterr_dn.Write()
+        #h_staterr_up.Write()
+        #h_staterr_dn.Write()
+        mask_bins(h_staterr_up).Write()
+        mask_bins(h_staterr_dn).Write()
 
 #########################################################################################################################################################
 def set_to_average_and_write_genmet_syst_hist(h_nom, h_sys):
@@ -514,12 +545,32 @@ def set_to_average_and_write_genmet_syst_hist(h_nom, h_sys):
         h_nom.SetBinContent(i, n)
         h_sys_up.SetBinContent(i, n + d)
         h_sys_dn.SetBinContent(i, n - d)
-    h_sys_up.Write()
-    h_sys_dn.Write()
+    #h_sys_up.Write()
+    #h_sys_dn.Write()
+    mask_bins(h_sys_up).Write()
+    mask_bins(h_sys_dn).Write()
+
+#########################################################################################################################################################
+def mask_bins(h):
+    #h.SetBinContent(1,0)
+    #h.SetBinContent(2,0)
+    #h.SetBinContent(3,0)
+    #h.SetBinContent(4,0)
+    #h.SetBinContent(5,0)
+    #h.SetBinContent(6,0)
+    #h.SetBinContent(7,0)
+    #h.SetBinContent(8,0)
+    #h.SetBinContent(9,0)
+    #if h.GetBinContent(7) < 0: h.SetBinContent(7,0)
+    #if h.GetBinContent(8) < 0: h.SetBinContent(8,0)
+    #if h.GetBinContent(9) < 0: h.SetBinContent(9,0)
+    return h
 
 #########################################################################################################################################################
 #########################################################################################################################################################
 #########################################################################################################################################################
+
+
 
 if __name__ == "__main__":
 

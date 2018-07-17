@@ -28,7 +28,8 @@ def main(argv):
         "master_sample_name" : "samples",
 
         # Where the ntuples are located
-        "ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.2/skim/",
+        #"ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.2/skim/", # Freeze analysis July 17
+        "ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW2016_v3.0.1/skim/",
 
         # Path to the config file that defines how the samples should be organized
         "sample_config_path" : "../samples.cfg",
@@ -59,7 +60,10 @@ def main(argv):
             },
 
         # Custom observables (dictionary)
-        "output_dir" : "outputs/"
+        "output_dir" : "outputs/",
+
+        # Run on certain path only
+        #"path" : "/data/ee",
 
     }
 
@@ -103,15 +107,17 @@ def main(argv):
 
     sig_path_table = [
             ("WWW", "/sig"),
+            ("SM WWW", "/sig/www"),
+            ("WHWWW", "/sig/whwww"),
             ("H [200 GeV]", "/bsm/hpmpm/200"),
-            ("H [300 GeV]", "/bsm/hpmpm/300"),
-            ("H [400 GeV]", "/bsm/hpmpm/400"),
-            ("H [500 GeV]", "/bsm/hpmpm/500"),
+            #("H [300 GeV]", "/bsm/hpmpm/300"),
+            #("H [400 GeV]", "/bsm/hpmpm/400"),
+            #("H [500 GeV]", "/bsm/hpmpm/500"),
             ("H [600 GeV]", "/bsm/hpmpm/600"),
-            ("H [900 GeV]", "/bsm/hpmpm/900"),
-            ("H [1000 GeV]", "/bsm/hpmpm/1000"),
+            #("H [900 GeV]", "/bsm/hpmpm/900"),
+            #("H [1000 GeV]", "/bsm/hpmpm/1000"),
             ("H [1500 GeV]", "/bsm/hpmpm/1500"),
-            ("H [2000 GeV]", "/bsm/hpmpm/2000"),
+            #("H [2000 GeV]", "/bsm/hpmpm/2000"),
             ]
 
     histnames = [
@@ -174,6 +180,7 @@ def main(argv):
             "WZCRNj1SSee",
             "WZCRNj1SSem",
             "WZCRNj1SSmm",
+            #"Root",
             ]
     qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
 
@@ -206,7 +213,7 @@ def main(argv):
             "WZCRNj1SSemFull",
             "WZCRNj1SSmmFull",
             ]
-    qutils.table(samples, "Root", bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg", "cuts_list": summary_cuts, "output_name": "summary"})
+    qutils.table(samples, "Root", bkg_path=bkg_path, sig_path=sig_path_table, data_path="/data", options={"cuts": "cuts.cfg", "cuts_list": summary_cuts, "output_name": "summary"})
 
 #_____________________________________________________________________________________________________
 def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suffix="",btagsfvar_suffix="",genmet_prefix="",genmet_suffix=""): #define _up _dn etc.
@@ -222,16 +229,19 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     # 8107 = total semileptonic same-sign (from Wprime sample itself with splitWprime function in dilepbabymaker)
     # only one factor of (0.21 * (1-0.21)) because it's counted with same sign
     # 0.21 = HWW or W->lv (l = e or mu only, as 8107 was determined with e/mu only)
-    ["1"                                                                             , "{\'$(path)\'==\'/sig/www\'?1.0384615385:1}" ] , # Theory paper vs. 208 fb
-    ["1"                                                                             , "{\'$(type)\'==\'hpmpm\'?{$(mass)==600?1.0335276365*0.3258*0.3258:0.3258*0.3258}:1}" ] , # BR(W->lv)^2 for m=600 the scale1fb of 0.01 assumed 100k events. But due to some inefficiency need to rescale by 1.0335276.
-    ["1"                                                                             , "evt_scale1fb"                  ] , 
-    ["1"                                                                             , "purewgt"                       ] , 
-    ["1"                                                                             , "{$(usefakeweight)?ffwgt:35.9}" ] , 
-    ["firstgoodvertex==0"                                                            , "1"                             ] , 
-    ["Flag_AllEventFilters"                                                          , "1"                             ] , 
-    ["vetophoton==0"                                                                 , "1"                             ] , 
-    ["evt_passgoodrunlist"                                                           , "1"                             ] , 
-    ["{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?fastsimfilt==0:1}"               , "1"                             ] ,
+    ["1"                                                                                                , "{\'$(path)\'==\'/sig/www\'?1.0384615385:1}" ] , # Theory paper vs. 208 fb
+    ["1"                                                                                                , "{\'$(type)\'==\'hpmpm\'?{$(mass)==600?1.0335276365*0.3258*0.3258:0.3258*0.3258}:1}" ] , # BR(W->lv)^2 for m=600 the scale1fb of 0.01 assumed 100k events. But due to some inefficiency need to rescale by 1.0335276.
+    ["1"                                                                                                , "evt_scale1fb"                  ] , 
+    ["1"                                                                                                , "purewgt"                       ] , 
+    ["1"                                                                                                , "{$(usefakeweight)?ffwgt:35.9}" ] , 
+    ["firstgoodvertex==0"                                                                               , "1"                             ] , 
+    ["Flag_AllEventFilters"                                                                             , "1"                             ] , 
+    ["vetophoton==0"                                                                                    , "1"                             ] , 
+    ["evt_passgoodrunlist"                                                                              , "1"                             ] , 
+    ["{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?fastsimfilt==0:1}"                                  , "1"                             ] ,
+    #["{\'$(path)\'==\'/data/ee\'?(( [mc_HLT_DoubleEl_DZ])+( [mc_HLT_MuEG])+( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
+    #["{\'$(path)\'==\'/data/em\'?((![mc_HLT_DoubleEl_DZ])&&( [mc_HLT_MuEG])||( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
+    #["{\'$(path)\'==\'/data/mm\'?((![mc_HLT_DoubleEl_DZ])&&(![mc_HLT_MuEG])&&( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
     #["run==1" , "1"],
     #["lumi==1520" , "1"],
     #["evt==727193" , "1"],
@@ -254,7 +264,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["Presel"] = TQCut("Presel", "Presel", PreselCutExpr, PreselWgtExpr)
 
     # Trigger cuts
-    tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[Trigger]", "trigsf")
+    tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "(passTrigger)&&(pass_duplicate_ee_em_mm)", "trigsf")
 
     # The dilepton channel base cut
     tqcuts["SRDilep"] = TQCut("SRDilep" , "SRDilep" , "{$(usefakeweight)?(nVlep==2)*(nLlep==2)*(nTlep==1)*(lep_pt[0]>25.)*(lep_pt[1]>25.):(nVlep==2)*(nLlep==2)*(nTlep==2)}" , "{$(usefakeweight)?1.:lepsf"+lepsfvar_suffix+"}")
