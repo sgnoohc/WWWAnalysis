@@ -27,5 +27,6 @@ printer.addCut("WZCRSSemFull")
 printer.addCut("WZCRSSmmFull")
 printer.addCut("WZCR1SFOSFull")
 printer.addCut("WZCR2SFOSFull")
-printer.addProcess("/sig/whwww")
+#printer.addProcess("/sig/whwww")
+printer.addProcess("/typebkg/lostlep/WZ")
 printer.writeEventlists("lepton", "eventlists", "verbose=true");

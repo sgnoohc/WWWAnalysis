@@ -109,7 +109,11 @@ if __name__ == "__main__":
     qutils.makedir("statinputs/")
     f = open("statinputs/datacard_sm.txt", "w")
     f.write(main())
-    masses = [200, 300, 400, 500, 600, 900, 1000, 1500, 2000]
+    #masses = [200, 300, 400, 500, 600, 900, 1000, 1500, 2000]
+    #for mass in masses:
+    #    f = open("statinputs/datacard_hpmpm_{}.txt".format(mass), "w")
+    #    f.write(main("hpmpm", mass))
+    masses = [175, 200, 250, 300, 350, 400, 600]
     for mass in masses:
-        f = open("statinputs/datacard_hpmpm_{}.txt".format(mass), "w")
-        f.write(main("hpmpm", mass))
+        f = open("statinputs/datacard_alp_{}.txt".format(mass), "w")
+        f.write(main("alp", mass))

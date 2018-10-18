@@ -121,7 +121,9 @@ def main(model="sm", mass0=-1, mass1=-1):
             write_fake_ARstat_variations(h_nom)
 
     # Write data histogram
-    h_data = samples.getHistogram("/data", histname).Clone("data_obs")
+    h_data = samples.getHistogram("/typebkg", histname).Clone("data_obs")
+    for i in xrange(0,h_data.GetNbinsX()+2):
+        h_data.SetBinContent(i, int(h_data.GetBinContent(i)))
     #h_data.Write()
     mask_bins(h_data).Write()
 

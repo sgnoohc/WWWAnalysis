@@ -28,17 +28,19 @@ def main(argv):
         "master_sample_name" : "samples",
 
         # Where the ntuples are located
-        #"ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.2/skim/", # Freeze analysis July 17
-        "ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW2016_v3.0.1/skim/",
+        "ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW_v1.2.2/skim/", # Freeze analysis July 17
+        #"ntuple_path" : "/nfs-7/userdata/phchang/WWW_babies/WWW2016_v3.0.1/skim/",
 
         # Path to the config file that defines how the samples should be organized
         "sample_config_path" : "../samples.cfg",
 
         # The samples with "priority" (defined in sample_config_pat) values satisfying the following condition is looped over
-        "priority_value" : "<-1",
+        #"priority_value" : "<-1",
+        "priority_value" : "<-2",
 
         # The samples with "priority" (defined in sample_config_pat) values satisfying the following condition is NOT looped over
-        "exclude_priority_value" : "<-2",
+        #"exclude_priority_value" : "<-2",
+        "exclude_priority_value" : "<-3",
 
         # N-cores
         "ncore" : 16,
@@ -63,7 +65,7 @@ def main(argv):
         "output_dir" : "outputs/",
 
         # Run on certain path only
-        #"path" : "/data/ee",
+        #"path" : "/sig/aqgc",
 
     }
 
@@ -97,26 +99,38 @@ def main(argv):
             ("Charge mis-id"           , "/typebkg/qflip"   ) ,
             ("Non-prompt"              , "/fake"            ) ,
             ("Lost/three lep"          , "/typebkg/lostlep" ) ,
-            ("Irredu."                 , "/typebkg/prompt"  ) 
+            ("Irredu."                 , "/typebkg/prompt"  ) ,
+            ("WWW", "/sig"),
             ]
     sig_path_plots = [
-            ("WWW", "/sig"),
-            ("H^{#pm#pm} [200 GeV]", "/bsm/hpmpm/200"),
-            ("H^{#pm#pm} [1 TeV]", "/bsm/hpmpm/1500"),
+            #("WWW", "/sig"),
+            ("ALP [200 GeV]", "/bsm/alp/200"),
+            ("ALP [600 GeV]", "/bsm/alp/600"),
+            #("H^{#pm#pm} [200 GeV]", "/bsm/hpmpm/200"),
+            #("H^{#pm#pm} [1 TeV]", "/bsm/hpmpm/1500"),
             ]
 
     sig_path_table = [
-            ("WWW", "/sig"),
             ("SM WWW", "/sig/www"),
             ("WHWWW", "/sig/whwww"),
-            ("H [200 GeV]", "/bsm/hpmpm/200"),
+            ("WWW", "/sig"),
+            ("QGC ft -2.5", "/sig/aqgc/ftm2p5"),
+            ("QGC ft 0.0", "/sig/aqgc/nominal"),
+            ("ALP [175 GeV]", "/bsm/alp/175,raw"),
+            ("ALP [200 GeV]", "/bsm/alp/200,raw"),
+            ("ALP [250 GeV]", "/bsm/alp/250,raw"),
+            ("ALP [300 GeV]", "/bsm/alp/300,raw"),
+            ("ALP [350 GeV]", "/bsm/alp/350,raw"),
+            ("ALP [400 GeV]", "/bsm/alp/400,raw"),
+            ("ALP [600 GeV]", "/bsm/alp/600,raw"),
+            #("H [200 GeV]", "/bsm/hpmpm/200"),
             #("H [300 GeV]", "/bsm/hpmpm/300"),
             #("H [400 GeV]", "/bsm/hpmpm/400"),
             #("H [500 GeV]", "/bsm/hpmpm/500"),
-            ("H [600 GeV]", "/bsm/hpmpm/600"),
+            #("H [600 GeV]", "/bsm/hpmpm/600"),
             #("H [900 GeV]", "/bsm/hpmpm/900"),
             #("H [1000 GeV]", "/bsm/hpmpm/1000"),
-            ("H [1500 GeV]", "/bsm/hpmpm/1500"),
+            #("H [1500 GeV]", "/bsm/hpmpm/1500"),
             #("H [2000 GeV]", "/bsm/hpmpm/2000"),
             ]
 
@@ -128,6 +142,9 @@ def main(argv):
             "SRSSeeFull/MTlvlv" ,
             "SRSSemFull/MTlvlv" ,
             "SRSSmmFull/MTlvlv" ,
+            "SRSSeeFull/MTlvlvjj" ,
+            "SRSSemFull/MTlvlvjj" ,
+            "SRSSmmFull/MTlvlvjj" ,
             "SRSSeeFull/MllSS_wide" ,
             "SRSSemFull/MllSS_wide" ,
             "SRSSmmFull/MllSS_wide" ,
@@ -155,8 +172,19 @@ def main(argv):
             "SRNj1SSmmFull/MTmin" ,
             "SRSSeeFull/MllSS_wide+SRSSemFull/MllSS_wide+SRSSmmFull/MllSS_wide+SideSSeeFull/MllSS_wide+SideSSemFull/MllSS_wide+SideSSmmFull/MllSS_wide" ,
             "SRSSeeFull/MllSS_varbin+SRSSemFull/MllSS_varbin+SRSSmmFull/MllSS_varbin+SideSSeeFull/MllSS_varbin+SideSSemFull/MllSS_varbin+SideSSmmFull/MllSS_varbin" ,
+            "SRSSeeFull/ST+SRSSemFull/ST+SRSSmmFull/ST+SideSSeeFull/ST+SideSSemFull/ST+SideSSmmFull/ST" ,
+            "SRSSeeFull/ST+SRSSemFull/ST+SRSSmmFull/ST" ,
+            "SRSSeeFull/ST" ,
+            "SRSSemFull/ST" ,
+            "SRSSmmFull/ST" ,
+            "SideSSeeFull/ST" ,
+            "SideSSemFull/ST" ,
+            "SideSSmmFull/ST" ,
+            "SR0SFOSFull/ST3L+SR1SFOSFull/ST3L+SR2SFOSFull/ST3L" ,
+            "SR1SFOSFull/ST3L+SR2SFOSFull/ST3L" ,
+            "WZCR1SFOSFull/ST3L+WZCR2SFOSFull/ST3L" ,
             ]
-    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path_plots, data_path="/data", options={"blind":["SR"]})
+    qutils.autoplot(samples, histnames, bkg_path=bkg_path, sig_path=sig_path_plots, data_path="/data", options={"blind":["SR"], "signal_scale":"auto", "nbins":30})
 
     # Make cutflow table
     cutnames = [
@@ -182,7 +210,8 @@ def main(argv):
             "WZCRNj1SSmm",
             #"Root",
             ]
-    qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
+    #qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
+    qutils.autotable(samples, cutnames, bkg_path=[], sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
 
     # Make summary cutflow table
     summary_cuts = [
@@ -231,6 +260,7 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     # 0.21 = HWW or W->lv (l = e or mu only, as 8107 was determined with e/mu only)
     ["1"                                                                                                , "{\'$(path)\'==\'/sig/www\'?1.0384615385:1}" ] , # Theory paper vs. 208 fb
     ["1"                                                                                                , "{\'$(type)\'==\'hpmpm\'?{$(mass)==600?1.0335276365*0.3258*0.3258:0.3258*0.3258}:1}" ] , # BR(W->lv)^2 for m=600 the scale1fb of 0.01 assumed 100k events. But due to some inefficiency need to rescale by 1.0335276.
+    ["1"                                                                                                , "{\'$(type)\'==\'alp\'?2.3484:1}" ] , # BR(W->lv)^2 for m=600 the scale1fb of 0.01 assumed 100k events. But due to some inefficiency need to rescale by 1.0335276.
     ["1"                                                                                                , "evt_scale1fb"                  ] , 
     ["1"                                                                                                , "purewgt"                       ] , 
     ["1"                                                                                                , "{$(usefakeweight)?ffwgt:35.9}" ] , 
@@ -239,6 +269,8 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     ["vetophoton==0"                                                                                    , "1"                             ] , 
     ["evt_passgoodrunlist"                                                                              , "1"                             ] , 
     ["{\'$(path)\'==\'/bsm/whsusy/$(mchi)/$(mlsp)\'?fastsimfilt==0:1}"                                  , "1"                             ] ,
+    ["1"                                                                                                , "{\'$(path)\'==\'/sig/aqgc/ftm2p5\'?0.254826*genweights[66]/genps_origxwgtup:1}" ] , # Theory paper vs. 208 fb
+    ["1"                                                                                                , "{\'$(path)\'==\'/sig/aqgc/nominal\'?0.254826*genweights[71]/genps_origxwgtup:1}" ] , # Theory paper vs. 208 fb
     #["{\'$(path)\'==\'/data/ee\'?(( [mc_HLT_DoubleEl_DZ])+( [mc_HLT_MuEG])+( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
     #["{\'$(path)\'==\'/data/em\'?((![mc_HLT_DoubleEl_DZ])&&( [mc_HLT_MuEG])||( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
     #["{\'$(path)\'==\'/data/mm\'?((![mc_HLT_DoubleEl_DZ])&&(![mc_HLT_MuEG])&&( [mc_HLT_DoubleMu])):[mc_HLT_DoubleEl_DZ]||[mc_HLT_MuEG]||[mc_HLT_DoubleMu]}"  , "1"                             ] ,
@@ -264,7 +296,8 @@ def generate_www_analysis_cuts(lepsfvar_suffix="",trigsfvar_suffix="",jecvar_suf
     tqcuts["Presel"] = TQCut("Presel", "Presel", PreselCutExpr, PreselWgtExpr)
 
     # Trigger cuts
-    tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "(passTrigger)&&(pass_duplicate_ee_em_mm)", "trigsf")
+    #tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[(passTrigger)*(pass_duplicate_ee_em_mm)]", "trigsf")
+    tqcuts["Trigger"] = TQCut("Trigger", "Trigger", "[Trigger]", "trigsf")
 
     # The dilepton channel base cut
     tqcuts["SRDilep"] = TQCut("SRDilep" , "SRDilep" , "{$(usefakeweight)?(nVlep==2)*(nLlep==2)*(nTlep==1)*(lep_pt[0]>25.)*(lep_pt[1]>25.):(nVlep==2)*(nLlep==2)*(nTlep==2)}" , "{$(usefakeweight)?1.:lepsf"+lepsfvar_suffix+"}")

@@ -38,10 +38,11 @@ def addProcesses(printer, showdata, prettyversion=True):
     #printer.addCutflowProcess("$signif(/sig,/fake+typebkg/prompt+typebkg/qflip+typebkg/photon+typebkg/lostlep)", "Signif. (w/ Fake est.)")
     printer.addCutflowProcess("|", "|")
 
-    ## Wprime sample
+    # Wprime sample
     #wprimemasses = [600,800,1000,1200,1400,1600,1800,2000,2500,3500,4000,4500,5000,5500,6000]
-    #for wprimemass in wprimemasses:
-    #    printer.addCutflowProcess("/bsm/wprime/{}".format(wprimemass), "W'[{}]".format(wprimemass))
+    wprimemasses = [600,800,1000,1200,1400,1600]
+    for wprimemass in wprimemasses:
+        printer.addCutflowProcess("/bsm/wprime/{}".format(wprimemass), "W'[{}]".format(wprimemass))
 
     ## Doubly charged higgs samples
     #hpmpmmasses = [200,300,400,500,600,900,1000,1500,2000]

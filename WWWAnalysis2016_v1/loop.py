@@ -251,16 +251,16 @@ def main(samples, sample_to_run, extra_args):
     # Set object "generalization" (i.e. merging histograms)
     #
     #
-    samples.getSampleFolder("/typebkg/prompt/Other").setTagBool(".asv.generalize.counter", True)
-    samples.getSampleFolder("/typebkg/prompt/Other").setTagBool(".asv.generalize.histograms", True)
-    samples.getSampleFolder("/typebkg/lostlep/Other").setTagBool(".asv.generalize.counter", True)
-    samples.getSampleFolder("/typebkg/lostlep/Other").setTagBool(".asv.generalize.histograms", True)
-    samples.getSampleFolder("/typebkg/qflip/Other").setTagBool(".asv.generalize.counter", True)
-    samples.getSampleFolder("/typebkg/qflip/Other").setTagBool(".asv.generalize.histograms", True)
-    samples.getSampleFolder("/typebkg/photon/Other").setTagBool(".asv.generalize.counter", True)
-    samples.getSampleFolder("/typebkg/photon/Other").setTagBool(".asv.generalize.histograms", True)
-    samples.getSampleFolder("/typebkg/fakes/Other").setTagBool(".asv.generalize.counter", True)
-    samples.getSampleFolder("/typebkg/fakes/Other").setTagBool(".asv.generalize.histograms", True)
+    #samples.getSampleFolder("/typebkg/prompt/Other").setTagBool(".asv.generalize.counter", True)
+    #samples.getSampleFolder("/typebkg/prompt/Other").setTagBool(".asv.generalize.histograms", True)
+    #samples.getSampleFolder("/typebkg/lostlep/Other").setTagBool(".asv.generalize.counter", True)
+    #samples.getSampleFolder("/typebkg/lostlep/Other").setTagBool(".asv.generalize.histograms", True)
+    #samples.getSampleFolder("/typebkg/qflip/Other").setTagBool(".asv.generalize.counter", True)
+    #samples.getSampleFolder("/typebkg/qflip/Other").setTagBool(".asv.generalize.histograms", True)
+    #samples.getSampleFolder("/typebkg/photon/Other").setTagBool(".asv.generalize.counter", True)
+    #samples.getSampleFolder("/typebkg/photon/Other").setTagBool(".asv.generalize.histograms", True)
+    #samples.getSampleFolder("/typebkg/fakes/Other").setTagBool(".asv.generalize.counter", True)
+    #samples.getSampleFolder("/typebkg/fakes/Other").setTagBool(".asv.generalize.histograms", True)
 
     #
     #
@@ -368,7 +368,9 @@ if __name__ == "__main__":
     samples = TQSampleFolder("samples")
 
     # Connect input baby ntuple
-    connectNtuples(samples, "../samples.cfg", ntuplepath, "<-1", "<-2")
+    connectNtuples(samples, "../samples.cfg", ntuplepath, "<-2", "<-3")
+
+    samples.printContents("trd")
 
     # Add BSM samples
     addBSMsamples(samples)
