@@ -42,7 +42,18 @@ int main(int argc, char** argv)
     cutflow.addCutToLastActiveCut("SRSSmmMET");
     cutflow.addCutToLastActiveCut("SRSSmmMllSS");
     cutflow.addCutToLastActiveCut("SRSSmmFull");
-    cutflow.bookCutflowsForRegions({"SRSSmmFull", "CutSRDilep"});
+    cutflow.getCut("CutSRDilep");
+    cutflow.addCutToLastActiveCut("SRSSem");
+    cutflow.addCutToLastActiveCut("SRSSemTVeto");
+    cutflow.addCutToLastActiveCut("SRSSemNj2");
+    cutflow.addCutToLastActiveCut("SRSSemNb0");
+    cutflow.addCutToLastActiveCut("SRSSemMjjW");
+    cutflow.addCutToLastActiveCut("SRSSemMjjL");
+    cutflow.addCutToLastActiveCut("SRSSemDetajjL");
+    cutflow.addCutToLastActiveCut("SRSSemMET");
+    cutflow.addCutToLastActiveCut("SRSSemMllSS");
+    cutflow.addCutToLastActiveCut("SRSSemFull");
+    cutflow.bookCutflows();
     cutflow.printCuts();
 
     // Looping input file
@@ -77,6 +88,16 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSmmMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSmmMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSmmFull"    , 1                                                            , 1                   );
+        cutflow.setCut("SRSSem"        , (www.passSSem())*(www.MllSS()>40.)                           , 1                   );
+        cutflow.setCut("SRSSemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
+        cutflow.setCut("SRSSemNj2"     , www.nj30()>= 2                                               , 1                   );
+        cutflow.setCut("SRSSemNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
+        cutflow.setCut("SRSSemMjjW"    , abs(www.Mjj()-80.)<15.                                       , 1                   );
+        cutflow.setCut("SRSSemMjjL"    , www.MjjL()<400.                                              , 1                   );
+        cutflow.setCut("SRSSemDetajjL" , www.DetajjL()<1.5                                            , 1                   );
+        cutflow.setCut("SRSSemMET"     , 1.                                                           , 1                   );
+        cutflow.setCut("SRSSemMllSS"   , www.MllSS()>40.                                              , 1                   );
+        cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
         // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fillCutflows();
     }
