@@ -25,9 +25,8 @@ int main(int argc, char** argv)
     TFile* ofile = new TFile(argv[2], "recreate");
 
     // Cutflow object that creates a tree structure of cuts
-    RooUtil::CutflowUtil::Cutflow cutflow(ofile);
-    cutflow.addCut("CutNothing");
-    cutflow.addCutToLastActiveCut("CutWeight");
+    RooUtil::Cutflow cutflow(ofile);
+    cutflow.addCut("CutWeight");
     cutflow.addCutToLastActiveCut("CutPresel");
     cutflow.addCutToLastActiveCut("CutTrigger");
     cutflow.addCutToLastActiveCut("CutSRDilep");
@@ -73,7 +72,6 @@ int main(int argc, char** argv)
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
         // setCut("CutName", <boolean value to say whether it passes>, <float value to define weight>);
-        cutflow.setCut("CutNothing"    , 1                                                            , 1                   );
         cutflow.setCut("CutWeight"     , 1                                                            , weight              );
         cutflow.setCut("CutPresel"     , presel                                                       , 1                   );
         cutflow.setCut("CutTrigger"    , www.passTrigger() * www.pass_duplicate_ee_em_mm()            , www.trigsf()        );
