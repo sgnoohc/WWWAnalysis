@@ -24,14 +24,13 @@ int main(int argc, char** argv)
     // Creating output file where we will put the outputs of the processing
     TFile* ofile = new TFile(argv[2], "recreate");
 
+    // Cutflow object that creates a tree structure of cuts
     RooUtil::CutflowUtil::Cutflow cutflow(ofile);
-
     cutflow.addCut("CutNothing");
     cutflow.addCutToLastActiveCut("CutWeight");
     cutflow.addCutToLastActiveCut("CutPresel");
     cutflow.addCutToLastActiveCut("CutTrigger");
     cutflow.addCutToLastActiveCut("CutSRDilep");
-
     cutflow.getCut("CutSRDilep");
     cutflow.addCutToLastActiveCut("SRSSmm");
     cutflow.addCutToLastActiveCut("SRSSmmTVeto");
@@ -43,7 +42,6 @@ int main(int argc, char** argv)
     cutflow.addCutToLastActiveCut("SRSSmmMET");
     cutflow.addCutToLastActiveCut("SRSSmmMllSS");
     cutflow.addCutToLastActiveCut("SRSSmmFull");
-
     cutflow.bookCutflowsForRegions({"SRSSmmFull", "CutSRDilep"});
     cutflow.printCuts();
 
@@ -52,13 +50,6 @@ int main(int argc, char** argv)
     RooUtil::Looper<wwwtree> looper(ch, &www, nEvents);
     while (looper.nextEvent())
     {
-
-        //
-        //
-        // Main processing
-        //
-        //
-
         // Luminosity setting
         float lumi = www.is2016() == 1 ? 35.9 : 41.3;
 
@@ -70,14 +61,12 @@ int main(int argc, char** argv)
 
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
-        //float weight = www.evt_scale1fb() * lumi;
-
+        // setCut("CutName", <boolean value to say whether it passes>, <float value to define weight>);
         cutflow.setCut("CutNothing"    , 1                                                            , 1                   );
         cutflow.setCut("CutWeight"     , 1                                                            , weight              );
         cutflow.setCut("CutPresel"     , presel                                                       , 1                   );
         cutflow.setCut("CutTrigger"    , www.passTrigger() * www.pass_duplicate_ee_em_mm()            , www.trigsf()        );
         cutflow.setCut("CutSRDilep"    , (www.nVlep() == 2) * (www.nLlep() == 2) * (www.nTlep() == 2) , www.lepsf()         );
-
         cutflow.setCut("SRSSmm"        , (www.passSSmm())*(www.MllSS()>40.)                           , 1                   );
         cutflow.setCut("SRSSmmTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSmmNj2"     , www.nj30()>= 2                                               , 1                   );
@@ -88,7 +77,7 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSmmMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSmmMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSmmFull"    , 1                                                            , 1                   );
-
+        // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fillCutflows();
     }
 
