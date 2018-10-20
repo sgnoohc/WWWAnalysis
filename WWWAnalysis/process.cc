@@ -17,14 +17,20 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // Creating output file where we will put the outputs of the processing
+    TFile* ofile = new TFile(argv[2], "recreate");
+
     // Create a TChain of the input files
     // The input files can be comma separated (e.g. "file1.root,file2.root")
     TChain* ch = RooUtil::FileUtil::createTChain("t", argv[1]);
 
-    // Creating output file where we will put the outputs of the processing
-    TFile* ofile = new TFile(argv[2], "recreate");
+    // Number of events to loop over
+    int nEvents = argc > 3 ? atoi(argv[3]) : -1;
 
-    // Cutflow object that creates a tree structure of cuts
+    // Create a Looper object to loop over input files
+    RooUtil::Looper<wwwtree> looper(ch, &www, nEvents);
+
+    // Cutflow utility object that creates a tree structure of cuts
     RooUtil::Cutflow cutflow(ofile);
     cutflow.addCut("CutWeight");
     cutflow.addCutToLastActiveCut("CutPresel");
@@ -52,12 +58,26 @@ int main(int argc, char** argv)
     cutflow.addCutToLastActiveCut("SRSSemMET");
     cutflow.addCutToLastActiveCut("SRSSemMllSS");
     cutflow.addCutToLastActiveCut("SRSSemFull");
+
+    // Histogram utility object that is used to define the histograms
+    RooUtil::Histograms histograms;
+    histograms.addHistogram("Mjj", 180, 0, 250);
+    histograms.addHistogram("Mll", 180, 0, 250);
+
+    // Now book cutflows
     cutflow.bookCutflows();
+
+    // Cutflow object that takes the histograms and books them to a cutflow for histogramming
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmm");
+
+    // Print the cut structure for review
     cutflow.printCuts();
 
-    // Looping input file
-    int nEvents = argc > 3 ? atoi(argv[3]) : -1;
-    RooUtil::Looper<wwwtree> looper(ch, &www, nEvents);
+    //
+    //
+    // Looping events
+    //
+    //
     while (looper.nextEvent())
     {
         // Luminosity setting
@@ -96,8 +116,10 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSemMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSemMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
+        cutflow.setVariable("Mjj" , www.Mjj()   );
+        cutflow.setVariable("Mll" , www.MllSS() );
         // Once every cut bits are set, now fill the cutflows that are booked
-        cutflow.fillCutflows();
+        cutflow.fill();
     }
 
     cutflow.saveOutput();
