@@ -4,3 +4,6 @@
 [submodule "WWWAnalysis2017/plottery"]
 	path = WWWAnalysis2017/plottery
 	url = git@github.com:sgnoohc/plottery.git
+[submodule "WWWAnalysis/rooutil"]
+	path = WWWAnalysis/rooutil
+	url = git@github.com:sgnoohc/rooutil.git
