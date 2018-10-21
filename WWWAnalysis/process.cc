@@ -57,18 +57,50 @@ int main(int argc, char** argv)
     cutflow.addCutToLastActiveCut("SRSSemDetajjL");
     cutflow.addCutToLastActiveCut("SRSSemMET");
     cutflow.addCutToLastActiveCut("SRSSemMllSS");
+    cutflow.addCutToLastActiveCut("SRSSemMTmax");
     cutflow.addCutToLastActiveCut("SRSSemFull");
 
     // Histogram utility object that is used to define the histograms
     RooUtil::Histograms histograms;
-    histograms.addHistogram("Mjj", 180, 0, 250);
-    histograms.addHistogram("Mll", 180, 0, 250);
+    histograms.addHistogram("MllSS"                ,  180 , 0.      , 300.   );
+    histograms.addHistogram("MllSS_wide"           ,  180 , 0.      , 2000.  );
+    histograms.addHistogram("MllZ"                 ,  180 , 60.     , 120.   );
+    histograms.addHistogram("MllZZoom"             ,  180 , 80.     , 100.   );
+    histograms.addHistogram("M3l"                  ,  180 , 0.      , 150.   );
+    histograms.addHistogram("Pt3lGCR"              ,  180 , 0.      , 100.   );
+    histograms.addHistogram("Pt3l"                 ,  180 , 0.      , 300.   );
+    histograms.addHistogram("Ptll"                 ,  180 , 0.      , 300.   );
+    histograms.addHistogram("nvtx"                 ,  60  , 0.      , 60.    );
+    histograms.addHistogram("Mjj"                  ,  180 , 0.      , 300.   );
+    histograms.addHistogram("MjjL"                 ,  180 , 0.      , 750.   );
+    histograms.addHistogram("DetajjL"              ,  180 , 0.      , 5.     );
+    histograms.addHistogram("MjjVBF"               ,  180 , 0.      , 750.   );
+    histograms.addHistogram("DetajjVBF"            ,  180 , 0.      , 8.     );
+    histograms.addHistogram("MET"                  ,  180 , 0.      , 180.   );
+    histograms.addHistogram("lep_pt0"              ,  180 , 0.      , 250    );
+    histograms.addHistogram("lep_pt1"              ,  180 , 0.      , 150    );
+    histograms.addHistogram("lep_pt2"              ,  180 , 0.      , 150    );
+    histograms.addHistogram("lep_eta0"             ,  180 , -2.5    , 2.5    );
+    histograms.addHistogram("lep_eta1"             ,  180 , -2.5    , 2.5    );
+    histograms.addHistogram("lep_phi0"             ,  180 , -3.1416 , 3.1416 );
+    histograms.addHistogram("lep_phi1"             ,  180 , -3.1416 , 3.1416 );
+    histograms.addHistogram("lep_relIso03EAv2Lep0" ,  180 , 0.0     , 0.2    );
+    histograms.addHistogram("lep_relIso03EAv2Lep1" ,  180 , 0.0     , 0.2    );
+    histograms.addHistogram("lep_relIso03EAv2Lep2" ,  180 , 0.0     , 0.2    );
+    histograms.addHistogram("nj"                   ,  7   , 0.      , 7.     );
+    histograms.addHistogram("nj30"                 ,  7   , 0.      , 7.     );
+    histograms.addHistogram("nb"                   ,  5   , 0.      , 5.     );
+    histograms.addHistogram("MTmin"                ,  180 , 0.      , 300.   );
+    histograms.addHistogram("MTmax"                ,  180 , 0.      , 300.   );
+    histograms.addHistogram("MTmax3L"              ,  180 , 0.      , 300.   );
+    histograms.addHistogram("MT3rd"                ,  180 , 0.      , 300.   );
 
     // Now book cutflows
     cutflow.bookCutflows();
 
     // Cutflow object that takes the histograms and books them to a cutflow for histogramming
-    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmm");
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmmFull");
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSemFull");
 
     // Print the cut structure for review
     cutflow.printCuts();
@@ -106,20 +138,52 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSmmMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSmmMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSmmFull"    , 1                                                            , 1                   );
-        cutflow.setCut("SRSSem"        , (www.passSSem())*(www.MllSS()>40.)                           , 1                   );
+        cutflow.setCut("SRSSem"        , (www.passSSem())*(www.MllSS()>30.)                           , 1                   );
         cutflow.setCut("SRSSemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSemNj2"     , www.nj30()>= 2                                               , 1                   );
         cutflow.setCut("SRSSemNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
         cutflow.setCut("SRSSemMjjW"    , abs(www.Mjj()-80.)<15.                                       , 1                   );
         cutflow.setCut("SRSSemMjjL"    , www.MjjL()<400.                                              , 1                   );
         cutflow.setCut("SRSSemDetajjL" , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSemMET"     , 1.                                                           , 1                   );
-        cutflow.setCut("SRSSemMllSS"   , www.MllSS()>40.                                              , 1                   );
+        cutflow.setCut("SRSSemMET"     , www.met_pt()>60.                                             , 1                   );
+        cutflow.setCut("SRSSemMllSS"   , www.MllSS()>30.                                              , 1                   );
+        cutflow.setCut("SRSSemMTmax"   , www.MTmax()>90.                                              , 1                   );
         cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
-        cutflow.setVariable("Mjj" , www.Mjj()   ); 
-        cutflow.setVariable("Mll" , www.MllSS() ); 
+        cutflow.setVariable("MllSS"                ,  www.MllSS()                  );
+        cutflow.setVariable("MllSS_wide"           ,  www.MllSS()                  );
+        cutflow.setVariable("MllZ"                 ,  www.MllSS()                  );
+        cutflow.setVariable("MllZZoom"             ,  www.MllSS()                  );
+        cutflow.setVariable("M3l"                  ,  www.M3l()                    );
+        cutflow.setVariable("Pt3lGCR"              ,  www.Pt3l()                   );
+        cutflow.setVariable("Pt3l"                 ,  www.Pt3l()                   );
+        cutflow.setVariable("Ptll"                 ,  www.Pt3l()                   );
+        cutflow.setVariable("nvtx"                 ,  www.nVert()                  );
+        cutflow.setVariable("Mjj"                  ,  www.Mjj()                    );
+        cutflow.setVariable("MjjL"                 ,  www.MjjL()                   );
+        cutflow.setVariable("DetajjL"              ,  www.DetajjL()                );
+        cutflow.setVariable("MjjVBF"               ,  www.MjjVBF()                 );
+        cutflow.setVariable("DetajjVBF"            ,  www.DetajjVBF()              );
+        cutflow.setVariable("MET"                  ,  www.met_pt()                 );
+        cutflow.setVariable("lep_pt0"              ,  www.lep_pt()[0]              );
+        cutflow.setVariable("lep_pt1"              ,  www.lep_pt()[1]              );
+        cutflow.setVariable("lep_pt2"              ,  www.lep_pt()[2]              );
+        cutflow.setVariable("lep_eta0"             ,  www.lep_eta()[0]             );
+        cutflow.setVariable("lep_eta1"             ,  www.lep_eta()[1]             );
+        cutflow.setVariable("lep_phi0"             ,  www.lep_phi()[0]             );
+        cutflow.setVariable("lep_phi1"             ,  www.lep_phi()[1]             );
+        cutflow.setVariable("lep_relIso03EAv2Lep0" ,  www.lep_relIso03EAv2Lep()[0] );
+        cutflow.setVariable("lep_relIso03EAv2Lep1" ,  www.lep_relIso03EAv2Lep()[1] );
+        cutflow.setVariable("lep_relIso03EAv2Lep2" ,  www.lep_relIso03EAv2Lep()[2] );
+        cutflow.setVariable("nj"                   ,  www.nj()                     );
+        cutflow.setVariable("nj30"                 ,  www.nj30()                   );
+        cutflow.setVariable("nb"                   ,  www.nb()                     );
+        cutflow.setVariable("MTmin"                ,  www.MTmin()                  );
+        cutflow.setVariable("MTmax"                ,  www.MTmax()                  );
+        cutflow.setVariable("MTmax3L"              ,  www.MTmax3L()                );
+        cutflow.setVariable("MT3rd"                ,  www.MT3rd()                  );
         // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fill();
+//        cutflow.printCuts();
     }
 
     cutflow.saveOutput();
