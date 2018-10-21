@@ -59,6 +59,19 @@ int main(int argc, char** argv)
     cutflow.addCutToLastActiveCut("SRSSemMllSS");
     cutflow.addCutToLastActiveCut("SRSSemMTmax");
     cutflow.addCutToLastActiveCut("SRSSemFull");
+    cutflow.getCut("CutSRDilep");
+    cutflow.addCutToLastActiveCut("SRSSee");
+    cutflow.addCutToLastActiveCut("SRSSeeZeeVt");
+    cutflow.addCutToLastActiveCut("SRSSeeTVeto");
+    cutflow.addCutToLastActiveCut("SRSSeeNj2");
+    cutflow.addCutToLastActiveCut("SRSSeeNb0");
+    cutflow.addCutToLastActiveCut("SRSSeePre");
+    cutflow.addCutToLastActiveCut("SRSSeeMjjW");
+    cutflow.addCutToLastActiveCut("SRSSeeMjjL");
+    cutflow.addCutToLastActiveCut("SRSSeeDetajjL");
+    cutflow.addCutToLastActiveCut("SRSSeeMET");
+    cutflow.addCutToLastActiveCut("SRSSeeMllSS");
+    cutflow.addCutToLastActiveCut("SRSSeeFull");
 
     // Histogram utility object that is used to define the histograms
     RooUtil::Histograms histograms;
@@ -99,8 +112,9 @@ int main(int argc, char** argv)
     cutflow.bookCutflows();
 
     // Cutflow object that takes the histograms and books them to a cutflow for histogramming
-    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmmFull");
-    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSemFull");
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmm");
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSem");
+    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSee");
 
     // Print the cut structure for review
     cutflow.printCuts();
@@ -123,7 +137,7 @@ int main(int argc, char** argv)
 
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
-        // setCut("CutName", <boolean value to say whether it passes>, <float value to define weight>);
+        //      setCut("CutName"       , <boolean value to say whether it passes>           , <float value to define weight>);
         cutflow.setCut("CutWeight"     , 1                                                            , weight              );
         cutflow.setCut("CutPresel"     , presel                                                       , 1                   );
         cutflow.setCut("CutTrigger"    , www.passTrigger() * www.pass_duplicate_ee_em_mm()            , www.trigsf()        );
@@ -132,7 +146,7 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSmmTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSmmNj2"     , www.nj30()>= 2                                               , 1                   );
         cutflow.setCut("SRSSmmNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSmmMjjW"    , abs(www.Mjj()-80.)<15.                                       , 1                   );
+        cutflow.setCut("SRSSmmMjjW"    , fabs(www.Mjj()-80.)<15.                                      , 1                   );
         cutflow.setCut("SRSSmmMjjL"    , www.MjjL()<400.                                              , 1                   );
         cutflow.setCut("SRSSmmDetajjL" , www.DetajjL()<1.5                                            , 1                   );
         cutflow.setCut("SRSSmmMET"     , 1.                                                           , 1                   );
@@ -142,13 +156,26 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSemNj2"     , www.nj30()>= 2                                               , 1                   );
         cutflow.setCut("SRSSemNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSemMjjW"    , abs(www.Mjj()-80.)<15.                                       , 1                   );
+        cutflow.setCut("SRSSemMjjW"    , fabs(www.Mjj()-80.)<15.                                      , 1                   );
         cutflow.setCut("SRSSemMjjL"    , www.MjjL()<400.                                              , 1                   );
         cutflow.setCut("SRSSemDetajjL" , www.DetajjL()<1.5                                            , 1                   );
         cutflow.setCut("SRSSemMET"     , www.met_pt()>60.                                             , 1                   );
         cutflow.setCut("SRSSemMllSS"   , www.MllSS()>30.                                              , 1                   );
         cutflow.setCut("SRSSemMTmax"   , www.MTmax()>90.                                              , 1                   );
         cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
+        cutflow.setCut("SRSSee"        , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                   );
+        cutflow.setCut("SRSSeeZeeVt"   , fabs(www.MllSS()-91.1876)>10.                                , 1                   );
+        cutflow.setCut("SRSSeeTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
+        cutflow.setCut("SRSSeeNj2"     , www.nj30()>= 2                                               , 1                   );
+        cutflow.setCut("SRSSeeNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
+        cutflow.setCut("SRSSeePre"     , 1                                                            , 1                   );
+        cutflow.setCut("SRSSeeMjjW"    , fabs(www.Mjj()-80.)<15.                                      , 1                   );
+        cutflow.setCut("SRSSeeMjjL"    , www.MjjL()<400.                                              , 1                   );
+        cutflow.setCut("SRSSeeDetajjL" , www.DetajjL()<1.5                                            , 1                   );
+        cutflow.setCut("SRSSeeMET"     , www.met_pt()>60.                                             , 1                   );
+        cutflow.setCut("SRSSeeMllSS"   , www.MllSS()>40.                                              , 1                   );
+        cutflow.setCut("SRSSeeFull"    , 1                                                            , 1                   );
+
         cutflow.setVariable("MllSS"                ,  www.MllSS()                  );
         cutflow.setVariable("MllSS_wide"           ,  www.MllSS()                  );
         cutflow.setVariable("MllZ"                 ,  www.MllSS()                  );

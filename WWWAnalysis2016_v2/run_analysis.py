@@ -208,7 +208,7 @@ def main(argv):
             "WZCRNj1SSee",
             "WZCRNj1SSem",
             "WZCRNj1SSmm",
-            #"Root",
+            "Root",
             ]
     #qutils.autotable(samples, cutnames, bkg_path=bkg_path, sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
     qutils.autotable(samples, cutnames, bkg_path=[], sig_path=sig_path_table, options={"cuts": "cuts.cfg"})
