@@ -116,8 +116,8 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSemMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSemMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
-        cutflow.setVariable("Mjj" , www.Mjj()   );
-        cutflow.setVariable("Mll" , www.MllSS() );
+        cutflow.setVariable("Mjj" , www.Mjj()   ); 
+        cutflow.setVariable("Mll" , www.MllSS() ); 
         // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fill();
     }
