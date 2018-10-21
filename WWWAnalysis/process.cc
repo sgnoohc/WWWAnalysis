@@ -137,6 +137,7 @@ int main(int argc, char** argv)
 
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
+
         //      setCut("CutName"       , <boolean value to say whether it passes>           , <float value to define weight>);
         cutflow.setCut("CutWeight"     , 1                                                            , weight              );
         cutflow.setCut("CutPresel"     , presel                                                       , 1                   );
@@ -176,6 +177,7 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSeeMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSeeFull"    , 1                                                            , 1                   );
 
+        // Set the variables used for histogramming
         cutflow.setVariable("MllSS"                ,  www.MllSS()                  );
         cutflow.setVariable("MllSS_wide"           ,  www.MllSS()                  );
         cutflow.setVariable("MllZ"                 ,  www.MllSS()                  );
@@ -208,10 +210,11 @@ int main(int argc, char** argv)
         cutflow.setVariable("MTmax"                ,  www.MTmax()                  );
         cutflow.setVariable("MTmax3L"              ,  www.MTmax3L()                );
         cutflow.setVariable("MT3rd"                ,  www.MT3rd()                  );
+
         // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fill();
-//        cutflow.printCuts();
     }
 
+    // Save output
     cutflow.saveOutput();
 }
