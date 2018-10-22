@@ -5,14 +5,7 @@
 //_______________________________________________________________________________________________________
 int main(int argc, char** argv)
 {
-    // Run parallel jobs of several processes
-    if (argc == 2)
-    {
-        std::cout << "parallel job not implemented yet" << std::endl;
-        help();
-        return 2;
-    }
-    else if (argc == 4)
+    if (argc == 4)
     {
         return process(argv[1], argv[2], argv[3], -1);
     }
@@ -40,11 +33,6 @@ int help()
     std::cout << "  OUTPUTFILE      output file name" << std::endl;
     std::cout << "  [NEVENTS=-1]    # of events to run over" << std::endl;
     std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "CASE 2: 1 argument" << std::endl;
-    std::cout << "  $ ./process BABY_VERSION" << std::endl;
-    std::cout << std::endl;
-    std::cout << "  BABY_VERSION    e.g. WWW2017_v4.0.1" << std::endl;
     return 1;
 }
 
