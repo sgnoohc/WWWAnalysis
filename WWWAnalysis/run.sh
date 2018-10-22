@@ -5,22 +5,28 @@ TREEVARIATIONS="qflip photon fakes prompt lostlep"
 OUTPUTDIR=outputs/${VERSION}
 mkdir -p ${OUTPUTDIR}
 
+rm .jobs.txt
 for f in $(ls /nfs-7/userdata/phchang/WWW_babies/${VERSION}/skim/*.root); do
-    echo "Launched a job for $f"
+    if [[ $f == *"hpmpm"* ]]; then continue; fi
+    if [[ $f == *"wprime"* ]]; then continue; fi
+    if [[ $f == *"whsusy"* ]]; then continue; fi
+    echo "Writing jobs for $f to .jobs.txt"
     if [[ $f == *"/www_"* ]]; then
-        ./doAnalysis $f t_www ${OUTPUTDIR}/t_www_$(basename $f) -1 > ${OUTPUTDIR}/t_www_$(basename $f).log 2>&1 &
+        TREEVARIATION="www"
+        echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt
     elif [[ $f == *"/vh_"* ]]; then
-        ./doAnalysis $f t_www ${OUTPUTDIR}/t_www_$(basename $f) -1 > ${OUTPUTDIR}/t_www_$(basename $f).log 2>&1 &
+        TREEVARIATION="www"
+        echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt
         for TREEVARIATION in ${TREEVARIATIONS}; do
-            ./doAnalysis $f t_${TREEVARIATION} ${OUTPUTDIR}/t_${TREEVARIATION}_$(basename $f) -1 > ${OUTPUTDIR}/t_${TREEVARIATION}_$(basename $f).log 2>&1 &
+            echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt
         done
     elif [[ $f == *"/data_"* ]]; then
-        ./doAnalysis $f t ${OUTPUTDIR}/$(basename $f) -1 > ${OUTPUTDIR}/$(basename $f).log 2>&1 &
+        echo './doAnalysis '$f' 't' '${OUTPUTDIR}'/'$(basename $f)' -1 > '${OUTPUTDIR}'/'$(basename $f)'.log 2>&1' >> .jobs.txt
     else
         for TREEVARIATION in ${TREEVARIATIONS}; do
-            ./doAnalysis $f t_${TREEVARIATION} ${OUTPUTDIR}/t_${TREEVARIATION}_$(basename $f) -1 > ${OUTPUTDIR}/t_${TREEVARIATION}_$(basename $f).log 2>&1 &
+            echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt
         done
     fi
 done
 
-wait
+sh rooutil/xargs.sh .jobs.txt
