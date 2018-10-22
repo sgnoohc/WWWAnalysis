@@ -224,8 +224,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     // Print the cut structure for review
     cutflow.printCuts();
 
-    // Parse path to determine the year
+    // Some case-by-case checking needed for WWW_v1.2.2 (should be no longer necessary later on)
     bool is2017 = TString(input_paths).Contains("2017");
+    bool isWWW = TString(input_paths).Contains("www_2l_");
 
     //
     //
@@ -249,6 +250,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
 
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
+        if (isWWW && !is2017) weight *= 1.0384615385;
 
         //      setCut("CutName"       , <boolean value to say whether it passes>           , <float value to define weight>);
         cutflow.setCut("CutWeight"         , 1                                                            , weight              );

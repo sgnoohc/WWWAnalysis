@@ -5,13 +5,35 @@ from rooutil import plottery_wrapper as p
 import glob
 
 def main():
-    histnames = ["SRSSeeFull__yield", "SRSSemFull__yield", "SRSSmmFull__yield", "SRSSSideeeFull__yield", "SRSSSideemFull__yield", "SRSSSidemmFull__yield", "SR0SFOSFull__yield", "SR1SFOSFull__yield", "SR2SFOSFull__yield"]
-    h_lostlep = ru.get_summed_histogram(glob.glob("outputs/t_lostlep_*.root"), histnames)
-    h_photon  = ru.get_summed_histogram(glob.glob("outputs/t_photon_*.root"), histnames)
-    h_qflip   = ru.get_summed_histogram(glob.glob("outputs/t_qflip_*.root"), histnames)
-    h_fakes   = ru.get_summed_histogram(glob.glob("outputs/t_fakes_*.root"), histnames)
-    h_prompt  = ru.get_summed_histogram(glob.glob("outputs/t_prompt_*.root"), histnames)
-    h_sig     = ru.get_summed_histogram(glob.glob("outputs/t_www_www*.root") + glob.glob("outputs/t_www_vh*.root"), histnames)
+
+    output_dirpath = "outputs/WWW_v1.2.2"
+    sig_globber = "www_2l"
+
+    histnames = [
+            "SRSSeeFull__yield",
+            "SRSSemFull__yield",
+            "SRSSmmFull__yield",
+            "SRSSSideeeFull__yield",
+            "SRSSSideemFull__yield",
+            "SRSSSidemmFull__yield",
+            "SR0SFOSFull__yield",
+            "SR1SFOSFull__yield",
+            "SR2SFOSFull__yield"
+            ]
+
+    bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/t_lostlep_*.root") if "alp_" not in x ]
+    bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/t_photon_*.root")  if "alp_" not in x ]
+    bkg_list_qflip   = [ x for x in glob.glob(output_dirpath+"/t_qflip_*.root")   if "alp_" not in x ]
+    bkg_list_fakes   = [ x for x in glob.glob(output_dirpath+"/t_fakes_*.root")   if "alp_" not in x ]
+    bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/t_prompt_*.root")  if "alp_" not in x ]
+    sig_list = glob.glob(output_dirpath+"/t_www_"+sig_globber+"*.root") + glob.glob(output_dirpath+"/t_www_vh*.root")
+
+    h_lostlep = ru.get_summed_histogram(bkg_list_lostlep , histnames)
+    h_photon  = ru.get_summed_histogram(bkg_list_photon  , histnames)
+    h_qflip   = ru.get_summed_histogram(bkg_list_qflip   , histnames)
+    h_fakes   = ru.get_summed_histogram(bkg_list_fakes   , histnames)
+    h_prompt  = ru.get_summed_histogram(bkg_list_prompt  , histnames)
+    h_sig     = ru.get_summed_histogram(sig_list         , histnames)
 
     h_lostlep .SetName("Lost/three lep")
     h_photon  .SetName("#gamma#rightarrowlepton")
@@ -19,6 +41,7 @@ def main():
     h_fakes   .SetName("Non-prompt")
     h_prompt  .SetName("Irredu.")
     h_sig     .SetName("WWW")
+    h_sig.Print("all")
 
     colors = [ 920, 2007, 2005, 2003, 2001, 2 ]
     alloptions= {
