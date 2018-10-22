@@ -1,31 +1,62 @@
 #include "wwwtree.h"
 #include "rooutil/rooutil.h"
+#include "process.h"
 
-// ./process INPUTFILEPATH OUTPUTFILEPATH [NEVENTS]
+//_______________________________________________________________________________________________________
 int main(int argc, char** argv)
 {
-    // Argument checking
-    if (argc < 3)
+    // Run parallel jobs of several processes
+    if (argc == 2)
     {
-        std::cout << "Usage:" << std::endl;
-        std::cout << "  $ ./process INPUTFILES OUTPUTFILE [NEVENTS]" << std::endl;
-        std::cout << std::endl;
-        std::cout << "  INPUTFILES      comma separated file list" << std::endl;
-        std::cout << "  OUTPUTFILE      output file name" << std::endl;
-        std::cout << "  [NEVENTS=-1]    # of events to run over" << std::endl;
-        std::cout << std::endl;
-        return 1;
+        std::cout << "parallel job not implemented yet" << std::endl;
+        help();
+        return 2;
     }
+    else if (argc == 4)
+    {
+        return process(argv[1], argv[2], argv[3], -1);
+    }
+    else if (argc == 5)
+    {
+        return process(argv[1], argv[2], argv[3], atoi(argv[4]));
+    }
+    else
+    {
+        return help();
+    }
+}
 
+//_______________________________________________________________________________________________________
+int help()
+{
+    // Help function
+    std::cout << "Usage:" << std::endl;
+    std::cout << std::endl;
+    std::cout << "CASE 1: 3 or more arguments" << std::endl;
+    std::cout << "  $ ./process INPUTFILES INPUTTREENAME OUTPUTFILE [NEVENTS]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  INPUTFILES      comma separated file list" << std::endl;
+    std::cout << "  INPUTTREENAME   tree name in the file" << std::endl;
+    std::cout << "  OUTPUTFILE      output file name" << std::endl;
+    std::cout << "  [NEVENTS=-1]    # of events to run over" << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "CASE 2: 1 argument" << std::endl;
+    std::cout << "  $ ./process BABY_VERSION" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  BABY_VERSION    e.g. WWW2017_v4.0.1" << std::endl;
+    return 1;
+}
+
+//_______________________________________________________________________________________________________
+int process(const char* input_paths, const char* input_tree_name, const char* output_file_name, int nEvents)
+{
     // Creating output file where we will put the outputs of the processing
-    TFile* ofile = new TFile(argv[2], "recreate");
+    TFile* ofile = new TFile(output_file_name, "recreate");
 
     // Create a TChain of the input files
     // The input files can be comma separated (e.g. "file1.root,file2.root")
-    TChain* ch = RooUtil::FileUtil::createTChain("t", argv[1]);
-
-    // Number of events to loop over
-    int nEvents = argc > 3 ? atoi(argv[3]) : -1;
+    TChain* ch = RooUtil::FileUtil::createTChain(input_tree_name, input_paths);
 
     // Create a Looper object to loop over input files
     RooUtil::Looper<wwwtree> looper(ch, &www, nEvents);
@@ -116,6 +147,9 @@ int main(int argc, char** argv)
     cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSem");
     cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSee");
 
+    // Event list
+    cutflow.bookEventLists();
+
     // Print the cut structure for review
     cutflow.printCuts();
 
@@ -126,8 +160,10 @@ int main(int argc, char** argv)
     //
     while (looper.nextEvent())
     {
+
         // Luminosity setting
-        float lumi = www.is2016() == 1 ? 35.9 : 41.3;
+//        float lumi = www.is2016() == 1 ? 35.9 : 41.3;
+        float lumi = 41.3;
 
         // Compute preselection
         bool presel = (www.firstgoodvertex() == 0);
@@ -143,6 +179,7 @@ int main(int argc, char** argv)
         cutflow.setCut("CutPresel"     , presel                                                       , 1                   );
         cutflow.setCut("CutTrigger"    , www.passTrigger() * www.pass_duplicate_ee_em_mm()            , www.trigsf()        );
         cutflow.setCut("CutSRDilep"    , (www.nVlep() == 2) * (www.nLlep() == 2) * (www.nTlep() == 2) , www.lepsf()         );
+
         cutflow.setCut("SRSSmm"        , (www.passSSmm())*(www.MllSS()>40.)                           , 1                   );
         cutflow.setCut("SRSSmmTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSmmNj2"     , www.nj30()>= 2                                               , 1                   );
@@ -153,6 +190,7 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSmmMET"     , 1.                                                           , 1                   );
         cutflow.setCut("SRSSmmMllSS"   , www.MllSS()>40.                                              , 1                   );
         cutflow.setCut("SRSSmmFull"    , 1                                                            , 1                   );
+
         cutflow.setCut("SRSSem"        , (www.passSSem())*(www.MllSS()>30.)                           , 1                   );
         cutflow.setCut("SRSSemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
         cutflow.setCut("SRSSemNj2"     , www.nj30()>= 2                                               , 1                   );
@@ -164,6 +202,7 @@ int main(int argc, char** argv)
         cutflow.setCut("SRSSemMllSS"   , www.MllSS()>30.                                              , 1                   );
         cutflow.setCut("SRSSemMTmax"   , www.MTmax()>90.                                              , 1                   );
         cutflow.setCut("SRSSemFull"    , 1                                                            , 1                   );
+
         cutflow.setCut("SRSSee"        , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                   );
         cutflow.setCut("SRSSeeZeeVt"   , fabs(www.MllSS()-91.1876)>10.                                , 1                   );
         cutflow.setCut("SRSSeeTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
@@ -211,10 +250,18 @@ int main(int argc, char** argv)
         cutflow.setVariable("MTmax3L"              ,  www.MTmax3L()                );
         cutflow.setVariable("MT3rd"                ,  www.MT3rd()                  );
 
+        // Set the event list variables
+        cutflow.setEventID(www.run(), www.lumi(), www.evt());
+
         // Once every cut bits are set, now fill the cutflows that are booked
         cutflow.fill();
     }
 
+    cutflow.getCut("SRSSmmFull").sortEventList();
+    cutflow.getCut("SRSSmmFull").printEventList();
+
     // Save output
     cutflow.saveOutput();
+
+    return 0;
 }
