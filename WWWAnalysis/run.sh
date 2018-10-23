@@ -10,6 +10,7 @@ for f in $(ls /nfs-7/userdata/phchang/WWW_babies/${VERSION}/skim/*.root); do
     if [[ $f == *"hpmpm"* ]]; then continue; fi
     if [[ $f == *"wprime"* ]]; then continue; fi
     if [[ $f == *"whsusy"* ]]; then continue; fi
+    if [[ $f == *"data_Run"* ]]; then continue; fi
     echo "Writing jobs for $f to .jobs.txt"
     if [[ $f == *"/www_"* ]]; then
         TREEVARIATION="www"
@@ -20,8 +21,10 @@ for f in $(ls /nfs-7/userdata/phchang/WWW_babies/${VERSION}/skim/*.root); do
         for TREEVARIATION in ${TREEVARIATIONS}; do
             echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt
         done
-    elif [[ $f == *"/data_"* ]]; then
+    elif [[ $f == *"/data_ss"* ]]; then
         echo './doAnalysis '$f' 't' '${OUTPUTDIR}'/'$(basename $f)' -1 > '${OUTPUTDIR}'/'$(basename $f)'.log 2>&1' >> .jobs.txt
+        # data-driven fake estimate
+        echo './doAnalysis '$f' 't_ss' '${OUTPUTDIR}'/t_fakes_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_fakes_'$(basename $f)'.log 2>&1' >> .jobs.txt
     else
         for TREEVARIATION in ${TREEVARIATIONS}; do
             echo './doAnalysis '$f' 't_${TREEVARIATION}' '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)' -1 > '${OUTPUTDIR}'/t_'${TREEVARIATION}'_'$(basename $f)'.log 2>&1' >> .jobs.txt

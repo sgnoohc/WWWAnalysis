@@ -225,8 +225,13 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.printCuts();
 
     // Some case-by-case checking needed for WWW_v1.2.2 (should be no longer necessary later on)
-    bool is2017 = TString(input_paths).Contains("2017");
+    bool is2017 = TString(input_paths).Contains("WWW2017");
     bool isWWW = TString(input_paths).Contains("www_2l_");
+
+    // For fake estimations, we use data-driven method.
+    // When looping over data and the output_path is set to have a "fakes" substring included we turn on the fake-weight settings
+    bool doFakeEstimation = TString(input_paths).Contains("data_") && TString(output_file_name).Contains("fakes");
+    bool isData = TString(input_paths).Contains("data_");
 
     //
     //
@@ -238,6 +243,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
 
         // Luminosity setting
         float lumi = is2017 == 1 ? 41.3 : 35.9;
+        lumi = doFakeEstimation ? www.ffwgt() : lumi;
 
         // Compute preselection
         bool presel = (www.firstgoodvertex() == 0);
@@ -251,123 +257,130 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         // Event weight
         float weight = www.evt_scale1fb() * www.purewgt() * lumi;
         if (isWWW && !is2017) weight *= 1.0384615385;
+        if (isData && !doFakeEstimation) weight = 1;
+
+        // Lepton counter to define dilep or trilep region
+        bool isdilep      = (www.nVlep() == 2) * (www.nLlep() == 2) * (www.nTlep() == 2);
+        bool istrilep     = (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 3) * (www.lep_pt()[0]>25.);
+        bool isfakedilep  = (www.nVlep() == 2) * (www.nLlep() == 2) * (www.nTlep() == 1) * (www.lep_pt()[0]>25.) * (www.lep_pt()[1]>25.);
+        bool isfaketrilep = (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 2);
 
         //      setCut("CutName"       , <boolean value to say whether it passes>           , <float value to define weight>);
-        cutflow.setCut("CutWeight"         , 1                                                            , weight              );
-        cutflow.setCut("CutPresel"         , presel                                                       , 1                   );
-        cutflow.setCut("CutTrigger"        , trigger                                                      , www.trigsf()        );
-        cutflow.setCut("CutSRDilep"        , (www.nVlep() == 2) * (www.nLlep() == 2) * (www.nTlep() == 2) , www.lepsf()         );
-        cutflow.setCut("CutSRTrilep"       , (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 3) , www.lepsf()         );
+        cutflow.setCut("CutWeight"         , 1                                                            , weight                             );
+        cutflow.setCut("CutPresel"         , presel                                                       , 1                                  );
+        cutflow.setCut("CutTrigger"        , trigger                                                      , www.trigsf()                       );
+        cutflow.setCut("CutSRDilep"        , doFakeEstimation ? isfakedilep : isdilep                     , doFakeEstimation ? 1 : www.lepsf() );
+        cutflow.setCut("CutSRTrilep"       , doFakeEstimation ? isfaketrilep : istrilep                   , doFakeEstimation ? 1 : www.lepsf() );
 
-        cutflow.setCut("SRSSmm"            , (www.passSSmm())*(www.MllSS()>40.)                           , 1                   );
-        cutflow.setCut("SRSSmmTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSmmNj2"         , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSmmNb0"         , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSmmMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                   );
-        cutflow.setCut("SRSSmmMjjL"        , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSmmDetajjL"     , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSmmMET"         , 1.                                                           , 1                   );
-        cutflow.setCut("SRSSmmMllSS"       , www.MllSS()>40.                                              , 1                   );
-        cutflow.setCut("SRSSmmFull"        , 1                                                            , 1                   );
+        cutflow.setCut("SRSSmm"            , (www.passSSmm())*(www.MllSS()>40.)                           , 1                                  );
+        cutflow.setCut("SRSSmmTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSmmNj2"         , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSmmNb0"         , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSmmMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                                  );
+        cutflow.setCut("SRSSmmMjjL"        , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSmmDetajjL"     , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSmmMET"         , 1.                                                           , 1                                  );
+        cutflow.setCut("SRSSmmMllSS"       , www.MllSS()>40.                                              , 1                                  );
+        cutflow.setCut("SRSSmmFull"        , 1                                                            , 1                                  );
 
-        cutflow.setCut("SRSSem"            , (www.passSSem())*(www.MllSS()>30.)                           , 1                   );
-        cutflow.setCut("SRSSemTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSemNj2"         , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSemNb0"         , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSemMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                   );
-        cutflow.setCut("SRSSemMjjL"        , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSemDetajjL"     , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSemMET"         , www.met_pt()>60.                                             , 1                   );
-        cutflow.setCut("SRSSemMllSS"       , www.MllSS()>30.                                              , 1                   );
-        cutflow.setCut("SRSSemMTmax"       , www.MTmax()>90.                                              , 1                   );
-        cutflow.setCut("SRSSemFull"        , 1                                                            , 1                   );
+        cutflow.setCut("SRSSem"            , (www.passSSem())*(www.MllSS()>30.)                           , 1                                  );
+        cutflow.setCut("SRSSemTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSemNj2"         , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSemNb0"         , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSemMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                                  );
+        cutflow.setCut("SRSSemMjjL"        , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSemDetajjL"     , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSemMET"         , www.met_pt()>60.                                             , 1                                  );
+        cutflow.setCut("SRSSemMllSS"       , www.MllSS()>30.                                              , 1                                  );
+        cutflow.setCut("SRSSemMTmax"       , www.MTmax()>90.                                              , 1                                  );
+        cutflow.setCut("SRSSemFull"        , 1                                                            , 1                                  );
 
-        cutflow.setCut("SRSSee"            , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                   );
-        cutflow.setCut("SRSSeeZeeVt"       , fabs(www.MllSS()-91.1876)>10.                                , 1                   );
-        cutflow.setCut("SRSSeeTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSeeNj2"         , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSeeNb0"         , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSeePre"         , 1                                                            , 1                   );
-        cutflow.setCut("SRSSeeMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                   );
-        cutflow.setCut("SRSSeeMjjL"        , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSeeDetajjL"     , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSeeMET"         , www.met_pt()>60.                                             , 1                   );
-        cutflow.setCut("SRSSeeMllSS"       , www.MllSS()>40.                                              , 1                   );
-        cutflow.setCut("SRSSeeFull"        , 1                                                            , 1                   );
+        cutflow.setCut("SRSSee"            , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                                  );
+        cutflow.setCut("SRSSeeZeeVt"       , fabs(www.MllSS()-91.1876)>10.                                , 1                                  );
+        cutflow.setCut("SRSSeeTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSeeNj2"         , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSeeNb0"         , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSeePre"         , 1                                                            , 1                                  );
+        cutflow.setCut("SRSSeeMjjW"        , fabs(www.Mjj()-80.)<15.                                      , 1                                  );
+        cutflow.setCut("SRSSeeMjjL"        , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSeeDetajjL"     , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSeeMET"         , www.met_pt()>60.                                             , 1                                  );
+        cutflow.setCut("SRSSeeMllSS"       , www.MllSS()>40.                                              , 1                                  );
+        cutflow.setCut("SRSSeeFull"        , 1                                                            , 1                                  );
 
-        cutflow.setCut("SRSSSidemm"        , (www.passSSmm())*(www.MllSS()>40.)                           , 1                   );
-        cutflow.setCut("SRSSSidemmTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSSidemmNj2"     , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSSidemmNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSSidemmMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                   );
-        cutflow.setCut("SRSSSidemmMjjL"    , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSSidemmDetajjL" , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSSidemmMET"     , www.met_pt()>60.                                             , 1                   );
-        cutflow.setCut("SRSSSidemmMllSS"   , www.MllSS()>40.                                              , 1                   );
-        cutflow.setCut("SRSSSidemmFull"    , 1                                                            , 1                   );
+        cutflow.setCut("SRSSSidemm"        , (www.passSSmm())*(www.MllSS()>40.)                           , 1                                  );
+        cutflow.setCut("SRSSSidemmTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSSidemmNj2"     , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSSidemmNb0"     , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSSidemmMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                                  );
+        cutflow.setCut("SRSSSidemmMjjL"    , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSSidemmDetajjL" , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSSidemmMET"     , www.met_pt()>60.                                             , 1                                  );
+        cutflow.setCut("SRSSSidemmMllSS"   , www.MllSS()>40.                                              , 1                                  );
+        cutflow.setCut("SRSSSidemmFull"    , 1                                                            , 1                                  );
 
-        cutflow.setCut("SRSSSideem"        , (www.passSSem())*(www.MllSS()>30.)                           , 1                   );
-        cutflow.setCut("SRSSSideemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSSideemNj2"     , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSSideemNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSSideemMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                   );
-        cutflow.setCut("SRSSSideemMjjL"    , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSSideemDetajjL" , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSSideemMET"     , www.met_pt()>60.                                             , 1                   );
-        cutflow.setCut("SRSSSideemMllSS"   , www.MllSS()>30.                                              , 1                   );
-        cutflow.setCut("SRSSSideemMTmax"   , www.MTmax()>90.                                              , 1                   );
-        cutflow.setCut("SRSSSideemFull"    , 1                                                            , 1                   );
+        cutflow.setCut("SRSSSideem"        , (www.passSSem())*(www.MllSS()>30.)                           , 1                                  );
+        cutflow.setCut("SRSSSideemTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSSideemNj2"     , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSSideemNb0"     , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSSideemMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                                  );
+        cutflow.setCut("SRSSSideemMjjL"    , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSSideemDetajjL" , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSSideemMET"     , www.met_pt()>60.                                             , 1                                  );
+        cutflow.setCut("SRSSSideemMllSS"   , www.MllSS()>30.                                              , 1                                  );
+        cutflow.setCut("SRSSSideemMTmax"   , www.MTmax()>90.                                              , 1                                  );
+        cutflow.setCut("SRSSSideemFull"    , 1                                                            , 1                                  );
 
-        cutflow.setCut("SRSSSideee"        , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                   );
-        cutflow.setCut("SRSSSideeeZeeVt"   , fabs(www.MllSS()-91.1876)>10.                                , 1                   );
-        cutflow.setCut("SRSSSideeeTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                   );
-        cutflow.setCut("SRSSSideeeNj2"     , www.nj30()>= 2                                               , 1                   );
-        cutflow.setCut("SRSSSideeeNb0"     , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SRSSSideeePre"     , 1                                                            , 1                   );
-        cutflow.setCut("SRSSSideeeMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                   );
-        cutflow.setCut("SRSSSideeeMjjL"    , www.MjjL()<400.                                              , 1                   );
-        cutflow.setCut("SRSSSideeeDetajjL" , www.DetajjL()<1.5                                            , 1                   );
-        cutflow.setCut("SRSSSideeeMET"     , www.met_pt()>60.                                             , 1                   );
-        cutflow.setCut("SRSSSideeeMllSS"   , www.MllSS()>40.                                              , 1                   );
-        cutflow.setCut("SRSSSideeeFull"    , 1                                                            , 1                   );
+        cutflow.setCut("SRSSSideee"        , (www.passSSee())*(1)*(www.MllSS()>40.)                       , 1                                  );
+        cutflow.setCut("SRSSSideeeZeeVt"   , fabs(www.MllSS()-91.1876)>10.                                , 1                                  );
+        cutflow.setCut("SRSSSideeeTVeto"   , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
+        cutflow.setCut("SRSSSideeeNj2"     , www.nj30()>= 2                                               , 1                                  );
+        cutflow.setCut("SRSSSideeeNb0"     , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SRSSSideeePre"     , 1                                                            , 1                                  );
+        cutflow.setCut("SRSSSideeeMjjW"    , fabs(www.Mjj()-80.)>=15.                                     , 1                                  );
+        cutflow.setCut("SRSSSideeeMjjL"    , www.MjjL()<400.                                              , 1                                  );
+        cutflow.setCut("SRSSSideeeDetajjL" , www.DetajjL()<1.5                                            , 1                                  );
+        cutflow.setCut("SRSSSideeeMET"     , www.met_pt()>60.                                             , 1                                  );
+        cutflow.setCut("SRSSSideeeMllSS"   , www.MllSS()>40.                                              , 1                                  );
+        cutflow.setCut("SRSSSideeeFull"    , 1                                                            , 1                                  );
 
-        cutflow.setCut("SR0SFOS"           , (www.nSFOS()==0)                                             , 1                   );
-        cutflow.setCut("SR0SFOSNj1"        , www.nj()<=1                                                  , 1                   );
-        cutflow.setCut("SR0SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SR0SFOSPre"        , 1                                                            , 1                   );
-        cutflow.setCut("SR0SFOSPt3l"       , 1.                                                           , 1                   );
-        cutflow.setCut("SR0SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                   );
-        cutflow.setCut("SR0SFOSMET"        , www.met_pt()>30.                                             , 1                   );
-        cutflow.setCut("SR0SFOSMll"        , www.Mll3L() > 20.                                            , 1                   );
-        cutflow.setCut("SR0SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                   );
-        cutflow.setCut("SR0SFOSZVt"        , abs(www.Mee3L()-91.1876) > 15.                               , 1                   );
-        cutflow.setCut("SR0SFOSMTmax"      , www.MTmax3L()>90.                                            , 1                   );
-        cutflow.setCut("SR0SFOSFull"       , 1                                                            , 1                   );
+        cutflow.setCut("SR0SFOS"           , (www.nSFOS()==0)                                             , 1                                  );
+        cutflow.setCut("SR0SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("SR0SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SR0SFOSPre"        , 1                                                            , 1                                  );
+        cutflow.setCut("SR0SFOSPt3l"       , 1.                                                           , 1                                  );
+        cutflow.setCut("SR0SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("SR0SFOSMET"        , www.met_pt()>30.                                             , 1                                  );
+        cutflow.setCut("SR0SFOSMll"        , www.Mll3L() > 20.                                            , 1                                  );
+        cutflow.setCut("SR0SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("SR0SFOSZVt"        , abs(www.Mee3L()-91.1876) > 15.                               , 1                                  );
+        cutflow.setCut("SR0SFOSMTmax"      , www.MTmax3L()>90.                                            , 1                                  );
+        cutflow.setCut("SR0SFOSFull"       , 1                                                            , 1                                  );
 
-        cutflow.setCut("SR1SFOS"           , (www.nSFOS()==1)                                             , 1                   );
-        cutflow.setCut("SR1SFOSNj1"        , www.nj()<=1                                                  , 1                   );
-        cutflow.setCut("SR1SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SR1SFOSPre"        , 1                                                            , 1                   );
-        cutflow.setCut("SR1SFOSPt3l"       , www.Pt3l()>60.                                               , 1                   );
-        cutflow.setCut("SR1SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                   );
-        cutflow.setCut("SR1SFOSMET"        , www.met_pt()>40.                                             , 1                   );
-        cutflow.setCut("SR1SFOSMll"        , www.Mll3L() > 20.                                            , 1                   );
-        cutflow.setCut("SR1SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                   );
-        cutflow.setCut("SR1SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                   );
-        cutflow.setCut("SR1SFOSMT3rd"      , www.MT3rd()>90.                                              , 1                   );
-        cutflow.setCut("SR1SFOSFull"       , 1                                                            , 1                   );
+        cutflow.setCut("SR1SFOS"           , (www.nSFOS()==1)                                             , 1                                  );
+        cutflow.setCut("SR1SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("SR1SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SR1SFOSPre"        , 1                                                            , 1                                  );
+        cutflow.setCut("SR1SFOSPt3l"       , www.Pt3l()>60.                                               , 1                                  );
+        cutflow.setCut("SR1SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("SR1SFOSMET"        , www.met_pt()>40.                                             , 1                                  );
+        cutflow.setCut("SR1SFOSMll"        , www.Mll3L() > 20.                                            , 1                                  );
+        cutflow.setCut("SR1SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("SR1SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                                  );
+        cutflow.setCut("SR1SFOSMT3rd"      , www.MT3rd()>90.                                              , 1                                  );
+        cutflow.setCut("SR1SFOSFull"       , 1                                                            , 1                                  );
 
-        cutflow.setCut("SR2SFOS"           , (www.nSFOS()==2)                                             , 1                   );
-        cutflow.setCut("SR2SFOSNj1"        , www.nj()<=1                                                  , 1                   );
-        cutflow.setCut("SR2SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf() );
-        cutflow.setCut("SR2SFOSPre"        , 1                                                            , 1                   );
-        cutflow.setCut("SR2SFOSPt3l"       , www.Pt3l()>60.                                               , 1                   );
-        cutflow.setCut("SR2SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                   );
-        cutflow.setCut("SR2SFOSMET"        , www.met_pt()>55.                                             , 1                   );
-        cutflow.setCut("SR2SFOSMll"        , (www.Mll3L() > 20. && www.Mll3L1() > 20.)                    , 1                   );
-        cutflow.setCut("SR2SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                   );
-        cutflow.setCut("SR2SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                   );
-        cutflow.setCut("SR2SFOSFull"       , 1                                                            , 1                   );
+        cutflow.setCut("SR2SFOS"           , (www.nSFOS()==2)                                             , 1                                  );
+        cutflow.setCut("SR2SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("SR2SFOSNb0"        , www.nb()==0                                                  , www.weight_btagsf()                );
+        cutflow.setCut("SR2SFOSPre"        , 1                                                            , 1                                  );
+        cutflow.setCut("SR2SFOSPt3l"       , www.Pt3l()>60.                                               , 1                                  );
+        cutflow.setCut("SR2SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("SR2SFOSMET"        , www.met_pt()>55.                                             , 1                                  );
+        cutflow.setCut("SR2SFOSMll"        , (www.Mll3L() > 20. && www.Mll3L1() > 20.)                    , 1                                  );
+        cutflow.setCut("SR2SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("SR2SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                                  );
+        cutflow.setCut("SR2SFOSFull"       , 1                                                            , 1                                  );
 
         // Set the variables used for histogramming
         cutflow.setVariable("MllSS"                ,  www.MllSS()                  );
@@ -443,74 +456,4 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.saveOutput();
 
     return 0;
-}
-
-//_______________________________________________________________________________________________________
-bool passTrigger2016()
-{
-    if (www.nLlep() < 2)
-        return false;
-
-    const vector<int>& lep_pdgId = www.lep_pdgId();
-    const int mc_HLT_DoubleEl    = www.mc_HLT_DoubleEl();
-    const int mc_HLT_DoubleEl_DZ = www.mc_HLT_DoubleEl_DZ();
-    const int mc_HLT_MuEG        = www.mc_HLT_MuEG();
-    const int mc_HLT_DoubleMu    = www.mc_HLT_DoubleMu();
-    const int nVlep              = www.nVlep();
-    const int nLlep              = www.nLlep();
-
-
-    if (nVlep != 2 && nVlep != 3)
-        return 0;
-
-    if (nLlep != 2 && nLlep != 3)
-        return 0;
-
-    if (lep_pdgId.size() < 2)
-        return 0;
-
-    if (nVlep == 2 && nLlep == 2)
-    {
-        int lepprod = lep_pdgId.at(0)*lep_pdgId.at(1);
-        if (abs(lepprod) == 121)
-            return (mc_HLT_DoubleEl || mc_HLT_DoubleEl_DZ);
-        else if (abs(lepprod) == 143)
-            return mc_HLT_MuEG;
-        else if (abs(lepprod) == 169)
-            return mc_HLT_DoubleMu;
-        else
-            return 0;
-    }
-    else if (nVlep == 3 && nLlep == 3)
-    {
-        int lepprod01 = lep_pdgId.at(0)*lep_pdgId.at(1);
-        if (abs(lepprod01) == 121 && (mc_HLT_DoubleEl || mc_HLT_DoubleEl_DZ))
-            return true;
-        else if (abs(lepprod01) == 143 && mc_HLT_MuEG)
-            return true;
-        else if (abs(lepprod01) == 169 && mc_HLT_DoubleMu)
-            return true;
-
-        int lepprod02 = lep_pdgId.at(0)*lep_pdgId.at(2);
-        if (abs(lepprod02) == 121 && (mc_HLT_DoubleEl || mc_HLT_DoubleEl_DZ))
-            return true;
-        else if (abs(lepprod02) == 143 && mc_HLT_MuEG)
-            return true;
-        else if (abs(lepprod02) == 169 && mc_HLT_DoubleMu)
-            return true;
-
-        int lepprod12 = lep_pdgId.at(1)*lep_pdgId.at(2);
-        if (abs(lepprod12) == 121 && (mc_HLT_DoubleEl || mc_HLT_DoubleEl_DZ))
-            return true;
-        else if (abs(lepprod12) == 143 && mc_HLT_MuEG)
-            return true;
-        else if (abs(lepprod12) == 169 && mc_HLT_DoubleMu)
-            return true;
-
-        return false;
-    }
-    else
-    {
-        return 0;
-    }
 }

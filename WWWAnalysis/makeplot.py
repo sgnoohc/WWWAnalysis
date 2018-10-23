@@ -7,6 +7,7 @@ import glob
 def main():
 
     output_dirpath = "outputs/WWW_v1.2.2"
+    is2017 = "WWW2017" in output_dirpath
     sig_globber = "www_2l"
 
     histnames = [
@@ -21,12 +22,22 @@ def main():
             "SR2SFOSFull__yield"
             ]
 
+    histnames = [
+            "SRSSeeFull__Mjj",
+            "SRSSemFull__Mjj",
+            "SRSSmmFull__Mjj",
+            "SRSSSideeeFull__Mjj",
+            "SRSSSideemFull__Mjj",
+            "SRSSSidemmFull__Mjj",
+            ]
+
     bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/t_lostlep_*.root") if "alp_" not in x ]
     bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/t_photon_*.root")  if "alp_" not in x ]
     bkg_list_qflip   = [ x for x in glob.glob(output_dirpath+"/t_qflip_*.root")   if "alp_" not in x ]
-    bkg_list_fakes   = [ x for x in glob.glob(output_dirpath+"/t_fakes_*.root")   if "alp_" not in x ]
+    bkg_list_fakes   = [ x for x in glob.glob(output_dirpath+"/t_fakes_data*.root")   if "alp_" not in x ]
     bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/t_prompt_*.root")  if "alp_" not in x ]
-    sig_list = glob.glob(output_dirpath+"/t_www_"+sig_globber+"*.root") + glob.glob(output_dirpath+"/t_www_vh*.root")
+    sig_list  = glob.glob(output_dirpath+"/t_www_"+sig_globber+"*.root") + glob.glob(output_dirpath+"/t_www_vh*.root")
+    data_list = glob.glob(output_dirpath+"/data_*.root")
 
     h_lostlep = ru.get_summed_histogram(bkg_list_lostlep , histnames)
     h_photon  = ru.get_summed_histogram(bkg_list_photon  , histnames)
@@ -34,6 +45,7 @@ def main():
     h_fakes   = ru.get_summed_histogram(bkg_list_fakes   , histnames)
     h_prompt  = ru.get_summed_histogram(bkg_list_prompt  , histnames)
     h_sig     = ru.get_summed_histogram(sig_list         , histnames)
+    h_data    = ru.get_summed_histogram(data_list        , histnames)
 
     h_lostlep .SetName("Lost/three lep")
     h_photon  .SetName("#gamma#rightarrowlepton")
@@ -57,7 +69,7 @@ def main():
     p.plot_hist(
             sigs = [h_sig],
             bgs  = [h_photon, h_qflip, h_fakes, h_lostlep, h_prompt],
-            data = None,
+            data = h_data,
             colors = colors,
             syst = None,
             options=alloptions)
