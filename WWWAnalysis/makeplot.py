@@ -7,8 +7,10 @@ import glob
 def main():
 
     output_dirpath = "outputs/WWW_v1.2.2"
+    #output_dirpath = "outputs/WWW2017_v4.0.5"
     is2017 = "WWW2017" in output_dirpath
-    sig_globber = "www_2l"
+    sig_globber = "www_" if is2017 else "www_2l"
+    fake_globber = "t_fakes_*.root" if is2017 else "t_fakes_data*.root"
 
     histnames = [
             "SRSSeeFull__yield",
@@ -23,19 +25,26 @@ def main():
             ]
 
     histnames = [
-            "SRSSeeFull__Mjj",
-            "SRSSemFull__Mjj",
-            "SRSSmmFull__Mjj",
-            "SRSSSideeeFull__Mjj",
-            "SRSSSideemFull__Mjj",
-            "SRSSSidemmFull__Mjj",
+            "WZCRSSeeFull__wzcryield",
+            "WZCRSSemFull__wzcryield",
+            "WZCRSSmmFull__wzcryield",
+            "WZCR1SFOSFull__wzcryield",
+            "WZCR2SFOSFull__wzcryield"
             ]
 
-    bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/t_lostlep_*.root") if "alp_" not in x ]
-    bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/t_photon_*.root")  if "alp_" not in x ]
-    bkg_list_qflip   = [ x for x in glob.glob(output_dirpath+"/t_qflip_*.root")   if "alp_" not in x ]
-    bkg_list_fakes   = [ x for x in glob.glob(output_dirpath+"/t_fakes_data*.root")   if "alp_" not in x ]
-    bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/t_prompt_*.root")  if "alp_" not in x ]
+    histnames = [
+            "SR1SFOSFull_cutflow",
+            ]
+
+    def veto(x):
+        #return "alp_" not in x and "wz_3lnu0" not in x and "wz_3lnu1" not in x and "wz_3lnu2" not in x and "wz_3lnu3" not in x
+        return "alp_" not in x and "wz_3lnu_" not in x
+
+    bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/t_lostlep_*.root") if veto(x) ]
+    bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/t_photon_*.root")  if veto(x) ]
+    bkg_list_qflip   = [ x for x in glob.glob(output_dirpath+"/t_qflip_*.root")   if veto(x) ]
+    bkg_list_fakes   = [ x for x in glob.glob(output_dirpath+"/"+fake_globber)    if veto(x) ]
+    bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/t_prompt_*.root")  if veto(x) ]
     sig_list  = glob.glob(output_dirpath+"/t_www_"+sig_globber+"*.root") + glob.glob(output_dirpath+"/t_www_vh*.root")
     data_list = glob.glob(output_dirpath+"/data_*.root")
 
@@ -53,7 +62,6 @@ def main():
     h_fakes   .SetName("Non-prompt")
     h_prompt  .SetName("Irredu.")
     h_sig     .SetName("WWW")
-    h_sig.Print("all")
 
     colors = [ 920, 2007, 2005, 2003, 2001, 2 ]
     alloptions= {
@@ -65,11 +73,13 @@ def main():
                 "output_name": "plots/test.pdf",
                 "bkg_sort_method": "unsorted",
                 "no_ratio": True,
+                "print_yield": True,
                 }
     p.plot_hist(
             sigs = [h_sig],
             bgs  = [h_photon, h_qflip, h_fakes, h_lostlep, h_prompt],
             data = h_data,
+            #data = None,
             colors = colors,
             syst = None,
             options=alloptions)
