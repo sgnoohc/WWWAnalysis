@@ -67,18 +67,34 @@ int main(int argc, char** argv)
 
     // Histogram utility object that is used to define the histograms
     RooUtil::Histograms histograms;
-    histograms.addHistogram("Mll"          , 180 , 60 , 120 );
-    histograms.addHistogram("MT"           , 180 , 0  , 180 );
-    histograms.addHistogram("MET"          , 180 , 0  , 250 );
-    histograms.addHistogram("Nvtx"         , 50  , 0  , 50  );
-    histograms.addHistogram("eta"          , 180 , -3 , 3   );
-    histograms.addHistogram("pt"           , 180 , 0  , 250 );
-    histograms.addHistogram("ptcorr"       , 180 , 0  , 250 );
-    histograms.addHistogram("nj"           , 5   , 0  , 5   );
-    histograms.addHistogram("nVlep"        , 4   , 0  , 4   );
-    histograms.addHistogram("nLlep"        , 4   , 0  , 4   );
-    histograms.addHistogram("nTlep"        , 4   , 0  , 4   );
-    histograms.addHistogram("ptcorrvarbin" , {0., 20., 25., 30., 35., 50., 150.} );
+    histograms.addHistogram("Mll"             , 180 , 60 , 120 );
+    histograms.addHistogram("MT"              , 180 , 0  , 180 );
+    histograms.addHistogram("MET"             , 180 , 0  , 250 );
+    histograms.addHistogram("Nvtx"            , 50  , 0  , 50  );
+    histograms.addHistogram("eta"             , 180 , -3 , 3   );
+    histograms.addHistogram("pt"              , 180 , 0  , 250 );
+    histograms.addHistogram("ptcorr"          , 180 , 0  , 250 );
+    histograms.addHistogram("nj"              , 5   , 0  , 5   );
+    histograms.addHistogram("nVlep"           , 4   , 0  , 4   );
+    histograms.addHistogram("nLlep"           , 4   , 0  , 4   );
+    histograms.addHistogram("nTlep"           , 4   , 0  , 4   );
+
+    // The pt corr v. eta are used to parametrize the fake rates
+    // The boundaries are stored in std::vector
+    const std::vector<float> eta_bounds = {0.0, 1.6, 2.4};
+    const std::vector<float> ptcorr_bounds = {0., 20., 25., 30., 35., 50., 150.};
+    const std::vector<float> ptcorrcoarse_bounds = {0., 20., 25., 30., 35., 150.};
+
+    // 1D plots to understand the behavior in general
+    histograms.addHistogram("etavarbin"    , eta_bounds);
+    histograms.addHistogram("ptcorrvarbin"    , ptcorr_bounds);
+    histograms.addHistogram("ptcorrvarbincoarse"    , ptcorrcoarse_bounds);
+
+    // The histogram for the 2d fake rate will be simplified to 1d histogram rolled out
+    histograms.addHistogram("ptcorretarolled" , (eta_bounds.size()-1) * (ptcorr_bounds.size()-1)  , 0  , (eta_bounds.size()-1) * (ptcorr_bounds.size()-1)  );
+
+    // The histogram that merges the last two bins
+    histograms.addHistogram("ptcorretarolledcoarse" , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  , 0  , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  );
 
     // Book cutflows
     cutflow.bookCutflows();
@@ -98,6 +114,7 @@ int main(int argc, char** argv)
 
         float jet_pt0 = fr.jets_p4().size() > 0 ? fr.jets_p4()[0].pt() : -999;
         float MT = (TMath::Sqrt(2*fr.met_pt()*fr.lep_pt()[0]*(1.0-TMath::Cos(fr.lep_phi()[0]-fr.met_phi()))));
+        float ptcorr = fr.lep_pt()[0]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[0]-0.03));
         bool onemu_cuts      = (fr.nVlep() == 1) * (fr.nTlep() == 1) * (abs(fr.lep_pdgId()[0])==13) * (fr.mc_HLT_SingleIsoMu17() > 0) * (jet_pt0>40.);
         bool oneel_cuts      = (fr.nVlep() == 1) * (fr.nTlep() == 1) * (abs(fr.lep_pdgId()[0])==11) * (fr.mc_HLT_SingleIsoEl23() > 0) * (jet_pt0>40.);
         bool onemuloose_cuts = (fr.nVlep() == 1) * (fr.nLlep() == 1) * (abs(fr.lep_pdgId()[0])==13) * (fr.mc_HLT_SingleIsoMu17() > 0) * (jet_pt0>40.);
@@ -128,12 +145,16 @@ int main(int argc, char** argv)
         cutflow.setVariable("Nvtx"   , fr.nVert());
         cutflow.setVariable("eta"    , fr.lep_eta()[0]);
         cutflow.setVariable("pt"     , fr.lep_pt()[0]);
-        cutflow.setVariable("ptcorr" , fr.lep_pt()[0]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[0]-0.03)));
+        cutflow.setVariable("ptcorr" , ptcorr);
         cutflow.setVariable("nj"     , fr.nj());
         cutflow.setVariable("nVlep"  , fr.nVlep());
         cutflow.setVariable("nLlep"  , fr.nLlep());
         cutflow.setVariable("nTlep"  , fr.nTlep());
-        cutflow.setVariable("ptcorrvarbin" , min(fr.lep_pt()[0]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[0]-0.03)),149.99));
+        cutflow.setVariable("etavarbin" , min((double) fabs(fr.lep_eta()[0]), 2.3999));
+        cutflow.setVariable("ptcorrvarbin" , min((double) ptcorr, 149.99));
+        cutflow.setVariable("ptcorrvarbincoarse" , min((double) ptcorr, 149.99));
+        cutflow.setVariable("ptcorretarolled" , RooUtil::Calc::calcBin2D(ptcorr_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])));
+        cutflow.setVariable("ptcorretarolledcoarse" , RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])));
 
         cutflow.fill();
     }

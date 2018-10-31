@@ -15,27 +15,33 @@ def main():
     prescale_muHLT17 = 1
     prescale_elHLT23 = 1
 
-#    plot("OneElEWKCR__MT"             , prescale_elHLT23)
-#    plot("OneElEWKCR__MET"            , prescale_elHLT23)
-#    plot("OneElEWKCR__Nvtx"           , prescale_elHLT23)
-#    plot("OneElMR__MT"                , prescale_elHLT23)
-#    plot("OneElMR__ptcorr"            , prescale_elHLT23)
-#    plot("OneElTightMR__ptcorr"       , prescale_elHLT23)
+    plot("OneElEWKCR__MT"             , prescale_elHLT23)
+    plot("OneElEWKCR__MET"            , prescale_elHLT23)
+    plot("OneElEWKCR__Nvtx"           , prescale_elHLT23)
+    plot("OneElMR__MT"                , prescale_elHLT23)
+    plot("OneElMR__ptcorr"            , prescale_elHLT23)
+    plot("OneElTightMR__ptcorr"       , prescale_elHLT23)
     el_sf, el_sferr = ewksf("OneElEWKCR__MT")
-#    plot("OneElMR__ptcorrvarbin"      , prescale_elHLT23, el_sf)
-#    plot("OneElTightMR__ptcorrvarbin" , prescale_elHLT23, el_sf)
+    plot("OneElMR__ptcorrvarbin"      , prescale_elHLT23, el_sf)
+    plot("OneElTightMR__ptcorrvarbin" , prescale_elHLT23, el_sf)
     fakerate("OneElTightMR__ptcorrvarbin", "OneElMR__ptcorrvarbin", prescale_elHLT23, el_sf, el_sferr)
+    fakerate("OneElTightMR__etavarbin", "OneElMR__etavarbin", prescale_elHLT23, el_sf, el_sferr)
+    fakerate("OneElTightMR__ptcorretarolled", "OneElMR__ptcorretarolled", prescale_elHLT23, el_sf, el_sferr)
+    fakerate("OneElTightMR__ptcorretarolledcoarse", "OneElMR__ptcorretarolledcoarse", prescale_elHLT23, el_sf, el_sferr)
 
-#    plot("OneMuEWKCR__MT"             , prescale_muHLT17)
-#    plot("OneMuEWKCR__MET"            , prescale_muHLT17)
-#    plot("OneMuEWKCR__Nvtx"           , prescale_muHLT17)
-#    plot("OneMuMR__MT"                , prescale_muHLT17)
-#    plot("OneMuMR__ptcorr"            , prescale_muHLT17)
-#    plot("OneMuTightMR__ptcorr"       , prescale_muHLT17)
+    plot("OneMuEWKCR__MT"             , prescale_muHLT17)
+    plot("OneMuEWKCR__MET"            , prescale_muHLT17)
+    plot("OneMuEWKCR__Nvtx"           , prescale_muHLT17)
+    plot("OneMuMR__MT"                , prescale_muHLT17)
+    plot("OneMuMR__ptcorr"            , prescale_muHLT17)
+    plot("OneMuTightMR__ptcorr"       , prescale_muHLT17)
     mu_sf, mu_sferr = ewksf("OneMuEWKCR__MT")
-#    plot("OneMuMR__ptcorrvarbin"      , prescale_muHLT17)
-#    plot("OneMuTightMR__ptcorrvarbin" , prescale_muHLT17)
+    plot("OneMuMR__ptcorrvarbin"      , prescale_muHLT17)
+    plot("OneMuTightMR__ptcorrvarbin" , prescale_muHLT17)
     fakerate("OneMuTightMR__ptcorrvarbin", "OneMuMR__ptcorrvarbin", prescale_muHLT17, mu_sf, mu_sferr)
+    fakerate("OneMuTightMR__etavarbin", "OneMuMR__etavarbin", prescale_muHLT17, mu_sf, mu_sferr)
+    fakerate("OneMuTightMR__ptcorretarolled", "OneMuMR__ptcorretarolled", prescale_muHLT17, mu_sf, mu_sferr)
+    fakerate("OneMuTightMR__ptcorretarolledcoarse", "OneMuMR__ptcorretarolledcoarse", prescale_muHLT17, mu_sf, mu_sferr)
 
 def get_prescale(histname):
     _, h_d, h_b, _, _, _ = plot(histname)
@@ -132,6 +138,7 @@ def fakerate(num, den, ps=0, sf=0, sferr=0):
                 "bkg_sort_method": "unsorted",
                 "no_ratio": False,
                 "print_yield": True,
+                "yield_prec": 3,
                 "draw_points": True,
                 }
 
