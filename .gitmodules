@@ -10,3 +10,9 @@
 [submodule "WWWAnalysis/plottery"]
 	path = WWWAnalysis/plottery
 	url = git@github.com:aminnj/plottery.git
+[submodule "WWWAnalysis/fakerate/rooutil"]
+	path = WWWAnalysis/fakerate/rooutil
+	url = git@github.com:sgnoohc/rooutil.git
+[submodule "WWWAnalysis/fakerate/plottery"]
+	path = WWWAnalysis/fakerate/plottery
+	url = git@github.com:aminnj/plottery.git
