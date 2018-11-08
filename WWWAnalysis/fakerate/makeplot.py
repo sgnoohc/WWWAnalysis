@@ -12,7 +12,7 @@ from array import array
 output_dirpath = "outputs/FR2017_v3.0.17"
 is2017 = "FR2017" in output_dirpath
 
-output_dirpath = "outputs/FR2017_analysis_v0.11.1"
+output_dirpath = "outputs/FR2017_analysis_v0.11.2"
 
 def main():
 
@@ -337,6 +337,8 @@ def plot(histnames, ps=0, sf=0):
                 "no_ratio": False,
                 "print_yield": False,
                 "yaxis_log": True if "ptcorr" in histnames else False,
+                #"yaxis_log": False,
+                "divide_by_bin_width": True,
                 "legend_smart": False if "ptcorr" in histnames else True,
                 "lumi_value" : 41.3,
                 }
@@ -433,7 +435,7 @@ def mu_fakerate():
         output_dirpath + "/wj_ht.root",
         output_dirpath + "/tt_1l.root",
         ]
-    varname = "muptcorretarolledfineeta"
+    varname = "muptcorretarolledcoarse"
     num = "MuClosureTight__{}".format(varname)
     den = "MuClosureLoose__{}".format(varname)
     h_num = ru.get_summed_histogram(mcs , num)

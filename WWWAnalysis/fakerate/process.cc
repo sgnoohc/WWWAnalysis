@@ -14,6 +14,7 @@ int main(int argc, char** argv)
         std::cout << std::endl;
         std::cout << "  INPUTFILES      comma separated file list" << std::endl;
         std::cout << "  OUTPUTFILE      output file name" << std::endl;
+        std::cout << "  [LEPVERSION]    0: SS 1: 3L" << std::endl;
         std::cout << "  [NEVENTS=-1]    # of events to run over" << std::endl;
         std::cout << std::endl;
         return 1;
@@ -26,8 +27,11 @@ int main(int argc, char** argv)
     // The input files can be comma separated (e.g. "file1.root,file2.root") or with wildcard (n.b. be sure to escape)
     TChain* ch = RooUtil::FileUtil::createTChain("t", argv[1]);
 
+    // Version of lepton to run
+    int lepversion = argc > 3 ? atoi(argv[3]) : 0;
+
     // Number of events to loop over
-    int nEvents = argc > 3 ? atoi(argv[3]) : -1;
+    int nEvents = argc > 4 ? atoi(argv[4]) : -1;
 
     // Create a Looper object to loop over input files
     RooUtil::Looper<frtree> looper(ch, &fr, nEvents);
@@ -155,22 +159,6 @@ int main(int argc, char** argv)
     cutflow.getCut("ElClosureTightPredict");
     cutflow.addCutToLastActiveCut("ElClosureTightNbgeq1Predict");
 
-//    cutflow.getCut("ElClosure");
-//    cutflow.addCutToLastActiveCut("ElClosureLoosePredictBVeto");
-//    cutflow.addCutToLastActiveCut("ElClosureTightPredictBVeto");
-//    cutflow.getCut("ElClosure");
-//    cutflow.addCutToLastActiveCut("ElClosureLoosePredictHF");
-//    cutflow.addCutToLastActiveCut("ElClosureTightPredictHF");
-//    cutflow.getCut("ElClosure");
-//    cutflow.addCutToLastActiveCut("ElClosureLoosePredictEM");
-//    cutflow.addCutToLastActiveCut("ElClosureTightPredictEM");
-//    cutflow.getCut("ElClosure");
-//    cutflow.addCutToLastActiveCut("ElClosureLoosePredictBVetoHF");
-//    cutflow.addCutToLastActiveCut("ElClosureTightPredictBVetoHF");
-//    cutflow.getCut("ElClosure");
-//    cutflow.addCutToLastActiveCut("ElClosureLoosePredictBVetoEM");
-//    cutflow.addCutToLastActiveCut("ElClosureTightPredictBVetoEM");
-
     cutflow.getCut("ElClosureLoose");
     cutflow.addCutToLastActiveCut("ElClosureLooseEta0Pt1");
     cutflow.getCut("ElClosureLoose");
@@ -248,13 +236,16 @@ int main(int argc, char** argv)
         presel &= fr.Flag_AllEventFilters() > 0;
         presel &= fr.evt_passgoodrunlist() > 0;
 
+        const float muiso_thresh = lepversion == 0 ? 0.03 : 0.07;
+        const float eliso_thresh = lepversion == 0 ? 0.03 : 0.05;
+
         float jet_pt0 = fr.jets_p4().size() > 0 ? fr.jets_p4()[0].pt() : -999;
         float MT = (TMath::Sqrt(2*fr.met_pt()*fr.lep_pt()[0]*(1.0-TMath::Cos(fr.lep_phi()[0]-fr.met_phi()))));
-        float ptcorr = fr.lep_pt()[0]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[0]-0.03));
         int muidx = abs(fr.lep_pdgId()[0]) == 13 ? 0 : 1;
         int elidx = abs(fr.lep_pdgId()[0]) == 11 ? 0 : 1;
-        float muptcorr = fr.lep_pt()[muidx]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[muidx]-0.03));
-        float elptcorr = fr.lep_pt()[elidx]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[elidx]-0.03));
+        float muptcorr = fr.lep_pt()[muidx]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[muidx]-muiso_thresh));
+        float elptcorr = fr.lep_pt()[elidx]*(1 + max((double) 0. , (double) fr.lep_relIso03EAv2Lep()[elidx]-eliso_thresh));
+        float ptcorr = abs(fr.lep_pdgId()[0]) == 13 ? muptcorr : elptcorr;
         bool onemu_cuts      = (fr.nVlep() == 1) * (fr.lep_pt()[0] > 25.) * (fr.lep_pass_VVV_cutbased_tight()[0] == 1) * (abs(fr.lep_pdgId()[0])==13) * (fr.mc_HLT_SingleIsoMu17() > 0) * (jet_pt0>40.);
         bool oneel_cuts      = (fr.nVlep() == 1) * (fr.lep_pt()[0] > 25.) * (fr.lep_pass_VVV_cutbased_tight()[0] == 1) * (abs(fr.lep_pdgId()[0])==11) * (fr.mc_HLT_SingleIsoEl23() > 0) * (jet_pt0>40.);
         bool onemuloose_cuts = (fr.nVlep() == 1) * (fr.lep_pt()[0] > 25.) * (fr.lep_pass_VVV_cutbased_fo()[0] == 1) * (abs(fr.lep_pdgId()[0])==13) * (fr.mc_HLT_SingleIsoMu17() > 0) * (jet_pt0>40.);
@@ -276,31 +267,31 @@ int main(int argc, char** argv)
         cutflow.setCut("OneMuTightMR" , (fr.met_pt() < 20.) * (MT < 20.) , 1.                        );
         cutflow.setCut("OneElTightMR" , (fr.met_pt() < 20.) * (MT < 20.) , 1.                        );
 
-        cutflow.setCut("OneMuEWKCREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
-        cutflow.setCut("OneMuEWKCREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
-        cutflow.setCut("OneMuEWKCREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
-        cutflow.setCut("OneMuEWKCREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
-        cutflow.setCut("OneMuEWKCREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
-        cutflow.setCut("OneMuEWKCREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
+        cutflow.setCut("OneMuEWKCREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
+        cutflow.setCut("OneMuEWKCREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
+        cutflow.setCut("OneMuEWKCREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
+        cutflow.setCut("OneMuEWKCREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
+        cutflow.setCut("OneMuEWKCREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
+        cutflow.setCut("OneMuEWKCREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
 
         cutflow.setCut("OneMuLoose" , onemuloose_cuts  , fr.mc_HLT_SingleIsoMu17() );
         cutflow.setCut("OneElLoose" , oneelloose_cuts  , fr.mc_HLT_SingleIsoEl23() );
         cutflow.setCut("OneMuMR"    , (fr.met_pt() < 20.) * (MT < 20.) , 1. );
         cutflow.setCut("OneElMR"    , (fr.met_pt() < 20.) * (MT < 20.) , 1. );
 
-        cutflow.setCut("OneMuMREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
-        cutflow.setCut("OneMuMREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
-        cutflow.setCut("OneMuMREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
-        cutflow.setCut("OneMuMREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
-        cutflow.setCut("OneMuMREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
-        cutflow.setCut("OneMuMREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
+        cutflow.setCut("OneMuMREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
+        cutflow.setCut("OneMuMREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
+        cutflow.setCut("OneMuMREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
+        cutflow.setCut("OneMuMREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
+        cutflow.setCut("OneMuMREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
+        cutflow.setCut("OneMuMREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
 
-        cutflow.setCut("OneElMREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
-        cutflow.setCut("OneElMREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
-        cutflow.setCut("OneElMREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
-        cutflow.setCut("OneElMREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
-        cutflow.setCut("OneElMREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
-        cutflow.setCut("OneElMREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, ptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
+        cutflow.setCut("OneElMREta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 2, 1.);
+        cutflow.setCut("OneElMREta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 3, 1.);
+        cutflow.setCut("OneElMREta0Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 4, 1.);
+        cutflow.setCut("OneElMREta1Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 7, 1.);
+        cutflow.setCut("OneElMREta1Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 8, 1.);
+        cutflow.setCut("OneElMREta1Pt3", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, elptcorr, fabs(fr.lep_eta()[0])) == 9, 1.);
 
         cutflow.setCut("MuClosureLooseEta0Pt1", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[muidx])) == 2, 1.);
         cutflow.setCut("MuClosureLooseEta0Pt2", RooUtil::Calc::calcBin2D(ptcorrcoarse_bounds, eta_bounds, muptcorr, fabs(fr.lep_eta()[muidx])) == 3, 1.);
