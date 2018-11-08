@@ -175,18 +175,18 @@ class LeptonScaleFactors
             histmap_tert_mu_recoid_3l_sf  = new RooUtil::HistMap("scalefactors/RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta");
             histmap_tert_el_recoid_3l_sf  = new RooUtil::HistMap("scalefactors/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root:EGamma_SF2D");
             histmap_tert_el_mva_3l_sf     = new RooUtil::HistMap("scalefactors/gammaEffi.txt_EGM2D_runBCDEF_passingMVA94Xwp90noiso.root:EGamma_SF2D");
-            histmap_lead_mu_isoip_sf      = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_subl_mu_isoip_sf      = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_lead_el_isoip_sf      = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_subl_el_isoip_sf      = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_emu_mu_isoip_sf       = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_emu_el_isoip_sf       = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
-            histmap_lead_mu_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
-            histmap_subl_mu_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
-            histmap_lead_el_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
-            histmap_subl_el_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
-            histmap_tert_mu_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
-            histmap_tert_el_isoip_3l_sf   = new RooUtil::HistMap("/home/users/phchang/public_html/analysis/tnp/CMSSW_7_4_2/src/TagAndProbe/Analysis/plots/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_lead_mu_isoip_sf      = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_subl_mu_isoip_sf      = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_lead_el_isoip_sf      = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_subl_el_isoip_sf      = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_emu_mu_isoip_sf       = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_emu_el_isoip_sf       = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA80POG2017_EGammaTightVVV/sf.root:h_sf_pt_vs_eta");
+            histmap_lead_mu_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_subl_mu_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_lead_el_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_subl_el_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_tert_mu_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/MuonID_2017www/muon/MuMediumPOG_MuTightVVV3l/sf.root:h_sf_pt_vs_eta");
+            histmap_tert_el_isoip_3l_sf   = new RooUtil::HistMap("scalefactors/isoipsf/ElectronID_2017www/electron/EGammaMVA90POG2017_EGammaTightVVV3l/sf.root:h_sf_pt_vs_eta");
         }
 
         ~LeptonScaleFactors()
@@ -223,7 +223,7 @@ class LeptonScaleFactors
             delete histmap_tert_el_isoip_3l_sf;
         }
 
-        std::tuple<float, float, float, float> getScaleSactors(bool is2017, bool doFakeEstimation)
+        std::tuple<float, float, float, float> getScaleFactors(bool is2017, bool doFakeEstimation)
         {
             if (is2017)
             {
@@ -287,4 +287,124 @@ class LeptonScaleFactors
             }
         }
 };
+
+class FakeRates
+{
+    public:
+        RooUtil::HistMap* histmap_fr_ss_el;
+        RooUtil::HistMap* histmap_fr_ss_mu;
+        RooUtil::HistMap* histmap_fr_3l_el;
+        RooUtil::HistMap* histmap_fr_3l_mu;
+
+        const float muiso_ss_thresh = 0.03;
+        const float eliso_ss_thresh = 0.03;
+        const float muiso_3l_thresh = 0.07;
+        const float eliso_3l_thresh = 0.05;
+
+        FakeRates()
+        {
+            histmap_fr_ss_el = new RooUtil::HistMap("scalefactors/fakerate.root:El_ptcorretarolledcoarse_data_fakerate");
+            histmap_fr_ss_mu = new RooUtil::HistMap("scalefactors/fakerate.root:Mu_ptcorretarolledcoarse_data_fakerate");
+            histmap_fr_3l_el = new RooUtil::HistMap("scalefactors/fakerate_3l.root:El_ptcorretarolledcoarse_data_fakerate");
+            histmap_fr_3l_mu = new RooUtil::HistMap("scalefactors/fakerate_3l.root:Mu_ptcorretarolledcoarse_data_fakerate");
+        }
+
+        ~FakeRates()
+        {
+            delete histmap_fr_ss_el;
+            delete histmap_fr_ss_mu;
+            delete histmap_fr_3l_el;
+            delete histmap_fr_3l_mu;
+        }
+
+        int getFakeLepIndex()
+        {
+            // Check the number of leptons
+            if ((www.nLlep() - 1) != www.nTlep())
+                return -1;
+
+            // Retrieve the flags for the lepton ID
+            const vector<int>& istight = www.nVlep() == 2 ? www.lep_pass_VVV_cutbased_tight() : www.lep_pass_VVV_cutbased_3l_tight();
+            const vector<int>& isloose = www.nVlep() == 2 ? www.lep_pass_VVV_cutbased_fo() : www.lep_pass_VVV_cutbased_3l_fo();
+
+            // Figure out the index by whichever one is the loose but not tight
+            int index = -1;
+            for (int ilep = 0; ilep < www.nVlep(); ++ilep)
+            {
+                if (!istight[ilep] && isloose[ilep])
+                    index = ilep;
+            }
+
+            return index;
+        }
+
+        float getPtCorr()
+        {
+            int index = getFakeLepIndex();
+
+            if (index < 0)
+                return 0;
+
+            // Create an int to indicate which lepton id fakerate to use
+            int lepversion = 0;
+            if (www.nLlep() >= 3)
+                lepversion = 1;
+
+            float ptcorr = -1;
+            if (abs(www.lep_pdgId()[index]) == 11 and lepversion == 0)
+            {
+                ptcorr = www.lep_pt()[index] * (1 + max((double) 0. , (double) www.lep_relIso03EAv2Lep()[index]-eliso_ss_thresh));
+            }
+            else if (abs(www.lep_pdgId()[index]) == 13 and lepversion == 0)
+            {
+                ptcorr = www.lep_pt()[index] * (1 + max((double) 0. , (double) www.lep_relIso03EAv2Lep()[index]-muiso_ss_thresh));
+//                std::cout <<  " ptcorr: " << ptcorr <<  " fabs(www.lep_eta()[index]): " << fabs(www.lep_eta()[index]) <<  " fr: " << fr <<  " muiso_ss_thresh: " << muiso_ss_thresh <<  std::endl;
+            }
+            else if (abs(www.lep_pdgId()[index]) == 11 and lepversion == 1)
+            {
+                ptcorr = www.lep_pt()[index] * (1 + max((double) 0. , (double) www.lep_relIso03EAv2Lep()[index]-eliso_3l_thresh));
+            }
+            else if (abs(www.lep_pdgId()[index]) == 13 and lepversion == 1)
+            {
+                ptcorr = www.lep_pt()[index] * (1 + max((double) 0. , (double) www.lep_relIso03EAv2Lep()[index]-muiso_3l_thresh));
+            }
+            return ptcorr;
+        }
+
+        float getFakeFactor()
+        {
+            int index = getFakeLepIndex();
+            float ptcorr = getPtCorr();
+            float fr = 0;
+
+            // Create an int to indicate which lepton id fakerate to use
+            int lepversion = 0;
+            if (www.nLlep() >= 3)
+                lepversion = 1;
+
+            if (abs(www.lep_pdgId()[index]) == 11 and lepversion == 0)
+            {
+                fr = histmap_fr_ss_el->eval(ptcorr, fabs(www.lep_eta()[index]));
+            }
+            else if (abs(www.lep_pdgId()[index]) == 13 and lepversion == 0)
+            {
+                fr = histmap_fr_ss_mu->eval(ptcorr, fabs(www.lep_eta()[index]));
+            }
+            else if (abs(www.lep_pdgId()[index]) == 11 and lepversion == 1)
+            {
+                fr = histmap_fr_3l_el->eval(ptcorr, fabs(www.lep_eta()[index]));
+            }
+            else if (abs(www.lep_pdgId()[index]) == 13 and lepversion == 1)
+            {
+                fr = histmap_fr_3l_mu->eval(ptcorr, fabs(www.lep_eta()[index]));
+            }
+            else
+            {
+                return 0;
+            }
+            return fr / (1 - fr);
+        }
+
+};
+
 #endif
