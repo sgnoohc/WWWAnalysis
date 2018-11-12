@@ -39,6 +39,8 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.addCutToLastActiveCut("CutWZCRTrilep");
     cutflow.getCut("CutTrigger");
     cutflow.addCutToLastActiveCut("CutARDilep");
+    cutflow.getCut("CutTrigger");
+    cutflow.addCutToLastActiveCut("CutARTrilep");
 
     // Same-sign Mjj on-W region
     cutflow.getCut("CutSRDilep");
@@ -283,6 +285,43 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.addCutToLastActiveCut("ARSSSideeeMET");
     cutflow.addCutToLastActiveCut("ARSSSideeeMllSS");
     cutflow.addCutToLastActiveCut("ARSSSideeeFull");
+
+    // Trilep regions
+    cutflow.getCut("CutARTrilep");
+    cutflow.addCutToLastActiveCut("AR0SFOS");
+    cutflow.addCutToLastActiveCut("AR0SFOSNj1");
+    cutflow.addCutToLastActiveCut("AR0SFOSNb0");
+    cutflow.addCutToLastActiveCut("AR0SFOSPt3l");
+    cutflow.addCutToLastActiveCut("AR0SFOSDPhi3lMET");
+    cutflow.addCutToLastActiveCut("AR0SFOSMET");
+    cutflow.addCutToLastActiveCut("AR0SFOSMll");
+    cutflow.addCutToLastActiveCut("AR0SFOSM3l");
+    cutflow.addCutToLastActiveCut("AR0SFOSZVt");
+    cutflow.addCutToLastActiveCut("AR0SFOSMTmax");
+    cutflow.addCutToLastActiveCut("AR0SFOSFull");
+    cutflow.getCut("CutARTrilep");
+    cutflow.addCutToLastActiveCut("AR1SFOS");
+    cutflow.addCutToLastActiveCut("AR1SFOSNj1");
+    cutflow.addCutToLastActiveCut("AR1SFOSNb0");
+    cutflow.addCutToLastActiveCut("AR1SFOSPt3l");
+    cutflow.addCutToLastActiveCut("AR1SFOSDPhi3lMET");
+    cutflow.addCutToLastActiveCut("AR1SFOSMET");
+    cutflow.addCutToLastActiveCut("AR1SFOSMll");
+    cutflow.addCutToLastActiveCut("AR1SFOSM3l");
+    cutflow.addCutToLastActiveCut("AR1SFOSZVt");
+    cutflow.addCutToLastActiveCut("AR1SFOSMT3rd");
+    cutflow.addCutToLastActiveCut("AR1SFOSFull");
+    cutflow.getCut("CutARTrilep");
+    cutflow.addCutToLastActiveCut("AR2SFOS");
+    cutflow.addCutToLastActiveCut("AR2SFOSNj1");
+    cutflow.addCutToLastActiveCut("AR2SFOSNb0");
+    cutflow.addCutToLastActiveCut("AR2SFOSPt3l");
+    cutflow.addCutToLastActiveCut("AR2SFOSDPhi3lMET");
+    cutflow.addCutToLastActiveCut("AR2SFOSMET");
+    cutflow.addCutToLastActiveCut("AR2SFOSMll");
+    cutflow.addCutToLastActiveCut("AR2SFOSM3l");
+    cutflow.addCutToLastActiveCut("AR2SFOSZVt");
+    cutflow.addCutToLastActiveCut("AR2SFOSFull");
 
     // Btagged CR for Same-sign Mjj on-W region
     cutflow.getCut("CutSRDilep");
@@ -578,8 +617,8 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     if (doSystematics)
     {
         // Declare cut varying systematics to cuts with the patterns provided in the vector
-        cutflow.addCutSyst("JESUp"  , {"jj", "MET", "Nj", "Nb"});
-        cutflow.addCutSyst("JESDown", {"jj", "MET", "Nj", "Nb"});
+        cutflow.addCutSyst("JESUp"  , {"jj", "MET", "Nj", "Nb", "VBF"});
+        cutflow.addCutSyst("JESDown", {"jj", "MET", "Nj", "Nb", "VBF"});
 
         cutflow.addWgtSyst("LepSFUp");
         cutflow.addWgtSyst("LepSFDown");
@@ -688,9 +727,12 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.bookHistogramsForCutAndBelow(histograms, "ARSSSidemm"+suffix);
     cutflow.bookHistogramsForCutAndBelow(histograms, "ARSSSideem"+suffix);
     cutflow.bookHistogramsForCutAndBelow(histograms, "ARSSSideee"+suffix);
+    cutflow.bookHistogramsForCutAndBelow(histograms, "AR0SFOS"+suffix);
+    cutflow.bookHistogramsForCutAndBelow(histograms, "AR1SFOS"+suffix);
+    cutflow.bookHistogramsForCutAndBelow(histograms, "AR2SFOS"+suffix);
 
     // Event list
-    cutflow.bookEventLists();
+//    cutflow.bookEventLists();
 
     // Print the cut structure for review
     cutflow.printCuts();
@@ -750,6 +792,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCut("CutWZCRDilep"      , doFakeEstimation ? isfakewzcrtrilep : iswzcrtrilep           , 1                                  );
         cutflow.setCut("CutWZCRTrilep"     , doFakeEstimation ? isfaketrilep : istrilep                   , 1                                  );
         cutflow.setCut("CutARDilep"        , isfakedilep                                                  , 1                                  );
+        cutflow.setCut("CutARTrilep"       , isfaketrilep                                                 , 1                                  );
 
         cutflow.setCut("SRSSmm"            , (www.passSSmm())*(www.MllSS()>40.)                           , mm_sf                              );
         cutflow.setCut("SRSSmmTVeto"       , www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0             , 1                                  );
@@ -986,6 +1029,41 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCut("ARSSSideeeMET"     , www.met_pt()>60.                                             , 1                                  );
         cutflow.setCut("ARSSSideeeMllSS"   , www.MllSS()>40.                                              , 1                                  );
         cutflow.setCut("ARSSSideeeFull"    , 1                                                            , 1                                  );
+
+        cutflow.setCut("AR0SFOS"           , (www.nSFOS()==0)                                             , threelep_sf                        );
+        cutflow.setCut("AR0SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("AR0SFOSNb0"        , www.nb()==0                                                  , btagsf                             );
+        cutflow.setCut("AR0SFOSPt3l"       , 1.                                                           , 1                                  );
+        cutflow.setCut("AR0SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("AR0SFOSMET"        , www.met_pt()>30.                                             , 1                                  );
+        cutflow.setCut("AR0SFOSMll"        , www.Mll3L() > 20.                                            , 1                                  );
+        cutflow.setCut("AR0SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("AR0SFOSZVt"        , abs(www.Mee3L()-91.1876) > 15.                               , 1                                  );
+        cutflow.setCut("AR0SFOSMTmax"      , www.MTmax3L()>90.                                            , 1                                  );
+        cutflow.setCut("AR0SFOSFull"       , 1                                                            , 1                                  );
+
+        cutflow.setCut("AR1SFOS"           , (www.nSFOS()==1)                                             , threelep_sf                        );
+        cutflow.setCut("AR1SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("AR1SFOSNb0"        , www.nb()==0                                                  , btagsf                             );
+        cutflow.setCut("AR1SFOSPt3l"       , www.Pt3l()>60.                                               , 1                                  );
+        cutflow.setCut("AR1SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("AR1SFOSMET"        , www.met_pt()>40.                                             , 1                                  );
+        cutflow.setCut("AR1SFOSMll"        , www.Mll3L() > 20.                                            , 1                                  );
+        cutflow.setCut("AR1SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("AR1SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                                  );
+        cutflow.setCut("AR1SFOSMT3rd"      , www.MT3rd()>90.                                              , 1                                  );
+        cutflow.setCut("AR1SFOSFull"       , 1                                                            , 1                                  );
+
+        cutflow.setCut("AR2SFOS"           , (www.nSFOS()==2)                                             , threelep_sf                        );
+        cutflow.setCut("AR2SFOSNj1"        , www.nj()<=1                                                  , 1                                  );
+        cutflow.setCut("AR2SFOSNb0"        , www.nb()==0                                                  , btagsf                             );
+        cutflow.setCut("AR2SFOSPt3l"       , www.Pt3l()>60.                                               , 1                                  );
+        cutflow.setCut("AR2SFOSDPhi3lMET"  , www.DPhi3lMET()>2.5                                          , 1                                  );
+        cutflow.setCut("AR2SFOSMET"        , www.met_pt()>55.                                             , 1                                  );
+        cutflow.setCut("AR2SFOSMll"        , (www.Mll3L() > 20. && www.Mll3L1() > 20.)                    , 1                                  );
+        cutflow.setCut("AR2SFOSM3l"        , abs(www.M3l()-91.1876) > 10.                                 , 1                                  );
+        cutflow.setCut("AR2SFOSZVt"        , www.nSFOSinZ() == 0                                          , 1                                  );
+        cutflow.setCut("AR2SFOSFull"       , 1                                                            , 1                                  );
 
         // B tagged control regions
         cutflow.setCut("BTCRSSmm"            , (www.passSSmm())*(www.MllSS()>40.)                           , mm_sf                              );
@@ -1382,6 +1460,12 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSideeeMjjL"                 , "JESUp"   , www.MjjL_up()<400.                                    , 1 );
             cutflow.setCutSyst("ARSSSideeeDetajjL"              , "JESUp"   , www.DetajjL_up()<1.5                                  , 1 );
             cutflow.setCutSyst("ARSSSideeeMET"                  , "JESUp"   , www.met_up_pt()>60.                                   , 1 );
+            cutflow.setCutSyst("AR0SFOSDPhi3lMET"               , "JESUp"   , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR0SFOSMET"                     , "JESUp"   , www.met_up_pt()>30.                                   , 1 );
+            cutflow.setCutSyst("AR1SFOSDPhi3lMET"               , "JESUp"   , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR1SFOSMET"                     , "JESUp"   , www.met_up_pt()>40.                                   , 1 );
+            cutflow.setCutSyst("AR2SFOSDPhi3lMET"               , "JESUp"   , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR2SFOSMET"                     , "JESUp"   , www.met_up_pt()>55.                                   , 1 );
             cutflow.setCutSyst("BTCRSSmmMjjW"                   , "JESUp"   , fabs(www.Mjj_up()-80.)<15.                            , 1 );
             cutflow.setCutSyst("BTCRSSmmMjjL"                   , "JESUp"   , www.MjjL_up()<400.                                    , 1 );
             cutflow.setCutSyst("BTCRSSmmDetajjL"                , "JESUp"   , www.DetajjL_up()<1.5                                  , 1 );
@@ -1521,6 +1605,12 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSideeeMjjL"                 , "JESDown" , www.MjjL_dn()<400.                                    , 1 );
             cutflow.setCutSyst("ARSSSideeeDetajjL"              , "JESDown" , www.DetajjL_dn()<1.5                                  , 1 );
             cutflow.setCutSyst("ARSSSideeeMET"                  , "JESDown" , www.met_dn_pt()>60.                                   , 1 );
+            cutflow.setCutSyst("AR0SFOSDPhi3lMET"               , "JESDown" , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR0SFOSMET"                     , "JESDown" , www.met_up_pt()>30.                                   , 1 );
+            cutflow.setCutSyst("AR1SFOSDPhi3lMET"               , "JESDown" , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR1SFOSMET"                     , "JESDown" , www.met_up_pt()>40.                                   , 1 );
+            cutflow.setCutSyst("AR2SFOSDPhi3lMET"               , "JESDown" , www.DPhi3lMET_up()>2.5                                , 1 );
+            cutflow.setCutSyst("AR2SFOSMET"                     , "JESDown" , www.met_up_pt()>55.                                   , 1 );
             cutflow.setCutSyst("BTCRSSmmMjjW"                   , "JESDown" , fabs(www.Mjj_dn()-80.)<15.                            , 1 );
             cutflow.setCutSyst("BTCRSSmmMjjL"                   , "JESDown" , www.MjjL_dn()<400.                                    , 1 );
             cutflow.setCutSyst("BTCRSSmmDetajjL"                , "JESDown" , www.DetajjL_dn()<1.5                                  , 1 );
@@ -1613,6 +1703,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSidemmNj2"                  , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
             cutflow.setCutSyst("ARSSSideemNj2"                  , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
             cutflow.setCutSyst("ARSSSideeeNj2"                  , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
+            cutflow.setCutSyst("AR0SFOSNj1"                     , "JESUp"   , www.nj_up()<=1                                        , 1 );
+            cutflow.setCutSyst("AR1SFOSNj1"                     , "JESUp"   , www.nj_up()<=1                                        , 1 );
+            cutflow.setCutSyst("AR2SFOSNj1"                     , "JESUp"   , www.nj_up()<=1                                        , 1 );
             cutflow.setCutSyst("BTCRSSmmNj2"                    , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
             cutflow.setCutSyst("BTCRSSemNj2"                    , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
             cutflow.setCutSyst("BTCRSSeeNj2"                    , "JESUp"   , www.nj30_up()>= 2                                     , 1 );
@@ -1659,6 +1752,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSidemmNj2"                  , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
             cutflow.setCutSyst("ARSSSideemNj2"                  , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
             cutflow.setCutSyst("ARSSSideeeNj2"                  , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
+            cutflow.setCutSyst("AR0SFOSNj1"                     , "JESDown" , www.nj_dn()<=1                                        , 1 );
+            cutflow.setCutSyst("AR1SFOSNj1"                     , "JESDown" , www.nj_dn()<=1                                        , 1 );
+            cutflow.setCutSyst("AR2SFOSNj1"                     , "JESDown" , www.nj_dn()<=1                                        , 1 );
             cutflow.setCutSyst("BTCRSSmmNj2"                    , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
             cutflow.setCutSyst("BTCRSSemNj2"                    , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
             cutflow.setCutSyst("BTCRSSeeNj2"                    , "JESDown" , www.nj30_dn()>= 2                                     , 1 );
@@ -1705,6 +1801,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSidemmNb0"                  , "JESUp"   , www.nb_up()==0                                        , btagsf );
             cutflow.setCutSyst("ARSSSideemNb0"                  , "JESUp"   , www.nb_up()==0                                        , btagsf );
             cutflow.setCutSyst("ARSSSideeeNb0"                  , "JESUp"   , www.nb_up()==0                                        , btagsf );
+            cutflow.setCutSyst("AR0SFOSNb0"                     , "JESUp"   , www.nb_up()==0                                        , btagsf );
+            cutflow.setCutSyst("AR1SFOSNb0"                     , "JESUp"   , www.nb_up()==0                                        , btagsf );
+            cutflow.setCutSyst("AR2SFOSNb0"                     , "JESUp"   , www.nb_up()==0                                        , btagsf );
             cutflow.setCutSyst("BTCRSSmmNbgeq1"                 , "JESUp"   , www.nb_up()>=1                                        , btagsf );
             cutflow.setCutSyst("BTCRSSemNbgeq1"                 , "JESUp"   , www.nb_up()>=1                                        , btagsf );
             cutflow.setCutSyst("BTCRSSeeNbgeq1"                 , "JESUp"   , www.nb_up()>=1                                        , btagsf );
@@ -1751,6 +1850,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             cutflow.setCutSyst("ARSSSidemmNb0"                  , "JESDown" , www.nb_dn()==0                                        , btagsf );
             cutflow.setCutSyst("ARSSSideemNb0"                  , "JESDown" , www.nb_dn()==0                                        , btagsf );
             cutflow.setCutSyst("ARSSSideeeNb0"                  , "JESDown" , www.nb_dn()==0                                        , btagsf );
+            cutflow.setCutSyst("AR0SFOSNb0"                     , "JESDown" , www.nb_dn()==0                                        , btagsf );
+            cutflow.setCutSyst("AR1SFOSNb0"                     , "JESDown" , www.nb_dn()==0                                        , btagsf );
+            cutflow.setCutSyst("AR2SFOSNb0"                     , "JESDown" , www.nb_dn()==0                                        , btagsf );
             cutflow.setCutSyst("BTCRSSmmNbgeq1"                 , "JESDown" , www.nb_dn()>=1                                        , btagsf );
             cutflow.setCutSyst("BTCRSSemNbgeq1"                 , "JESDown" , www.nb_dn()>=1                                        , btagsf );
             cutflow.setCutSyst("BTCRSSeeNbgeq1"                 , "JESDown" , www.nb_dn()>=1                                        , btagsf );
