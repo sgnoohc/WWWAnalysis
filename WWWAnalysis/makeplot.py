@@ -9,7 +9,7 @@ def main():
     output_dirpath = "outputs/WWW2016_v4.0.5"
     output_dirpath = "outputs/WWW_v1.2.2"
     output_dirpath = "outputs/WWW2017_v4.0.5"
-    output_dirpath = "/hadoop/cms/store/user/phchang/metis/wwwanalysis/WWW2017_analysis_v0.9.1/"
+    output_dirpath = "/hadoop/cms/store/user/phchang/metis/wwwanalysis/WWW2017_analysis_v0.11.1/"
     is2017 = "WWW2017" in output_dirpath
 
     histnames = [

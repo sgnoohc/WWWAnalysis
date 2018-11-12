@@ -12,6 +12,7 @@ def main():
     job_tag = "WWW{}_analysis_v0.8.1".format(data_year) # Fixed baby mode handling
     job_tag = "WWW{}_analysis_v0.9.1".format(data_year) # Added 3lep fakerate
     job_tag = "WWW{}_analysis_v0.10.1".format(data_year) # Added 3lep fakerate
+    job_tag = "WWW{}_analysis_v0.11.1".format(data_year) # All systematics included
     input_ntup_tag = "WWW2017_v4.0.5"
     base_dir_path = "/hadoop/cms/store/user/phchang/metis/wwwbaby/{}/".format(input_ntup_tag)
     tar_files = ["doAnalysis", "setup.sh", "scalefactors/*.root", "scalefactors/*/*/*/*/sf.root"]

@@ -75,18 +75,20 @@ bool passTrigger2016()
 }
 
 //_______________________________________________________________________________________________________
-int yield()
+int yield(int jes=0)
 {
     int yield = -1;
     if (www.nVlep() == 2)
     {
-        if (fabs(www.Mjj() - 80.) < 15.)
+        float mjj = www.Mjj();
+        mjj = jes == 0 ? www.Mjj() : ((jes == 1) ? www.Mjj_up() : www.Mjj_dn());
+        if (fabs(mjj - 80.) < 15.)
         {
             if (www.passSSee()) yield = 0;
             if (www.passSSem()) yield = 1;
             if (www.passSSmm()) yield = 2;
         }
-        else if (fabs(www.Mjj() - 80.) > 15.)
+        else if (fabs(mjj - 80.) > 15.)
         {
             if (www.passSSee()) yield = 3;
             if (www.passSSem()) yield = 4;
