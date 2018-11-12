@@ -661,13 +661,13 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     // Fake rate estimation histogram
     const std::vector<float> eta_bounds = {0.0, 1.6, 2.4};
     const std::vector<float> ptcorrcoarse_bounds = {0., 20., 25., 30., 35., 150.};
-//    histograms.addHistogram("ptcorretarolledcoarse" , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  , 0  , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  );
+    histograms.addHistogram("ptcorretarolledcoarse" , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  , 0  , (eta_bounds.size()-1) * (ptcorrcoarse_bounds.size()-1)  );
 
     // Now book cutflows
     cutflow.bookCutflows();
 
     // Cutflow object that takes the histograms and books them to a cutflow for histogramming
-    TString suffix = "Full";
+    TString suffix = "";
     cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmm"+suffix);
     cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSem"+suffix);
     cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSee"+suffix);
@@ -689,23 +689,8 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.bookHistogramsForCutAndBelow(histograms, "ARSSSideem"+suffix);
     cutflow.bookHistogramsForCutAndBelow(histograms, "ARSSSideee"+suffix);
 
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSmmFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSemFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSeeFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSSidemmFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSSideemFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SRSSSideeeFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SR0SFOSFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SR1SFOSFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "SR2SFOSFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRSSmmFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRSSemFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRSSeeFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "WZCR1SFOSFull");
-//    cutflow.bookHistogramsForCutAndBelow(histograms, "WZCR2SFOSFull");
-
     // Event list
-//    cutflow.bookEventLists();
+    cutflow.bookEventLists();
 
     // Print the cut structure for review
     cutflow.printCuts();
