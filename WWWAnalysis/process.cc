@@ -104,9 +104,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     float trig_sf;
     bool hasz_ss, hasz_3l;
 
-#ifdef USE_CUTLAMBDA
 #include "setcuttree.h"
-#endif
 
     // Now book cutflows
     cutflow.bookCutflows();
@@ -164,10 +162,6 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         // Theory related weights from h_neventsinfile in each input root file but only set files when new file opens
         // NOTE if there was a continue statement prior to this it can mess it up
         if (looper.isNewFileInChain()) theoryweight.setFile(looper.getCurrentFileName());
-
-#ifndef USE_CUTLAMBDA
-#include "setcut.h"
-#endif
 
         // Set the variables used for histogramming
         cutflow.setVariable("MllSS"                ,  www.MllSS()                  );
