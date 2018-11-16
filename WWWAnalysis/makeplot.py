@@ -6,7 +6,7 @@ import glob
 
 def main():
 
-    output_dirpath = "outputs/WWW2017_analysis_v0.14.1"
+    output_dirpath = "outputs/WWW2017_analysis_v0.25.1"
     is2017 = "WWW2017" in output_dirpath
 
 #    histnames = [
@@ -22,16 +22,16 @@ def main():
 #           ]
 
 #    histnames = [
-#            "ARSSeeFull",
-#            "ARSSemFull",
-#            "ARSSmmFull",
-#            "ARSSSideeeFull",
-#            "ARSSSideemFull",
-#            "ARSSSidemmFull",
-#            "AR0SFOSFull",
-#            "AR1SFOSFull",
-#            "AR2SFOSFull"
-#            ]
+#            "ARSSeeNb0__lep_pt1",
+#            "ARSSemNb0__lep_pt1",
+#            "ARSSmmNb0__lep_pt1",
+#           ]
+
+#    histnames = [
+#            "ARSSeeNj2__lep_pt1",
+#            "ARSSemNj2__lep_pt1",
+#            "ARSSmmNj2__lep_pt1",
+#           ]
 
 #    histnames = [
 #            "BTCRSSeeFull",
@@ -45,23 +45,65 @@ def main():
 #            "BTCR2SFOSFull"
 #            ]
 
+    histnames = [
+            "SRSSeeFull",
+            "SRSSemFull",
+            "SRSSmmFull",
+            "SRSSSideeeFull",
+            "SRSSSideemFull",
+            "SRSSSidemmFull",
+            "SR0SFOSFull",
+            "SR1SFOSFull",
+            "SR2SFOSFull"
+            ]
+
 #    histnames = [
-#            "SRSSeeFull",
-#            "SRSSemFull",
-#            "SRSSmmFull",
-#            "SRSSSideeeFull",
-#            "SRSSSideemFull",
-#            "SRSSSidemmFull",
-#            "SR0SFOSFull",
-#            "SR1SFOSFull",
-#            "SR2SFOSFull"
+#            "LXECRSSeeFull",
+#            "LXECRSSemFull",
+#            "LXECRSSmmFull",
 #            ]
 
-    histnames = [
-            "LXECRSSeeFull",
-            "LXECRSSemFull",
-            "LXECRSSmmFull",
-            ]
+#    histnames = [
+#            "BTCRARSSeeFull",
+#            "BTCRARSSemFull",
+#            "BTCRARSSmmFull",
+#            "BTCRARSSSideeeFull",
+#            "BTCRARSSSideemFull",
+#            "BTCRARSSSidemmFull",
+#            "BTCRAR0SFOSFull",
+#            "BTCRAR1SFOSFull",
+#            "BTCRAR2SFOSFull"
+#            ]
+
+#    histnames = [
+#            "ARSSeeFull",
+#            "ARSSemFull",
+#            "ARSSmmFull",
+#            "ARSSSideeeFull",
+#            "ARSSSideemFull",
+#            "ARSSSidemmFull",
+#            "AR0SFOSFull",
+#            "AR1SFOSFull",
+#            "AR2SFOSFull"
+#            ]
+
+#    histnames = [
+#            "LXECRARSSeeFull",
+#            "LXECRARSSemFull",
+#            "LXECRARSSmmFull",
+#            ]
+
+#    histnames = [
+#            "LXECRSSeeFull",
+#            "LXECRSSemFull",
+#            "LXECRSSmmFull",
+#            ]
+
+#    histnames = [
+#            "LXECRARSSmmFull__ptcorretarolledcoarseemu",
+#            "LXECRARSSemFull__ptcorretarolledcoarseemu",
+#            "LXECRARSSeeFull__ptcorretarolledcoarseemu",
+#            ]
 
     bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/lostlep.root") ]
     bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/photon.root")  ]
@@ -70,8 +112,8 @@ def main():
     bkg_list_mcfakes = [ x for x in glob.glob(output_dirpath+"/fakes.root")   ]
     bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/prompt.root")  ]
 
-    bkg_list_fakes = bkg_list_ddfakes
     bkg_list_fakes = bkg_list_mcfakes
+    bkg_list_fakes = bkg_list_ddfakes
 
     sig_list  = glob.glob(output_dirpath+"/*t_www_*/*.root")
     vh_list   = glob.glob(output_dirpath+"/*VH*t_www_*/*.root")

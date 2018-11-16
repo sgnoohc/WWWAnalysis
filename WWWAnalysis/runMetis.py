@@ -16,6 +16,17 @@ def main():
     job_tag = "WWW{}_analysis_v0.12.1".format(data_year) # All CR included (Failed campaign)
     job_tag = "WWW{}_analysis_v0.13.1".format(data_year) # All CR included (histogram/cutflow fixed)
     job_tag = "WWW{}_analysis_v0.14.1".format(data_year) # All ARTrilep included
+    job_tag = "WWW{}_analysis_v0.15.1".format(data_year) # All AR BTag/LMET (failed as lepsf were incorrectly applied to AR regions)
+    job_tag = "WWW{}_analysis_v0.16.1".format(data_year) # All AR BTag/LMET
+    job_tag = "WWW{}_analysis_v0.17.1".format(data_year) # All AR BTag/LMET (BTCRAR had wrong two lep selection for in Mjj)
+    job_tag = "WWW{}_analysis_v0.18.1".format(data_year) # Including prompt subtraction in fake estimation (failed)
+    job_tag = "WWW{}_analysis_v0.19.1".format(data_year) # Including prompt subtraction in fake estimation
+    job_tag = "WWW{}_analysis_v0.20.1".format(data_year) # Including prompt subtraction in fake estimation (all histograms)
+    job_tag = "WWW{}_analysis_v0.21.1".format(data_year) # LXECR/LXECRAR only
+    job_tag = "WWW{}_analysis_v0.22.1".format(data_year) # LXECR/LXECRAR only (ptcorremu rolled)
+    job_tag = "WWW{}_analysis_v0.23.1".format(data_year) # Newer setCut (failed)
+    job_tag = "WWW{}_analysis_v0.24.1".format(data_year) # Newer setCut (failed)
+    job_tag = "WWW{}_analysis_v0.25.1".format(data_year) # Newer setCut
     input_ntup_tag = "WWW2017_v4.0.5"
     base_dir_path = "/hadoop/cms/store/user/phchang/metis/wwwbaby/{}/".format(input_ntup_tag)
     tar_files = ["doAnalysis", "setup.sh", "scalefactors/*.root", "scalefactors/*/*/*/*/sf.root"]
@@ -28,7 +39,7 @@ def main():
     arguments_map = {}
 
     # Bkg sample
-    for sample_dir_path in [ x for x in all_samples if "WWW_" not in x and "_Run2017" not in x]:
+    for sample_dir_path in [ x for x in all_samples if "WWW_" not in x and "_Run2017" not in x and "tZq" not in x]:
         for tree in trees:
             sample_name = sample_dir_path.split("MAKER_")[1].split("_"+input_ntup_tag)[0] + "_" + tree
             samples_map[sample_name] = sample_dir_path
@@ -50,7 +61,14 @@ def main():
 
     # Data-driven fake sample
     for sample_dir_path in [ x for x in all_samples if "_Run2017" in x ]:
-        tree = "t_fakes"
+        tree = "t_ddfakes"
+        sample_name = sample_dir_path.split("MAKER_")[1].split("_"+input_ntup_tag)[0] + "_" + tree
+        samples_map[sample_name] = sample_dir_path
+        arguments_map[sample_name] = "{} {}".format("t_ss", tree)
+
+    # Electroweak subtraction in data-drivek fake estimate
+    for sample_dir_path in [ x for x in all_samples if "_Run2017" not in x and "tZq" not in x ]:
+        tree = "t_ewksubt"
         sample_name = sample_dir_path.split("MAKER_")[1].split("_"+input_ntup_tag)[0] + "_" + tree
         samples_map[sample_name] = sample_dir_path
         arguments_map[sample_name] = "{} {}".format("t_ss", tree)
