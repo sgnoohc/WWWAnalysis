@@ -45,17 +45,17 @@ def main():
 #            "BTCR2SFOSFull"
 #            ]
 
-    histnames = [
-            "SRSSeeFull",
-            "SRSSemFull",
-            "SRSSmmFull",
-            "SRSSSideeeFull",
-            "SRSSSideemFull",
-            "SRSSSidemmFull",
-            "SR0SFOSFull",
-            "SR1SFOSFull",
-            "SR2SFOSFull"
-            ]
+#    histnames = [
+#            "SRSSeeFull",
+#            "SRSSemFull",
+#            "SRSSmmFull",
+#            "SRSSSideeeFull",
+#            "SRSSSideemFull",
+#            "SRSSSidemmFull",
+#            "SR0SFOSFull",
+#            "SR1SFOSFull",
+#            "SR2SFOSFull"
+#            ]
 
 #    histnames = [
 #            "LXECRSSeeFull",
@@ -99,11 +99,11 @@ def main():
 #            "LXECRSSmmFull",
 #            ]
 
-#    histnames = [
+    histnames = [
 #            "LXECRARSSmmFull__ptcorretarolledcoarseemu",
-#            "LXECRARSSemFull__ptcorretarolledcoarseemu",
+            "LXECRARSSemFull__ptcorretarolledcoarseemu",
 #            "LXECRARSSeeFull__ptcorretarolledcoarseemu",
-#            ]
+            ]
 
     bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/lostlep.root") ]
     bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/photon.root")  ]
@@ -158,8 +158,8 @@ def main():
                 "bkg_sort_method": "unsorted",
                 "no_ratio": False,
                 "print_yield": True,
-                #"blind": True if "SR" in histnames[0] else False,
-                "blind": False,
+                "blind": True if "SR" in histnames[0] else False,
+                #"blind": False,
                 "lumi_value": "41.3",
                 }
     p.plot_hist(
