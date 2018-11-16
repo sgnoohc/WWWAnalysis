@@ -3,10 +3,37 @@
 from rooutil import rooutil as ru
 from rooutil import plottery_wrapper as p
 import glob
+import ROOT as r
+
+def get_histnames(fpath, region):
+
+    f = r.TFile(fpath)
+
+    rtn = []
+
+    for key in f.GetListOfKeys():
+        if region in str(key.GetName()) and "Full_cutflow" in str(key.GetName()):
+            name = str(key.GetName())
+            name = name.replace("_cutflow", "")
+            rtn.append(name)
+
+    return rtn;
+
+def region_index(s):
+    if "ee" in s and "Side" not in s: return 0
+    if "em" in s and "Side" not in s: return 1
+    if "mm" in s and "Side" not in s: return 2
+    if "ee" in s and "Side" in s: return 3
+    if "em" in s and "Side" in s: return 4
+    if "mm" in s and "Side" in s: return 5
+    if "0SFOS" in s: return 6
+    if "1SFOS" in s: return 7
+    if "2SFOS" in s: return 8
+    else: return 999
 
 def main():
 
-    output_dirpath = "outputs/WWW2017_analysis_v0.25.1"
+    output_dirpath = "outputs/WWW2017_analysis_v0.27.1"
     is2017 = "WWW2017" in output_dirpath
 
 #    histnames = [
@@ -99,16 +126,37 @@ def main():
 #            "LXECRSSmmFull",
 #            ]
 
-    histnames = [
+#    histnames = [
 #            "LXECRARSSmmFull__ptcorretarolledcoarseemu",
-            "LXECRARSSemFull__ptcorretarolledcoarseemu",
+#            "LXECRARSSemFull__ptcorretarolledcoarseemu",
 #            "LXECRARSSeeFull__ptcorretarolledcoarseemu",
-            ]
+#            ]
+
+#    histnames = [
+#            "ARSSSideeeFull__ptcorretarolledcoarseemu",
+#            ]
+
+#    histnames = [
+#            "WZCRSSeeFull",
+#            "WZCRSSemFull",
+#            "WZCRSSmmFull",
+#            "WZCR1SFOSFull",
+#            "WZCR2SFOSFull"
+#            ]
+
+    region = "GCR"
+    region = "LXECRSS"
+    region = "VBSCRSS"
+    region = "BTCR"
+    #region = "SR"
+    histnames = get_histnames(output_dirpath + "/signal.root", region)
+    histnames.sort(key=region_index)
 
     bkg_list_lostlep = [ x for x in glob.glob(output_dirpath+"/lostlep.root") ]
     bkg_list_photon  = [ x for x in glob.glob(output_dirpath+"/photon.root")  ]
     bkg_list_qflip   = [ x for x in glob.glob(output_dirpath+"/qflip.root")   ]
     bkg_list_ddfakes = [ x for x in glob.glob(output_dirpath+"/ddfakes.root") ]
+    bkg_list_ewksubt = [ x for x in glob.glob(output_dirpath+"/ewksubt.root") ]
     bkg_list_mcfakes = [ x for x in glob.glob(output_dirpath+"/fakes.root")   ]
     bkg_list_prompt  = [ x for x in glob.glob(output_dirpath+"/prompt.root")  ]
 
@@ -127,6 +175,7 @@ def main():
         h_photon  = ru.get_summed_histogram(bkg_list_photon  , histnames)
         h_qflip   = ru.get_summed_histogram(bkg_list_qflip   , histnames)
         h_fakes   = ru.get_summed_histogram(bkg_list_fakes   , histnames)
+        h_ewksubt = ru.get_summed_histogram(bkg_list_ewksubt , histnames)
         h_prompt  = ru.get_summed_histogram(bkg_list_prompt  , histnames)
         h_sig     = ru.get_summed_histogram(sig_list         , histnames)
         h_data    = ru.get_summed_histogram(data_list        , histnames)
@@ -135,9 +184,16 @@ def main():
         h_photon  = ru.get_yield_histogram(bkg_list_photon  , histnames)
         h_qflip   = ru.get_yield_histogram(bkg_list_qflip   , histnames)
         h_fakes   = ru.get_yield_histogram(bkg_list_fakes   , histnames)
+        h_ewksubt = ru.get_yield_histogram(bkg_list_ewksubt , histnames)
         h_prompt  = ru.get_yield_histogram(bkg_list_prompt  , histnames)
         h_sig     = ru.get_yield_histogram(sig_list         , histnames)
         h_data    = ru.get_yield_histogram(data_list        , histnames)
+
+    if bkg_list_fakes == bkg_list_ddfakes:
+        for i in xrange(1, h_ewksubt.GetNbinsX()+1):
+            if h_ewksubt.GetBinContent(i) > 0:
+                h_ewksubt.SetBinContent(i, 0)
+        h_fakes.Add(h_ewksubt)
 
     h_lostlep .SetName("Lost/three lep")
     h_photon  .SetName("#gamma#rightarrowlepton")

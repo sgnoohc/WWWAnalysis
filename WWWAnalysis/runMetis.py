@@ -26,7 +26,9 @@ def main():
     job_tag = "WWW{}_analysis_v0.22.1".format(data_year) # LXECR/LXECRAR only (ptcorremu rolled)
     job_tag = "WWW{}_analysis_v0.23.1".format(data_year) # Newer setCut (failed)
     job_tag = "WWW{}_analysis_v0.24.1".format(data_year) # Newer setCut (failed)
-    job_tag = "WWW{}_analysis_v0.25.1".format(data_year) # Newer setCut
+    job_tag = "WWW{}_analysis_v0.25.1".format(data_year) # Newer setCut (hasz messed up)
+    job_tag = "WWW{}_analysis_v0.26.1".format(data_year) # Newer setCut (hasz_ss sf messed up)
+    job_tag = "WWW{}_analysis_v0.27.1".format(data_year) # Newer setCut
     input_ntup_tag = "WWW2017_v4.0.5"
     base_dir_path = "/hadoop/cms/store/user/phchang/metis/wwwbaby/{}/".format(input_ntup_tag)
     tar_files = ["doAnalysis", "setup.sh", "scalefactors/*.root", "scalefactors/*/*/*/*/sf.root"]
