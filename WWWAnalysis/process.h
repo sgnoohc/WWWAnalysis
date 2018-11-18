@@ -75,54 +75,6 @@ bool passTrigger2016()
 }
 
 //_______________________________________________________________________________________________________
-int yield(int jes=0)
-{
-    int yield = -1;
-    if (www.nVlep() == 2)
-    {
-        float mjj = www.Mjj();
-        mjj = jes == 0 ? www.Mjj() : ((jes == 1) ? www.Mjj_up() : www.Mjj_dn());
-        if (fabs(mjj - 80.) < 15.)
-        {
-            if (www.passSSee()) yield = 0;
-            if (www.passSSem()) yield = 1;
-            if (www.passSSmm()) yield = 2;
-        }
-        else if (fabs(mjj - 80.) > 15.)
-        {
-            if (www.passSSee()) yield = 3;
-            if (www.passSSem()) yield = 4;
-            if (www.passSSmm()) yield = 5;
-        }
-    }
-    else
-    {
-        if (www.nSFOS() == 0) yield = 6;
-        if (www.nSFOS() == 1) yield = 7;
-        if (www.nSFOS() == 2) yield = 8;
-    }
-    return yield;
-}
-
-//_______________________________________________________________________________________________________
-int wzcryield()
-{
-    int yield = -1;
-    if (www.nj30() >= 2)
-    {
-        if (www.passSSee()) yield = 0;
-        if (www.passSSem()) yield = 1;
-        if (www.passSSmm()) yield = 2;
-    }
-    else if (www.nj() <= 1)
-    {
-        if (www.nSFOS() == 1) yield = 4;
-        if (www.nSFOS() == 2) yield = 5;
-    }
-    return yield;
-}
-
-//_______________________________________________________________________________________________________
 class LeptonScaleFactors
 {
     public:

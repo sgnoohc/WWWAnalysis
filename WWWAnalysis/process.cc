@@ -846,42 +846,42 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.addCutSyst("JESUp"  , {"jj", "MET", "Nj", "Nb", "VBF"});
         cutflow.addCutSyst("JESDown", {"jj", "MET", "Nj", "Nb", "VBF"});
 
-        cutflow.addWgtSyst("LepSFUp"    , [&]() { return www.lepsf_up()               / www.lepsf()                                                          ; } );
-        cutflow.addWgtSyst("LepSFDown"  , [&]() { return www.lepsf_dn()               / www.lepsf()                                                          ; } );
-        cutflow.addWgtSyst("TrigSFUp"   , [&]() { return www.trigsf_up()              / www.trigsf()                                                         ; } );
-        cutflow.addWgtSyst("TrigSFDown" , [&]() { return www.trigsf_dn()              / www.trigsf()                                                         ; } );
-        cutflow.addWgtSyst("BTagLFUp"   , [&]() { return www.weight_btagsf_light_DN() / www.weight_btagsf()                                                  ; } );
-        cutflow.addWgtSyst("BTagLFDown" , [&]() { return www.weight_btagsf_light_UP() / www.weight_btagsf()                                                  ; } );
-        cutflow.addWgtSyst("BTagHFUp"   , [&]() { return www.weight_btagsf_heavy_DN() / www.weight_btagsf()                                                  ; } );
-        cutflow.addWgtSyst("BTagHFDown" , [&]() { return www.weight_btagsf_heavy_UP() / www.weight_btagsf()                                                  ; } );
-        cutflow.addWgtSyst("PileupUp"   , [&]() { return www.purewgt_dn()             / www.purewgt()                                                        ; } );
-        cutflow.addWgtSyst("PileupDown" , [&]() { return www.purewgt_up()             / www.purewgt()                                                        ; } );
-        cutflow.addWgtSyst("PDFUp"      , [&]() { return www.weight_pdf_up()          / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.pdfup(); } );
-        cutflow.addWgtSyst("PDFDown"    , [&]() { return www.weight_pdf_down()        / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.pdfdn(); } );
-        cutflow.addWgtSyst("QsqUp"      , [&]() { return www.weight_fr_r2_f2()        / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.qsqup(); } );
-        cutflow.addWgtSyst("QsqDown"    , [&]() { return www.weight_fr_r0p5_f0p5()    / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.qsqdn(); } );
-        cutflow.addWgtSyst("AlphaSUp"   , [&]() { return www.weight_alphas_up()       / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsup(); } );
-        cutflow.addWgtSyst("AlphaSDown" , [&]() { return www.weight_alphas_down()     / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsdn(); } );
+        cutflow.addWgtSyst("LepSFUp"    , [&]() { return www.lepsf()           == 0                              ? 0 : www.lepsf_up()               / www.lepsf()                                                          ; } );
+        cutflow.addWgtSyst("LepSFDown"  , [&]() { return www.lepsf()           == 0                              ? 0 : www.lepsf_dn()               / www.lepsf()                                                          ; } );
+        cutflow.addWgtSyst("TrigSFUp"   , [&]() { return www.trigsf()          == 0                              ? 0 : www.trigsf_up()              / www.trigsf()                                                         ; } );
+        cutflow.addWgtSyst("TrigSFDown" , [&]() { return www.trigsf()          == 0                              ? 0 : www.trigsf_dn()              / www.trigsf()                                                         ; } );
+        cutflow.addWgtSyst("BTagLFUp"   , [&]() { return www.weight_btagsf()   == 0                              ? 0 : www.weight_btagsf_light_DN() / www.weight_btagsf()                                                  ; } );
+        cutflow.addWgtSyst("BTagLFDown" , [&]() { return www.weight_btagsf()   == 0                              ? 0 : www.weight_btagsf_light_UP() / www.weight_btagsf()                                                  ; } );
+        cutflow.addWgtSyst("BTagHFUp"   , [&]() { return www.weight_btagsf()   == 0                              ? 0 : www.weight_btagsf_heavy_DN() / www.weight_btagsf()                                                  ; } );
+        cutflow.addWgtSyst("BTagHFDown" , [&]() { return www.weight_btagsf()   == 0                              ? 0 : www.weight_btagsf_heavy_UP() / www.weight_btagsf()                                                  ; } );
+        cutflow.addWgtSyst("PileupUp"   , [&]() { return www.purewgt()         == 0                              ? 0 : www.purewgt_dn()             / www.purewgt()                                                        ; } );
+        cutflow.addWgtSyst("PileupDown" , [&]() { return www.purewgt()         == 0                              ? 0 : www.purewgt_up()             / www.purewgt()                                                        ; } );
+        cutflow.addWgtSyst("PDFUp"      , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.pdfup() == 0 ? 0 : www.weight_pdf_up()          / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.pdfup(); } );
+        cutflow.addWgtSyst("PDFDown"    , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.pdfdn() == 0 ? 0 : www.weight_pdf_down()        / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.pdfdn(); } );
+        cutflow.addWgtSyst("QsqUp"      , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.qsqup() == 0 ? 0 : www.weight_fr_r2_f2()        / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.qsqup(); } );
+        cutflow.addWgtSyst("QsqDown"    , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.qsqdn() == 0 ? 0 : www.weight_fr_r0p5_f0p5()    / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.qsqdn(); } );
+        cutflow.addWgtSyst("AlphaSUp"   , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.alsup() == 0 ? 0 : www.weight_alphas_up()       / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsup(); } );
+        cutflow.addWgtSyst("AlphaSDown" , [&]() { return www.weight_fr_r1_f1() == 0 or theoryweight.alsdn() == 0 ? 0 : www.weight_alphas_down()     / www.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsdn(); } );
 
         if (doFakeEstimation)
         {
             if (!is2017)
             {
-                cutflow.addWgtSyst("FakeUp"            , [&]() { return www.ffwgt_full_up()       / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeDown"          , [&]() { return www.ffwgt_full_dn()       / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateUp"        , [&]() { return www.ffwgt_up()            / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateDown"      , [&]() { return www.ffwgt_dn()            / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateElUp"      , [&]() { return www.ffwgt_el_up()         / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateElDown"    , [&]() { return www.ffwgt_el_dn()         / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateMuUp"      , [&]() { return www.ffwgt_mu_up()         / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeRateMuDown"    , [&]() { return www.ffwgt_mu_dn()         / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureUp"     , [&]() { return www.ffwgt_closure_up()    / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureDown"   , [&]() { return www.ffwgt_closure_dn()    / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureElUp"   , [&]() { return www.ffwgt_closure_el_up() / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureElDown" , [&]() { return www.ffwgt_closure_el_dn() / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureMuUp"   , [&]() { return www.ffwgt_closure_mu_up() / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureMuDown" , [&]() { return www.ffwgt_closure_mu_dn() / www.ffwgt(); } );
-                cutflow.addWgtSyst("FakeClosureMuDown" , [&]() { return www.ffwgt_closure_mu_dn() / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeUp"            , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_full_up()       / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeDown"          , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_full_dn()       / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateUp"        , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_up()            / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateDown"      , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_dn()            / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateElUp"      , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_el_up()         / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateElDown"    , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_el_dn()         / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateMuUp"      , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_mu_up()         / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeRateMuDown"    , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_mu_dn()         / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureUp"     , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_up()    / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureDown"   , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_dn()    / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureElUp"   , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_el_up() / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureElDown" , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_el_dn() / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureMuUp"   , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_mu_up() / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureMuDown" , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_mu_dn() / www.ffwgt(); } );
+                cutflow.addWgtSyst("FakeClosureMuDown" , [&]() { return www.ffwgt() == 0 ? 0 : www.ffwgt_closure_mu_dn() / www.ffwgt(); } );
             }
             else
             {

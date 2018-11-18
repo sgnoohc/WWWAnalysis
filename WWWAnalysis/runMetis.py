@@ -29,6 +29,11 @@ def main():
     job_tag = "WWW{}_analysis_v0.25.1".format(data_year) # Newer setCut (hasz messed up)
     job_tag = "WWW{}_analysis_v0.26.1".format(data_year) # Newer setCut (hasz_ss sf messed up)
     job_tag = "WWW{}_analysis_v0.27.1".format(data_year) # Newer setCut
+    job_tag = "WWW{}_analysis_v0.28.1".format(data_year) # Newer histogramming
+    job_tag = "WWW{}_analysis_v0.29.1".format(data_year) # NaN problem fixed
+    job_tag = "WWW{}_analysis_v0.30.1".format(data_year) # Exclude WZ_Tune
+    job_tag = "WWW{}_analysis_v0.31.1".format(data_year) # Sumw2 fixed on cutflow histograms
+    job_tag = "WWW{}_analysis_v0.32.1".format(data_year) # Sumw2 fixed on cutflow histograms
     input_ntup_tag = "WWW2017_v4.0.5"
     base_dir_path = "/hadoop/cms/store/user/phchang/metis/wwwbaby/{}/".format(input_ntup_tag)
     tar_files = ["doAnalysis", "setup.sh", "scalefactors/*.root", "scalefactors/*/*/*/*/sf.root"]
@@ -69,19 +74,11 @@ def main():
         arguments_map[sample_name] = "{} {}".format("t_ss", tree)
 
     # Electroweak subtraction in data-drivek fake estimate
-    for sample_dir_path in [ x for x in all_samples if "_Run2017" not in x and "tZq" not in x ]:
+    for sample_dir_path in [ x for x in all_samples if "_Run2017" not in x and "tZq" not in x]:
         tree = "t_ewksubt"
         sample_name = sample_dir_path.split("MAKER_")[1].split("_"+input_ntup_tag)[0] + "_" + tree
         samples_map[sample_name] = sample_dir_path
         arguments_map[sample_name] = "{} {}".format("t_ss", tree)
-
-#    keys = samples_map.keys()
-#    keys.sort()
-#
-#    for key in keys:
-#        print key
-#        print arguments_map[key]
-#        print samples_map[key]
 
     ru.submit_metis(job_tag, samples_map, arguments_map=arguments_map, tar_files=tar_files, hadoop_dirname=hadoop_dirname, files_per_output=1, globber="merged/*.root")
 
