@@ -10,7 +10,7 @@ As of Nov. 2018, latest 2017 ntuple baby is:
 
 ## Quick start
 
-    git clone --recurse-submodules -j8 git@github.com:sgnoohc/WWWAnalysis.git
+    git clone --recurse-submodules git@github.com:sgnoohc/WWWAnalysis.git
     cd WWWAnalysis/WWWAnalysis/
     source setup.sh
     make clean
