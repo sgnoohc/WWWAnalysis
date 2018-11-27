@@ -172,7 +172,7 @@ done
 ####################
 # II. Now launch 36 core jobs (if you wish to change the number of cores running, change the number in the rooutil.xargs.sh)
 ####################
-sh rooutil/xargs.sh .jobs.txt
+time sh rooutil/xargs.sh .jobs.txt
 
 
 
