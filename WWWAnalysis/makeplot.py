@@ -14,19 +14,18 @@ from rooutil import plottery_wrapper as p
 import glob
 import ROOT as r
 
-output_dirpath = "outputs/WWW2017_analysis_v0.43.1"
-output_dirpath = "outputs/WWW2017_v4.0.5"
+output_dirpath = "outputs/WWW2017_v4.0.5/test1"
 is2017 = "WWW2017" in output_dirpath
 
 def main():
-#    plot()
+    plot()
 #    study_wz()
-    oscr()
+#    oscr()
 
 def plot():
 
     # Regions to plot
-    region = "WZCR"
+    region = "SR"
     use_data_driven_fakes = True
 
     # Bkg stack order
@@ -35,18 +34,6 @@ def plot():
 
     histnames = get_histnames(output_dirpath + "/signal.root", region)
     histnames.sort(key=region_index)
-
-    histnames = [
-            "SRSSeeFull(7)",
-            "SRSSemFull(7)",
-            "SRSSmmFull(7)",
-            "SR1SFOSFull(7)",
-            "SR2SFOSFull(7)",
-            ]
-
-    histnames = [
-            "WZCRSSmm__nvtx",
-            ]
 
     hists = get_hists(histnames, use_data_driven_fakes)
 
@@ -62,8 +49,8 @@ def plot():
                 "bkg_sort_method": "unsorted",
                 "no_ratio": False,
                 "print_yield": True,
-                #"blind": True if "SR" in histnames[0] else False,
-                "blind": False,
+                "blind": True if "SR" in histnames[0] else False,
+                #"blind": False,
                 "lumi_value": "41.3",
                 }
 
