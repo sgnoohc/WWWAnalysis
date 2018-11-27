@@ -20,22 +20,13 @@ CXXFLAGS  += $(ROOTCFLAGS)
 CFLAGS     = $(ROOTCFLAGS) -Wall -Wno-unused-function -g -O2 -fPIC -fno-var-tracking
 EXTRAFLAGS = -fPIC -ITMultiDrawTreePlayer -Wunused-variable -lTMVA -lEG -lGenVector -lXMLIO -lMLP -lTreePlayer
 
-.PHONY: check-env
+#.PHONY: check-env
 
-$(EXE): $(OBJECTS) wwwtree.o check-env
+$(EXE): $(OBJECTS) wwwtree.o
 	$(LD) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(ROOTLIBS) $(EXTRAFLAGS) -o $@
 
 %.o: %.cc
 	$(CC) $(CFLAGS) $< -c
 
-wwwtree.cc:
-	echo remaking tree class
-	sh rooutil/makeclass.sh -f -x  t wwwtree tas www
-
 clean:
 	rm -f *.o $(EXE)
-
-check-env:
-ifndef TEMPLATE_TREE_PATH
-  $(error TEMPLATE_TREE_PATH is not set. Please set via '>>> export TEMPLATE_TREE_PATH=/path/to/template.root)'
-endif
