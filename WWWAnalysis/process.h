@@ -399,4 +399,19 @@ class TheoryWeight
         float& qsqdn()   { return qsqdn_  ; }
 };
 
+//_______________________________________________________________________________________________________
+class PileupReweight
+{
+    public:
+        RooUtil::HistMap* histmap_purwegt;
+        PileupReweight()
+        {
+            histmap_purwegt = new RooUtil::HistMap("scalefactors/puw_2017.root:puw_central");
+        }
+        float purewgt()
+        {
+            return histmap_purwegt->eval(www.nTrueInt());
+        }
+};
+
 #endif

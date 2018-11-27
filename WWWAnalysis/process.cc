@@ -1,7 +1,7 @@
 #include "process.h"
 
 //_______________________________________________________________________________________________________
-int process(const char* input_paths, const char* input_tree_name, const char* output_file_name, int nEvents)
+int process(const char* input_paths, const char* input_tree_name, const char* output_file_name, int nEvents, TString regions)
 {
     // Creating output file where we will put the outputs of the processing
     TFile* ofile = new TFile(output_file_name, "recreate");
@@ -14,33 +14,38 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     RooUtil::Looper<wwwtree> looper(ch, &www, nEvents);
 
     // Some case-by-case checking needed for WWW_v1.2.2 (should be no longer necessary later on)
-    bool is2017 = TString(input_paths).Contains("WWW2017");
+    bool is2017 = TString(input_paths).Contains("2017");
     bool isWWW = TString(input_paths).Contains("www_2l_");
 
     // For fake estimations, we use data-driven method.
     // When looping over data and the output_path is set to have a "fakes" substring included we turn on the fake-weight settings
-    const bool doSystematics = not TString(input_paths).Contains("data_");
+//    const bool doSystematics = not TString(input_paths).Contains("data_");
+    const bool doSystematics = false;
     bool doFakeEstimation = TString(output_file_name).Contains("ddfakes") or TString(output_file_name).Contains("ewksubt");
     bool doEwkSubtraction = TString(output_file_name).Contains("ewksubt");
-    bool isData = TString(input_paths).Contains("data_");
+    bool isData = TString(input_paths).Contains("data_") || TString(input_paths).Contains("Run2017");
+
+    std::cout <<  " Printing configuration " << std::endl;
+    std::cout <<  " is2017: " << is2017 <<  std::endl;
+    std::cout <<  " isWWW: " << isWWW <<  std::endl;
+    std::cout <<  " doSystematics: " << doSystematics <<  std::endl;
+    std::cout <<  " doFakeEstimation: " << doFakeEstimation <<  std::endl;
+    std::cout <<  " doEwkSubtraction: " << doEwkSubtraction <<  std::endl;
+    std::cout <<  " isData: " << isData <<  std::endl;
+    std::cout <<  " input_paths: " << input_paths <<  std::endl;
+    std::cout <<  " output_file_name: " << output_file_name <<  std::endl;
 
     // Scale factors tools
     LeptonScaleFactors leptonScaleFactors;
     FakeRates fakerates;
     TheoryWeight theoryweight;
+    PileupReweight pileupreweight;
 
     // Luminosity setting
     float lumi = isData ? 1 : (is2017 == 1 ? 41.3 : 35.9);
 
     // Cutflow utility object that creates a tree structure of cuts
     RooUtil::Cutflow cutflow(ofile);
-
-    // Remove to filter
-//    cutflow.removeCut("CutSRDilep");
-//    cutflow.removeCut("CutWZCRDilep");
-//    cutflow.removeCut("CutWZCRTrilep");
-//    cutflow.removeCut("SR0SFOS");
-//    cutflow.removeCut("SR2SFOS");
 
     // Histogram utility object that is used to define the histograms
     RooUtil::Histograms histograms;
@@ -105,6 +110,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     bool isfaketrilep;
     bool iswzcrtrilep;
     bool isfakewzcrtrilep;
+    bool osdileppresel;
     float ee_sf, em_sf, mm_sf, threelep_sf;
     float btag_sf;
     float trig_sf;
@@ -126,6 +132,8 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.addCutToLastActiveCut("CutARDilep"    , [&]() { return isfakedilep                                                  ; } , [&]() { return 1                                  ; } );
     cutflow.getCut("CutTrigger");
     cutflow.addCutToLastActiveCut("CutARTrilep"   , [&]() { return isfaketrilep                                                 ; } , [&]() { return 1                                  ; } );
+    cutflow.getCut("CutPresel");
+    cutflow.addCutToLastActiveCut("CutOSDilep"    , [&]() { return osdileppresel                                                ; } , [&]() { return 1                                  ; } );
 
     // Same-sign Mjj on-W region
     cutflow.getCut("CutSRDilep");
@@ -839,6 +847,43 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     cutflow.addCutToLastActiveCut("LXEARCRSSeeMllSS"      , [&]() { return www.MllSS()>40.                                                    ; }        , [&]() { return 1                     ; } ) ;
     cutflow.addCutToLastActiveCut("LXEARCRSSeeFull"       , [&]() { return 1                                                                  ; }        , [&]() { return 1                     ; } ) ;
 
+    // Same-sign Mjj on-W region
+    cutflow.getCut("CutOSDilep");
+    cutflow.addCutToLastActiveCut("OSCRmm"                , [&]() { return (www.lep_pdgId()[0]*www.lep_pdgId()[1]==-169)*(www.MllSS()>40.)    ; }        , [&]() { return mm_sf                 ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmTVeto"           , [&]() { return www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0                   ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmNj2"             , [&]() { return www.nj30()>= 2                                                     ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmNb0"             , [&]() { return www.nb()==0                                                        ; }        , [&]() { return btag_sf               ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmMjjW"            , [&]() { return fabs(www.Mjj()-80.)<15.                                            ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmMjjL"            , [&]() { return www.MjjL()<400.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmDetajjL"         , [&]() { return www.DetajjL()<1.5                                                  ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmMET"             , [&]() { return 1.                                                                 ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmMllSS"           , [&]() { return www.MllSS()>40.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRmmFull"            , [&]() { return 1                                                                  ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.getCut("CutOSDilep")                                                                                                              ;
+    cutflow.addCutToLastActiveCut("OSCRem"                , [&]() { return (www.lep_pdgId()[0]*www.lep_pdgId()[1]==-143)*(www.MllSS()>30.)    ; }        , [&]() { return em_sf                 ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemTVeto"           , [&]() { return www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0                   ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemNj2"             , [&]() { return www.nj30()>= 2                                                     ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemNb0"             , [&]() { return www.nb()==0                                                        ; }        , [&]() { return btag_sf               ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemMjjW"            , [&]() { return fabs(www.Mjj()-80.)<15.                                            ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemMjjL"            , [&]() { return www.MjjL()<400.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemDetajjL"         , [&]() { return www.DetajjL()<1.5                                                  ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemMET"             , [&]() { return www.met_pt()>60.                                                   ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemMllSS"           , [&]() { return www.MllSS()>30.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemMTmax"           , [&]() { return www.MTmax()>90.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCRemFull"            , [&]() { return 1                                                                  ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.getCut("CutOSDilep")                                                                                                              ;
+    cutflow.addCutToLastActiveCut("OSCRee"                , [&]() { return (www.lep_pdgId()[0]*www.lep_pdgId()[1]==-121)*(1)*(www.MllSS()>40.); }        , [&]() { return ee_sf                 ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeZeeVt"           , [&]() { return fabs(www.MllSS()-91.1876)>10.                                      ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeTVeto"           , [&]() { return www.nisoTrack_mt2_cleaned_VVV_cutbased_veto()==0                   ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeNj2"             , [&]() { return www.nj30()>= 2                                                     ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeNb0"             , [&]() { return www.nb()==0                                                        ; }        , [&]() { return btag_sf               ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeMjjW"            , [&]() { return fabs(www.Mjj()-80.)<15.                                            ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeMjjL"            , [&]() { return www.MjjL()<400.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeDetajjL"         , [&]() { return www.DetajjL()<1.5                                                  ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeMET"             , [&]() { return www.met_pt()>60.                                                   ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeMllSS"           , [&]() { return www.MllSS()>40.                                                    ; }        , [&]() { return 1                     ; } ) ;
+    cutflow.addCutToLastActiveCut("OSCReeFull"            , [&]() { return 1                                                                  ; }        , [&]() { return 1                     ; } ) ;
+
     // Systematics
     if (doSystematics)
     {
@@ -1090,6 +1135,18 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmMET"                 , "JESUp"   , [&]() { return www.met_up_pt()<60.                                   ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSemMET"                 , "JESUp"   , [&]() { return www.met_up_pt()<60.                                   ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSeeMET"                 , "JESUp"   , [&]() { return www.met_up_pt()<60. and fabs(www.MllSS()-91.1876)>10. ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMET"                      , "JESUp"   , [&]() { return 1.                                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMjjW"                     , "JESUp"   , [&]() { return fabs(www.Mjj_up()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMjjL"                     , "JESUp"   , [&]() { return www.MjjL_up()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmDetajjL"                  , "JESUp"   , [&]() { return www.DetajjL_up()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMjjW"                     , "JESUp"   , [&]() { return fabs(www.Mjj_up()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMjjL"                     , "JESUp"   , [&]() { return www.MjjL_up()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemDetajjL"                  , "JESUp"   , [&]() { return www.DetajjL_up()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMET"                      , "JESUp"   , [&]() { return www.met_up_pt()>60.                                   ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMjjW"                     , "JESUp"   , [&]() { return fabs(www.Mjj_up()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMjjL"                     , "JESUp"   , [&]() { return www.MjjL_up()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeDetajjL"                  , "JESUp"   , [&]() { return www.DetajjL_up()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMET"                      , "JESUp"   , [&]() { return www.met_up_pt()>60.                                   ;} , [&]() { return 1 ;} );
 
         cutflow.setCutSyst("SRSSmmMET"                      , "JESDown" , [&]() { return 1.                                                    ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("SRSSmmMjjW"                     , "JESDown" , [&]() { return fabs(www.Mjj_dn()-80.)<15.                            ;} , [&]() { return 1 ;} );
@@ -1271,6 +1328,18 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmMET"                 , "JESDown" , [&]() { return www.met_dn_pt()<60.                                   ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSemMET"                 , "JESDown" , [&]() { return www.met_dn_pt()<60.                                   ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSeeMET"                 , "JESDown" , [&]() { return www.met_dn_pt()<60. and fabs(www.MllSS()-91.1876)>10. ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMET"                      , "JESDown" , [&]() { return 1.                                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMjjW"                     , "JESDown" , [&]() { return fabs(www.Mjj_dn()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmMjjL"                     , "JESDown" , [&]() { return www.MjjL_dn()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmDetajjL"                  , "JESDown" , [&]() { return www.DetajjL_dn()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMjjW"                     , "JESDown" , [&]() { return fabs(www.Mjj_dn()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMjjL"                     , "JESDown" , [&]() { return www.MjjL_dn()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemDetajjL"                  , "JESDown" , [&]() { return www.DetajjL_dn()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemMET"                      , "JESDown" , [&]() { return www.met_dn_pt()>60.                                   ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMjjW"                     , "JESDown" , [&]() { return fabs(www.Mjj_dn()-80.)<15.                            ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMjjL"                     , "JESDown" , [&]() { return www.MjjL_dn()<400.                                    ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeDetajjL"                  , "JESDown" , [&]() { return www.DetajjL_dn()<1.5                                  ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeMET"                      , "JESDown" , [&]() { return www.met_dn_pt()>60.                                   ;} , [&]() { return 1 ;} );
 
         cutflow.setCutSyst("SRSSmmNj2"                      , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("SRSSemNj2"                      , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
@@ -1332,6 +1401,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmNj2"                 , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSemNj2"                 , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSeeNj2"                 , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmNj2"                      , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemNj2"                      , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeNj2"                      , "JESUp"   , [&]() { return www.nj30_up()>= 2                                     ;} , [&]() { return 1 ;} );
 
         cutflow.setCutSyst("SRSSmmNj2"                      , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("SRSSemNj2"                      , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
@@ -1393,6 +1465,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmNj2"                 , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSemNj2"                 , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
         cutflow.setCutSyst("LXEARCRSSeeNj2"                 , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRmmNj2"                      , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCRemNj2"                      , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
+        cutflow.setCutSyst("OSCReeNj2"                      , "JESDown" , [&]() { return www.nj30_dn()>= 2                                     ;} , [&]() { return 1 ;} );
 
         cutflow.setCutSyst("SRSSmmNb0"                      , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("SRSSemNb0"                      , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
@@ -1454,6 +1529,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmNb0"                 , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("LXEARCRSSemNb0"                 , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("LXEARCRSSeeNb0"                 , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCRmmNb0"                      , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCRemNb0"                      , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCReeNb0"                      , "JESUp"   , [&]() { return www.nb_up()==0                                        ;} , [&]() { return btag_sf ;} );
 
         cutflow.setCutSyst("SRSSmmNb0"                      , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("SRSSemNb0"                      , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
@@ -1515,13 +1593,43 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         cutflow.setCutSyst("LXEARCRSSmmNb0"                 , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("LXEARCRSSemNb0"                 , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
         cutflow.setCutSyst("LXEARCRSSeeNb0"                 , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCRmmNb0"                      , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCRemNb0"                      , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
+        cutflow.setCutSyst("OSCReeNb0"                      , "JESDown" , [&]() { return www.nb_dn()==0                                        ;} , [&]() { return btag_sf ;} );
     }
+
+    if (regions.EqualTo("all"))
+    {
+        // Because I named the end cuts to be "Full" for every one of them, I can use this fact to filter out a chunk more easily
+        // {"SRSSeeFull", "SRSSemFull", .... }
+        // --> {"SRSSee", "SRSSem", .... }
+        std::vector<TString> endcuts = cutflow.cuttree.getEndCuts();
+        std::vector<TString> list_of_cuts;
+        for (auto& endcut : endcuts)
+            list_of_cuts.push_back(endcut.ReplaceAll("Full", ""));
+        // Now replace with "SRSSee,SRSSem,SRSSmm,..."
+        regions = RooUtil::StringUtil::join(list_of_cuts);
+    }
+
+    if (not regions.IsNull()) cutflow.filterCuts(RooUtil::StringUtil::split(regions, ","));
 
     // Now book cutflows
     cutflow.bookCutflows();
 
-    // Now book histograms at the end of each cut structures (the CutTree nodes that terminates)
-    cutflow.bookHistogramsForEndCuts(histograms);
+    // Histogram booking is dependent on whether you ask for certain regions
+    if (not regions.IsNull())
+    {
+        // book histogram from the requested region and below
+        for (auto& region : RooUtil::StringUtil::split(regions, ","))
+        {
+            cutflow.bookHistogramsForCutAndBelow(histograms, region);
+        }
+    }
+    else
+    {
+        // Now book histograms at the end of each cut structures (the CutTree nodes that terminates)
+        cutflow.bookHistogramsForEndCuts(histograms);
+    }
 
     // Print the cut structure for review
     cutflow.printCuts();
@@ -1534,6 +1642,9 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
     while (looper.nextEvent())
     {
 
+        // PureWgt
+        float purewgt = (is2017 == 1) ? pileupreweight.purewgt() : www.purewgt();
+
         // Fake factor weights
         ffwgt = 1;
         if (doFakeEstimation)
@@ -1541,6 +1652,7 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
             ffwgt = is2017 == 1 ? fakerates.getFakeFactor() : www.ffwgt();
             if (doEwkSubtraction && !www.bkgtype().EqualTo("fakes")) ffwgt *= -1; // subtracting non-fakes
             if (doEwkSubtraction &&  www.bkgtype().EqualTo("fakes")) ffwgt *=  0; // do not subtract fakes
+            if (!doEwkSubtraction) purewgt = 1;
         }
 
         // Compute preselection
@@ -1549,12 +1661,14 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         presel &= (www.Flag_AllEventFilters() >  0);
         presel &= (www.vetophoton()           == 0);
         presel &= (www.evt_passgoodrunlist()  >  0);
+        presel &= (www.nVlep()                >= 2);
+        presel &= (www.nLlep()                >= 2);
 
         // Compute trigger variable (TODO for 2016 baby, the tertiary statement may be outdated)
         trigger = is2017 == 1 ? www.passTrigger() * www.pass_duplicate_ee_em_mm() : passTrigger2016();
 
         // Event weight
-        weight = (isData and !doFakeEstimation) ? 1 : www.evt_scale1fb() * www.purewgt() * lumi * ffwgt;
+        weight = (isData and !doFakeEstimation) ? 1 : www.evt_scale1fb() * purewgt * lumi * ffwgt;
         if (isWWW and !is2017) weight *= 1.0384615385; // NLO cross section v. MadGraph cross section
 
         // Lepton counter to define dilep or trilep region
@@ -1564,6 +1678,8 @@ int process(const char* input_paths, const char* input_tree_name, const char* ou
         isfaketrilep     = (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 2);
         iswzcrtrilep     = (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 3);
         isfakewzcrtrilep = (www.nVlep() == 3) * (www.nLlep() == 3) * (www.nTlep() == 2);
+        osdileppresel    = (www.mc_HLT_DoubleEl()||www.mc_HLT_DoubleMu()||www.mc_HLT_MuEG())*(www.nVlep()==2)*(www.nLlep()==2)*(www.nTlep()==2);
+
 
         // Compute the scale factors
         std::tie(ee_sf, em_sf, mm_sf, threelep_sf) = leptonScaleFactors.getScaleFactors(is2017, doFakeEstimation, isData);
@@ -1611,6 +1727,7 @@ int help()
     std::cout << "  INPUTTREENAME   tree name in the file" << std::endl;
     std::cout << "  OUTPUTFILE      output file name" << std::endl;
     std::cout << "  [NEVENTS=-1]    # of events to run over" << std::endl;
+    std::cout << "  [REGIONS]       comma separated regions" << std::endl;
     std::cout << std::endl;
     return 1;
 }
@@ -1620,11 +1737,15 @@ int main(int argc, char** argv)
 {
     if (argc == 4)
     {
-        return process(argv[1], argv[2], argv[3], -1);
+        return process(argv[1], argv[2], argv[3], -1, "");
     }
     else if (argc == 5)
     {
-        return process(argv[1], argv[2], argv[3], atoi(argv[4]));
+        return process(argv[1], argv[2], argv[3], atoi(argv[4]), "");
+    }
+    else if (argc == 6)
+    {
+        return process(argv[1], argv[2], argv[3], atoi(argv[4]), argv[5]);
     }
     else
     {

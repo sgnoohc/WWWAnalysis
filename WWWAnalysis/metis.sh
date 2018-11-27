@@ -45,6 +45,7 @@ else
     SCRAMARCH=$6
     TREENAME=$7
     BABYMODE=$8
+    FILTER=$9
     if [ "x${_CONDOR_SLOT}" == "x" ]; then
         WORKDIR=/tmp/phchang_condor_local_${OUTPUTDIR//\//_}_${OUTPUTNAME}_${IFILE}
         mkdir -p ${WORKDIR}
@@ -65,7 +66,8 @@ else
     echo "SCRAMARCH     : $6"
     echo "TREENAME      : $7"
     echo "BABYMODE      : $8"
-    shift 8
+    echo "FILTER        : $9"
+    shift 9
     md5sum package.tar.gz
     tar xvzf package.tar.gz
     if [ $? -eq 0 ]; then
@@ -84,8 +86,8 @@ echo ">>> ls -l"
 ls -l
 echo ">>> export COREDIR=$PWD/CORE/"
 export COREDIR=$PWD/CORE/
-echo ">>> ./doAnalysis ${INPUTFILENAMES} ${TREENAME} ${BABYMODE}_output.root -1"
-./doAnalysis ${INPUTFILENAMES} ${TREENAME} ${BABYMODE}_output.root -1
+echo ">>> ./doAnalysis ${INPUTFILENAMES} ${TREENAME} ${BABYMODE}_output.root -1 ${FILTER}"
+./doAnalysis ${INPUTFILENAMES} ${TREENAME} ${BABYMODE}_output.root -1 ${FILTER}
 
 mv ${BABYMODE}_output.root output.root
 

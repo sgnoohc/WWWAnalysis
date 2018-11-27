@@ -2,6 +2,7 @@
 
 if [ -z $1 ]; then
     echo "EXAMPLE: sh hadd.sh v1.0.9"
+    exit
 fi
 
 VERSION=$1

@@ -7,3 +7,5 @@ cd - > /dev/null
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export LD_LIBRARY_PATH=$DIR:$LD_LIBRARY_PATH
+
+export TEMPLATE_TREE_PATH=/hadoop/cms/store/user/phchang/metis/wwwbaby/OS2017_v4.0.5/MAKER_ZZZ_TuneCP5_13TeV-amcatnlo-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_OS2017_v4.0.5/output_1.root
